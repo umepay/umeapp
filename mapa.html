@@ -183,7 +183,11 @@ async function init(){
       const gj=await r.json();
       const capa=agregarCapa(gj,c.clase,c.nombre,overlays,c.visible);
       cargadas++;
-      if(c.clase==='parcela'){ const b=capa.getBounds(); if(b.isValid()) bounds=b; }
+      if(c.clase==='parcela'){
+        const ume=L.geoJSON(gj,{filter:f=>String((f.properties||{}).Umepay||'').trim().toLowerCase()==='si'});
+        const b=ume.getBounds();
+        bounds = b.isValid()? b : capa.getBounds();
+      }
     }catch(e){ /* capa todavia no subida */ }
   }
   if(cargadas===0){
@@ -195,7 +199,7 @@ async function init(){
     bounds=L.geoJSON(MUESTRA_PARCELAS).getBounds();
   }
   L.control.layers(null,overlays,{collapsed:false}).addTo(map);
-  if(bounds && bounds.isValid()) map.fitBounds(bounds.pad(0.2));
+  if(bounds && bounds.isValid()) map.fitBounds(bounds.pad(0.05),{maxZoom:16});
 }
 
 // ---- Datos de muestra ----
