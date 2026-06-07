@@ -16,13 +16,20 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .btn-back{color:#9ecfb0;font-size:22px;cursor:pointer;background:none;border:none;padding:0;text-decoration:none}
 #map{flex:1;background:#cdd9cd}
 .aviso{background:#faeeda;color:#854f0b;font-size:12px;padding:7px 16px;display:none}
-.leyenda{background:#f5f5f0;padding:9px 16px;display:flex;gap:14px;flex-wrap:wrap;font-size:12px;align-items:center;border-top:0.5px solid #e0e0d8}
+.leyenda{background:#f5f5f0;font-size:12px;border-top:0.5px solid #e0e0d8}
+.leyenda summary{padding:9px 16px;cursor:pointer;font-weight:500;color:#2d5a3d;list-style:none}
+.leyenda summary::-webkit-details-marker{display:none}
+.leyenda summary::before{content:'▸ ';font-size:11px}
+.leyenda[open] summary::before{content:'▾ '}
+.items{padding:0 16px 10px;display:flex;flex-direction:column;gap:8px}
+.grp{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.glabel{font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.4px;width:100%}
 .ll{display:inline-flex;align-items:center;gap:6px}
 .sw{width:16px;height:12px;border-radius:2px;display:inline-block}
 .sw.ume{background:#2d5a3d52;border:1.6px solid #2d5a3d}
-.sw.fuera{background:#9a9e931f;border:1.6px solid #9a9e93}
 .sw.sinreg{background:#2d5a3d29;border:1.6px dashed #2d5a3d}
-.sw.agua{width:12px;height:12px;border-radius:50%;background:#1d6fb8;border:2px solid #fff;box-shadow:0 0 0 1px #1d6fb8}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.2)}
+.line{width:18px;border-top:3px solid;display:inline-block}
 .popup b{font-size:15px;color:#2d5a3d;display:block;margin-bottom:4px}
 .popup .row{font-size:13px;padding:1px 0}
 .popup .k{color:#888}
@@ -37,12 +44,28 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 </div>
 <div id="aviso" class="aviso"></div>
 <div id="map"></div>
-<div class="leyenda">
-  <span class="ll"><span class="sw ume"></span> Umepay</span>
-  <span class="ll"><span class="sw fuera"></span> Fuera de Umepay</span>
-  <span class="ll"><span class="sw sinreg"></span> Sin registrar</span>
-  <span class="ll"><span class="sw agua"></span> Red de agua</span>
-</div>
+<details class="leyenda">
+  <summary>Referencias</summary>
+  <div class="items">
+    <div class="grp"><span class="glabel">Parcelas</span>
+      <span class="ll"><span class="sw ume"></span> Umepay</span>
+      <span class="ll"><span class="sw sinreg"></span> Sin registrar</span>
+    </div>
+    <div class="grp"><span class="glabel">Red de agua</span>
+      <span class="ll"><span class="dot" style="background:#2e9e54"></span> Tanque acopio</span>
+      <span class="ll"><span class="dot" style="background:#e24b4a"></span> Tanque casa</span>
+      <span class="ll"><span class="dot" style="background:#1d6fb8"></span> Tanque distribución</span>
+      <span class="ll"><span class="line" style="border-color:#6f42c1"></span> Manguera 1"</span>
+      <span class="ll"><span class="line" style="border-color:#e24b4a"></span> Manguera 1/2"</span>
+      <span class="ll"><span class="line" style="border-color:#22b8cf"></span> Manguera 3/4"</span>
+    </div>
+    <div class="grp"><span class="glabel">Otras capas</span>
+      <span class="ll"><span class="line" style="border-color:#8a5a2b"></span> Calles internas</span>
+      <span class="ll"><span class="line" style="border-color:#2b7bba"></span> Cursos de agua</span>
+      <span class="ll"><span class="line" style="border-color:#e67e22"></span> Ruta provincial</span>
+    </div>
+  </div>
+</details>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -52,15 +75,13 @@ const CENTRO = [-31.8543, -64.7210];
 // Si lo dejas vacio, el boton no aparece.
 const FORM_URL = '';
 
-// Capas a cargar desde data/. visible:false = arranca apagada pero se puede prender.
 const CAPAS = [
-  {archivo:'data/parcelas.geojson',            nombre:'Parcelas',                       clase:'parcela',  visible:true},
-  {archivo:'data/lineas.geojson',              nombre:'Red de agua (caños)',            clase:'aguaLinea',visible:true},
-  {archivo:'data/puntos.geojson',              nombre:'Red de agua (tanques/válvulas)', clase:'aguaPunto',visible:true},
-  {archivo:'data/ejes_calles_int.geojson',     nombre:'Calles internas',                clase:'calle',    visible:true},
-  {archivo:'data/Cursos_de_agua_2021.geojson', nombre:'Cursos de agua',                 clase:'curso',    visible:false},
-  {archivo:'data/red_vial_nacional.geojson',   nombre:'Ruta nacional',                  clase:'vialNac',  visible:false},
-  {archivo:'data/red_vial_provincial.geojson', nombre:'Ruta provincial',                clase:'vialProv', visible:false}
+  {archivo:'data/parcelas.geojson',            nombre:'Parcelas',                 clase:'parcela',  visible:true},
+  {archivo:'data/lineas.geojson',              nombre:'Red de agua (mangueras)',  clase:'aguaLinea',visible:true},
+  {archivo:'data/puntos.geojson',              nombre:'Red de agua (tanques)',    clase:'aguaPunto',visible:true},
+  {archivo:'data/ejes_calles_int.geojson',     nombre:'Calles internas',          clase:'calle',    visible:true},
+  {archivo:'data/Cursos_de_agua_2021.geojson', nombre:'Cursos de agua',           clase:'curso',    visible:false},
+  {archivo:'data/red_vial_provincial.geojson', nombre:'Ruta provincial',          clase:'vialProv', visible:false}
 ];
 
 const map = L.map('map').setView(CENTRO, 16);
@@ -77,21 +98,30 @@ function estiloParcela(f){
   return {color:base, weight:1.6, dashArray:registrado?null:'5,4',
           fillColor:base, fillOpacity:esUmepay?0.32:0.12};
 }
-function colorAgua(cod){
-  cod=(cod||'').toLowerCase();
-  if(cod.includes('valv')) return '#e24b4a';
-  if(cod.includes('bomba')) return '#7f77dd';
-  if(cod.includes('gener')) return '#ba7517';
-  if(cod.includes('tanq')) return '#1d6fb8';
-  if(cod.includes('camino')) return '#9a9e93';
-  if(cod.includes('1/2')) return '#79c3e8';
-  if(cod.includes('3/4')) return '#3aa0d6';
+// Busca el valor de categoria del relevamiento en los nombres de campo mas comunes
+function valCat(p){
+  if(!p) return '';
+  return p.codigo||p.Codigo||p.tipo||p.Tipo||p.Cat||p.cat||p.Categoria||p.categoria||'';
+}
+function colorAgua(v){
+  v=String(v||'').trim().toLowerCase();
+  if(v.includes('acopio')) return '#2e9e54';   // tanque acopio - verde
+  if(v.includes('casa'))   return '#e24b4a';   // tanque casa - rojo
+  if(v.includes('distrib'))return '#1d6fb8';   // tanque distribucion - azul
+  if(v.includes('valv'))   return '#e24b4a';
+  if(v.includes('bomba'))  return '#7f77dd';
+  if(v.includes('gener'))  return '#ba7517';
+  if(v.includes('1/2'))    return '#e24b4a';   // manguera 1/2 - rojo
+  if(v.includes('3/4'))    return '#22b8cf';   // manguera 3/4 - celeste
+  if(v.includes('tanq'))   return '#1d6fb8';
+  if(v==='1'||v.includes('1pul')||v.includes('mang')) return '#6f42c1'; // manguera 1" - violeta
   return '#1d9e75';
 }
 
-// ---- Popup generico: muestra TODOS los campos del elemento ----
-const ETIQUETAS={Barrio:'Barrio',NumParc:'Parcela N°',EstadoCat:'Estado catastral',TipoTitula:'Titularidad',Titular_es:'Titular',Umepay:'Umepay','Sup(m2)':'Superficie',dueno:'Dueño',codigo:'Código',Codigo:'Código',capacidad_l:'Capacidad',Capacidad_L:'Capacidad'};
+// ---- Popup: muestra los campos, ocultando internos y coordenadas planas ----
+const ETIQUETAS={Barrio:'Barrio',NumParc:'Parcela N°',EstadoCat:'Estado catastral',TipoTitula:'Titularidad',Titular_es:'Titular',Umepay:'Umepay','Sup(m2)':'Superficie',codigo:'Código',Codigo:'Código',h:'Altura',capacidad_l:'Capacidad',Capacidad_L:'Capacidad'};
 const VALORES={SinRegistrar:'Sin registrar',Registrado:'Registrado',TitularUnico:'Titular único',Si:'Sí',No:'No'};
+const OCULTAR=['lote','NumParc','FID','Norte','Este','norte','este','NORTE','ESTE','X','Y','x','y','Latitud','Longitud','Lat','Lon','lat','lon'];
 function pretty(k){return ETIQUETAS[k] || (k.charAt(0).toUpperCase()+k.slice(1).replace(/_/g,' '));}
 function vacio(v){return v===null||v===''||String(v).toUpperCase()==='NULL';}
 function valor(k,v){
@@ -102,11 +132,9 @@ function valor(k,v){
 function popup(props){
   props=props||{};
   const num = props.NumParc!=null ? props.NumParc : props.lote;
-  const titulo = num!=null ? 'Parcela '+num
-               : (props.codigo || props.Codigo || props.nombre || 'Detalle');
-  const ocultar = ['lote','NumParc','FID'];
+  const titulo = num!=null ? 'Parcela '+num : (valCat(props) || props.nombre || 'Detalle');
   const filas = Object.entries(props)
-    .filter(([k,v])=> !vacio(v) && !ocultar.includes(k))
+    .filter(([k,v])=> !vacio(v) && !OCULTAR.includes(k))
     .map(([k,v])=>`<div class="row"><span class="k">${pretty(k)}:</span> ${valor(k,v)}</div>`)
     .join('');
   const corr = FORM_URL ? `<a class="corr" href="${FORM_URL}" target="_blank">Sugerir una corrección</a>` : '';
@@ -120,17 +148,15 @@ function agregarCapa(geojson, clase, nombre, overlays, visible){
     opts.style = estiloParcela;
   } else if(clase==='aguaPunto'){
     opts.pointToLayer=(f,ll)=>L.circleMarker(ll,{radius:7,color:'#fff',weight:2,
-      fillColor:colorAgua(f.properties&&(f.properties.codigo||f.properties.Codigo)),fillOpacity:1});
+      fillColor:colorAgua(valCat(f.properties)),fillOpacity:1});
   } else if(clase==='aguaLinea'){
-    opts.style=f=>({color:colorAgua(f.properties&&(f.properties.codigo||f.properties.Codigo)),weight:3});
+    opts.style=f=>({color:colorAgua(valCat(f.properties)),weight:3});
     opts.pointToLayer=(f,ll)=>L.circleMarker(ll,{radius:6,color:'#fff',weight:2,
-      fillColor:colorAgua(f.properties&&(f.properties.codigo||f.properties.Codigo)),fillOpacity:1});
+      fillColor:colorAgua(valCat(f.properties)),fillOpacity:1});
   } else if(clase==='curso'){
     opts.style={color:'#2b7bba',weight:2};
   } else if(clase==='calle'){
-    opts.style={color:'#9a9e93',weight:2};
-  } else if(clase==='vialNac'){
-    opts.style={color:'#c0392b',weight:3};
+    opts.style={color:'#8a5a2b',weight:2.5};
   } else if(clase==='vialProv'){
     opts.style={color:'#e67e22',weight:2.5};
   }
@@ -144,7 +170,6 @@ function agregarCapa(geojson, clase, nombre, overlays, visible){
 async function init(){
   const overlays={};
   let cargadas=0, bounds=null;
-
   for(const c of CAPAS){
     try{
       const r=await fetch(c.archivo,{cache:'no-store'});
@@ -155,7 +180,6 @@ async function init(){
       if(c.clase==='parcela'){ const b=capa.getBounds(); if(b.isValid()) bounds=b; }
     }catch(e){ /* capa todavia no subida */ }
   }
-
   if(cargadas===0){
     const av=document.getElementById('aviso');
     av.textContent='Mostrando datos de muestra. Subí tus GeoJSON a la carpeta data/ para ver los reales.';
@@ -164,12 +188,11 @@ async function init(){
     agregarCapa(MUESTRA_AGUA,'aguaLinea','Red de agua',overlays,true);
     bounds=L.geoJSON(MUESTRA_PARCELAS).getBounds();
   }
-
   L.control.layers(null,overlays,{collapsed:false}).addTo(map);
   if(bounds && bounds.isValid()) map.fitBounds(bounds.pad(0.2));
 }
 
-// ---- Datos de muestra (se descartan al subir los reales) ----
+// ---- Datos de muestra ----
 const MUESTRA_PARCELAS={type:"FeatureCollection",features:[
   {type:"Feature",properties:{Barrio:"Aldea",NumParc:1,Umepay:"Si",EstadoCat:"Registrado"},
    geometry:{type:"Polygon",coordinates:[[[-64.7220,-31.8535],[-64.7212,-31.8535],[-64.7212,-31.8542],[-64.7220,-31.8542],[-64.7220,-31.8535]]]}},
@@ -177,8 +200,8 @@ const MUESTRA_PARCELAS={type:"FeatureCollection",features:[
    geometry:{type:"Polygon",coordinates:[[[-64.7212,-31.8535],[-64.7204,-31.8535],[-64.7204,-31.8542],[-64.7212,-31.8542],[-64.7212,-31.8535]]]}}
 ]};
 const MUESTRA_AGUA={type:"FeatureCollection",features:[
-  {type:"Feature",properties:{codigo:"Tanq Acopio"},geometry:{type:"Point",coordinates:[-64.7216,-31.8538]}},
-  {type:"Feature",properties:{codigo:"Mang 1pul"},geometry:{type:"LineString",coordinates:[[-64.7216,-31.8538],[-64.7212,-31.8541],[-64.7207,-31.8546]]}}
+  {type:"Feature",properties:{codigo:"TanqAcopio"},geometry:{type:"Point",coordinates:[-64.7216,-31.8538]}},
+  {type:"Feature",properties:{codigo:"1"},geometry:{type:"LineString",coordinates:[[-64.7216,-31.8538],[-64.7212,-31.8541],[-64.7207,-31.8546]]}}
 ]};
 
 init();
