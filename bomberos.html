@@ -28,8 +28,12 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .line{width:18px;border-top:3px solid;display:inline-block}
 .ico{display:flex;align-items:center;justify-content:center}
 .ico i{line-height:1;text-shadow:0 0 2px #fff,0 0 3px #fff}
-.ico-galpon i{color:#1d6fb8;font-size:22px}.ico-dique i{color:#7f5bd0;font-size:22px}
-.ico-tranq i{color:#6b4f2a;font-size:17px}.ico-cruce i{color:#e03131;font-size:16px;font-weight:bold}
+.ico-galpon i{color:#1d6fb8;font-size:28px}.ico-dique i{color:#7f5bd0;font-size:26px}
+.ico-tranq i{color:#6b4f2a;font-size:12px}.ico-cruce i{color:#e03131;font-size:16px;font-weight:bold}
+.lbl{background:#fff;border:0;box-shadow:0 1px 3px rgba(0,0,0,.3);font-size:11px;font-weight:600;color:#333;padding:1px 6px}
+.lbl::before{display:none}
+.lbl-salida{background:#2b8a3e;border:0;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.lbl-salida::before{display:none}
 .popup b{font-size:15px;color:#2d5a3d;display:block;margin-bottom:4px}
 .popup .row{font-size:13px;padding:1px 0}.popup .k{color:#888}
 .popup .cl{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:13px;color:#fff;background:#1565c0;border-radius:6px;padding:6px 11px;text-decoration:none}
@@ -65,6 +69,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
   <span class="ll"><i class="ti ti-circle-filled" style="color:#6b4f2a"></i> Tranquera</span>
   <span class="ll"><span class="line" style="border-color:#1971c2"></span> Calle</span>
   <span class="ll"><span class="line" style="border-color:#e8590c"></span> Ruta prov.</span>
+  <span class="ll"><span class="line" style="border-color:#2b8a3e;border-top-width:5px"></span> Salida</span>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -103,18 +108,24 @@ function colorAgua(v){v=norm(v);
   return '#1d9e75';
 }
 function valCat(p){p=p||{};return p.Descripcio||p.Manguera||p.Tipo||'';}
+function salidaDe(nombre){
+  const n=norm(nombre);
+  if(n.includes('bajada')&&n.includes('club')) return 'Salida → Villa Yacanto';
+  if(n.includes('camino')&&n.includes('umepay')) return 'Salida → Cerro Pelado';
+  return null;
+}
 
 const SIMB={circulo:'ti-circle-filled',estrella:'ti-star-filled',cuadrado:'ti-square-filled',luna:'ti-moon-filled',triangulo:'ti-triangle-filled'};
 function icoTab(cls,glyph,size){return L.divIcon({html:'<i class="ti '+glyph+'"></i>',className:'ico '+cls,iconSize:[size,size],iconAnchor:[size/2,size/2]});}
 function aguaMarker(f,ll){
   const cat=norm(valCat(f.properties));
-  if(cat.includes('brigada')) return L.marker(ll,{icon:icoTab('ico-galpon','ti-building-warehouse',26)});
-  if(cat.includes('dique')) return L.marker(ll,{icon:icoTab('ico-dique','ti-ripple',24)});
+  if(cat.includes('brigada')) return L.marker(ll,{icon:icoTab('ico-galpon','ti-building-warehouse',34)}).bindTooltip('Brigada',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
+  if(cat.includes('dique')) return L.marker(ll,{icon:icoTab('ico-dique','ti-ripple',32)}).bindTooltip('Dique',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
   let r=5;
   if(cat.includes('tanqacopio')) r=7; else if(cat.includes('acopio')) r=9; else if(cat.includes('casa')) r=5; else if(cat==='t') r=4;
   return L.circleMarker(ll,{radius:r,color:'#fff',weight:2,fillColor:colorAgua(valCat(f.properties)),fillOpacity:1});
 }
-function tranqMarker(f,ll){const s=norm((f.properties||{}).Simbolo);return L.marker(ll,{icon:icoTab('ico-tranq',SIMB[s]||'ti-square-filled',19)});}
+function tranqMarker(f,ll){const s=norm((f.properties||{}).Simbolo);return L.marker(ll,{icon:icoTab('ico-tranq',SIMB[s]||'ti-square-filled',14)});}
 function cruceMarker(f,ll){return L.marker(ll,{icon:icoTab('ico-cruce','ti-x',18)});}
 
 const ETIQUETAS={Barrio:'Barrio',Litros:'Litros',Observacio:'Observación',AutoBomba:'Carga autobomba',Acople:'Acople',Disponibil:'Disponibilidad',Nombre_Ref:'Referencia',Simbolo:'Símbolo',Nombre:'Nombre',Tipo:'Tipo',Manguera:'Manguera',TipoRed:'Red',AcopioMadr:'Acopio madre',red:'Red',rst:'Calzada',gna:'Tipo de vía'};
@@ -166,12 +177,15 @@ function agregar(gj,clase,nombre,overlays,visible){
       l.on('click',()=>{resaltada=l;});
     };
   } else {
-    opts.onEachFeature=(f,l)=>l.bindPopup(popup(f.properties,clase));
+    opts.onEachFeature=(f,l)=>{
+      l.bindPopup(popup(f.properties,clase));
+      if(clase==='calle'){const sal=salidaDe((f.properties||{}).Nombre); if(sal) l.bindTooltip(sal,{permanent:true,direction:'center',className:'lbl-salida'});}
+    };
     if(clase==='aguaPunto') opts.pointToLayer=aguaMarker;
     else if(clase==='aguaLinea') opts.style=f=>({color:colorAgua(valCat(f.properties)),weight:3});
     else if(clase==='tranquera') opts.pointToLayer=tranqMarker;
     else if(clase==='cruce') opts.pointToLayer=cruceMarker;
-    else if(clase==='calle') opts.style=f=>({color:'#1971c2',weight:3.5,dashArray:norm((f.properties||{}).Tipo).includes('entrada')?'6,4':null});
+    else if(clase==='calle') opts.style=f=>{const sal=salidaDe((f.properties||{}).Nombre);return sal?{color:'#2b8a3e',weight:5}:{color:'#1971c2',weight:3.5,dashArray:norm((f.properties||{}).Tipo).includes('entrada')?'6,4':null};};
     else if(clase==='vialProv') opts.style={color:'#e8590c',weight:3.5};
   }
   const capa=L.geoJSON(gj,opts);
@@ -179,6 +193,8 @@ function agregar(gj,clase,nombre,overlays,visible){
   return capa;
 }
 
+let ultimoBounds=null;
+function encuadrar(){map.invalidateSize();if(ultimoBounds&&ultimoBounds.isValid())map.fitBounds(ultimoBounds.pad(0.05),{maxZoom:16});}
 async function init(){
   const overlays={}; let bounds=null;
   for(const c of CAPAS){
@@ -189,10 +205,10 @@ async function init(){
     }catch(e){}
   }
   L.control.layers(null,overlays,{collapsed:true}).addTo(map);
-  if(bounds&&bounds.isValid())map.fitBounds(bounds.pad(0.05),{maxZoom:16});
+  if(bounds&&bounds.isValid()){ultimoBounds=bounds;encuadrar();}
 }
 init();
-window.addEventListener('load',()=>setTimeout(()=>map.invalidateSize(),200));
+window.addEventListener('load',()=>setTimeout(encuadrar,300));
 const _tels=document.querySelector('.tels'); if(_tels)_tels.addEventListener('toggle',()=>setTimeout(()=>map.invalidateSize(),250));
 </script>
 </body>
