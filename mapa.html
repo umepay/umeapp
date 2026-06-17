@@ -115,6 +115,188 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+/* Leaflet.TextPath (makinacorpus) — rótulos que siguen la curva de la calle */
+/*
+ * Leaflet.TextPath - Shows text along a polyline
+ * Inspired by Tom Mac Wright article :
+ * https://web.archive.org/web/20130312131812/http://mapbox.com/osmdev/2012/11/20/getting-serious-about-svg/
+ */
+
+(function () {
+
+var __onAdd = L.Polyline.prototype.onAdd,
+    __onRemove = L.Polyline.prototype.onRemove,
+    __updatePath = L.Polyline.prototype._updatePath,
+    __bringToFront = L.Polyline.prototype.bringToFront;
+
+
+var PolylineTextPath = {
+
+    onAdd: function (map) {
+        __onAdd.call(this, map);
+        this._textRedraw();
+    },
+
+    onRemove: function (map) {
+        map = map || this._map;
+        if (map && this._textNode && this._renderer._container)
+            this._renderer._container.removeChild(this._textNode);
+        __onRemove.call(this, map);
+    },
+
+    bringToFront: function () {
+        __bringToFront.call(this);
+        this._textRedraw();
+    },
+
+    _updatePath: function () {
+        __updatePath.call(this);
+        this._textRedraw();
+    },
+
+    _textRedraw: function () {
+        var text = this._text,
+            options = this._textOptions;
+        if (text) {
+            this.setText(null).setText(text, options);
+        }
+    },
+
+    setText: function (text, options) {
+        this._text = text;
+        this._textOptions = options;
+
+        /* If not in SVG mode or Polyline not added to map yet return */
+        /* setText will be called by onAdd, using value stored in this._text */
+        if (!L.Browser.svg || typeof this._map === 'undefined') {
+          return this;
+        }
+
+        var defaults = {
+            repeat: false,
+            fillColor: 'black',
+            attributes: {},
+            below: false,
+        };
+        options = L.Util.extend(defaults, options);
+
+        /* If empty text, hide */
+        if (!text) {
+            if (this._textNode && this._textNode.parentNode) {
+                this._renderer._container.removeChild(this._textNode);
+                
+                /* delete the node, so it will not be removed a 2nd time if the layer is later removed from the map */
+                delete this._textNode;
+            }
+            return this;
+        }
+
+        text = text.replace(/ /g, '\u00A0');  // Non breakable spaces
+        var id = 'pathdef-' + L.Util.stamp(this);
+        var svg = this._renderer._container;
+        this._path.setAttribute('id', id);
+
+        if (options.repeat) {
+            if (options.repeat!=true && options.repeat>=1) {
+                text=text.padStart(options.repeat, '\u00A0');
+            }
+            /* Compute single pattern length */
+            var pattern = L.SVG.create('text');
+            for (var attr in options.attributes)
+                pattern.setAttribute(attr, options.attributes[attr]);
+            pattern.appendChild(document.createTextNode(text));
+            svg.appendChild(pattern);
+            var alength = pattern.getComputedTextLength();
+            svg.removeChild(pattern);
+
+            /* Create string as long as path */
+            text = new Array(Math.ceil(isNaN(this._path.getTotalLength() / alength) ? 0 : this._path.getTotalLength() / alength)).join(text);
+        }
+
+        /* Put it along the path using textPath */
+        var textNode = L.SVG.create('text'),
+            textPath = L.SVG.create('textPath');
+
+        var dy = options.offset || this._path.getAttribute('stroke-width');
+
+        textPath.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", '#'+id);
+        textNode.setAttribute('dy', dy);
+        for (var attr in options.attributes)
+            textNode.setAttribute(attr, options.attributes[attr]);
+        textPath.appendChild(document.createTextNode(text));
+        textNode.appendChild(textPath);
+        this._textNode = textNode;
+
+        if (options.below) {
+            svg.insertBefore(textNode, svg.firstChild);
+        }
+        else {
+            svg.appendChild(textNode);
+        }
+
+        /* Center text according to the path's bounding box */
+        if (options.center) {
+            var textLength = textNode.getComputedTextLength();
+            var pathLength = this._path.getTotalLength();
+            /* Set the position for the left side of the textNode */
+            textNode.setAttribute('dx', ((pathLength / 2) - (textLength / 2)));
+        }
+
+        /* Change label rotation (if required) */
+        if (options.orientation) {
+            var rotateAngle = 0;
+            switch (options.orientation) {
+                case 'flip':
+                    rotateAngle = 180;
+                    break;
+                case 'perpendicular':
+                    rotateAngle = 90;
+                    break;
+                default:
+                    rotateAngle = options.orientation;
+            }
+
+            var rotatecenterX = (textNode.getBBox().x + textNode.getBBox().width / 2);
+            var rotatecenterY = (textNode.getBBox().y + textNode.getBBox().height / 2);
+            textNode.setAttribute('transform','rotate(' + rotateAngle + ' '  + rotatecenterX + ' ' + rotatecenterY + ')');
+        }
+
+        /* Initialize mouse events for the additional nodes */
+        if (this.options.interactive) {
+            if (L.Browser.svg || !L.Browser.vml) {
+                textPath.setAttribute('class', 'leaflet-interactive');
+            }
+
+            var events = ['click', 'dblclick', 'mousedown', 'mouseover',
+                          'mouseout', 'mousemove', 'contextmenu'];
+            for (var i = 0; i < events.length; i++) {
+                L.DomEvent.on(textNode, events[i], this.fire, this);
+            }
+        }
+
+        return this;
+    }
+};
+
+L.Polyline.include(PolylineTextPath);
+
+L.LayerGroup.include({
+    setText: function(text, options) {
+        for (var layer in this._layers) {
+            if (typeof this._layers[layer].setText === 'function') {
+                this._layers[layer].setText(text, options);
+            }
+        }
+        return this;
+    }
+});
+
+
+
+})();
+
+</script>
+<script>
 const CENTRO=[-32.199,-64.743];
 const FORM_URL='';
 const CAPAS=[
@@ -131,6 +313,9 @@ const CAPAS=[
 
 const map=L.map('map').setView(CENTRO,16);
 map.createPane('parcelasPane'); map.getPane('parcelasPane').style.zIndex=350;
+map.createPane('hitPane'); map.getPane('hitPane').style.zIndex=450;
+map.createPane('rotuloPane'); map.getPane('rotuloPane').style.zIndex=460; map.getPane('rotuloPane').style.pointerEvents='none';
+map.createPane('puntosPane'); map.getPane('puntosPane').style.zIndex=470;
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
 
 const DATOS={}; let marcadorYo=null;
@@ -168,13 +353,70 @@ function aguaMarker(f,ll){
   if(cat.includes('dique')) return L.marker(ll,{icon:icoTab('ico-dique','ti-ripple',24)});
   if(cat.includes('cisterna')) return L.marker(ll,{icon:L.divIcon({html:'',className:'ico-cisterna',iconSize:[14,14],iconAnchor:[7,7]})});
   if(cat==='t') return L.marker(ll,{icon:L.divIcon({html:'T',className:'ico-tg',iconSize:[16,16],iconAnchor:[8,8]})});
-  let r=5;
-  if(cat.includes('tanqacopio')) r=7;
-  else if(cat.includes('acopio')) r=9;
-  else if(cat.includes('casa')) r=5;
-  return L.circleMarker(ll,{radius:r,color:'#fff',weight:2,fillColor:colorAgua(valCat(f.properties)),fillOpacity:1});
+  let r=6;
+  if(cat.includes('tanqacopio')) r=8;
+  else if(cat.includes('acopio')) r=10;
+  else if(cat.includes('casa')) r=6;
+  return L.circleMarker(ll,{radius:r,color:'#fff',weight:2,fillColor:colorAgua(valCat(f.properties)),fillOpacity:1,pane:'puntosPane'});
 }
 function cruceMarker(f,ll){return L.marker(ll,{icon:icoTab('ico-cruce','ti-x',18)});}
+
+/* ====== calles: estilo + rótulos que siguen la curva (igual que Bomberos) ====== */
+const CAMPO_CALLE=['Nombre','nombre','Calle','calle'];
+function primer(p,campos){p=p||{};for(const k of campos){const v=p[k];if(v!==undefined&&v!==null&&String(v).trim()!==''&&String(v).toUpperCase()!=='NULL')return v;}return '';}
+function esEntrada(p){const t=norm((p||{}).Tipo);return t.includes('entrada')||t.includes('acceso');}
+function estiloCalle(f){const e=esEntrada(f.properties);return {color:e?'#b07a45':'#8a5a2b',weight:e?3:4,dashArray:e?'7,5':null,lineCap:'round'};}
+const TIPOVIA=/^(calle|camino|bajada|subida|av\.?|avda\.?|avenida|pasaje|pje\.?|ruta|sendero|senda|diagonal|paseo|boulevard|bv\.?)\b/i;
+function capitaliz(s){s=String(s).trim();return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
+function etiquetaCalle(nombre){const n=capitaliz(nombre);return TIPOVIA.test(n)?n:'Calle '+n;}
+const ESPACIADO_CALLE=600, MAX_ETIQ_CALLE=4;
+const ATTR_CALLE={fill:'#5a3a1a','font-weight':'700','font-size':'11','font-family':"system-ui,'Segoe UI',Roboto,sans-serif",stroke:'#ffffff','stroke-width':'3','stroke-linejoin':'round','paint-order':'stroke'};
+const OFFSET_CALLE=4;
+function ptosLinea(layer){let ll=layer.getLatLngs();if(ll.length&&Array.isArray(ll[0]))ll=ll.slice().sort((a,b)=>b.length-a.length)[0]||[];return ll;}
+function largoMetros(pts){let d=0;for(let i=1;i<pts.length;i++)d+=pts[i-1].distanceTo(pts[i]);return d;}
+function porcion(pts,segs,d0,d1){
+  const interp=(a,b,t)=>L.latLng(a.lat+(b.lat-a.lat)*t,a.lng+(b.lng-a.lng)*t);
+  const res=[];let acc=0;
+  for(let i=0;i<segs.length;i++){
+    const s=acc,e=acc+segs[i],len=segs[i]||1;
+    if(e<d0){acc=e;continue;}
+    if(s>d1)break;
+    if(res.length===0)res.push(interp(pts[i],pts[i+1],Math.min(1,Math.max(0,(d0-s)/len))));
+    if(e<=d1+1e-6){res.push(pts[i+1]);}
+    else{res.push(interp(pts[i],pts[i+1],Math.min(1,Math.max(0,(d1-s)/len))));break;}
+    acc=e;
+  }
+  return res;
+}
+function subdividir(pts,n){const segs=[];let tot=0;for(let i=1;i<pts.length;i++){const d=pts[i-1].distanceTo(pts[i]);segs.push(d);tot+=d;}const out=[];for(let k=0;k<n;k++)out.push(porcion(pts,segs,tot*k/n,tot*(k+1)/n));return out;}
+function enderezar(sub){const segs=[];let tot=0;for(let i=1;i<sub.length;i++){const d=sub[i-1].distanceTo(sub[i]);segs.push(d);tot+=d;}let target=tot/2,acc=0,idx=0;for(let i=0;i<segs.length;i++){if(acc+segs[i]>=target){idx=i;break;}acc+=segs[i];idx=i;}const a=sub[idx],b=sub[idx+1]||sub[idx],pa=map.latLngToLayerPoint(a),pb=map.latLngToLayerPoint(b);if((pb.x-pa.x)<0)sub.reverse();return sub;}
+function etiquetarCalles(capa){
+  capa.getLayers().forEach(l=>{
+    const p=(l.feature&&l.feature.properties)||{};
+    if(esEntrada(p))return;
+    const nom=primer(p,CAMPO_CALLE); if(!nom)return;
+    const pts=ptosLinea(l); if(!pts||pts.length<2)return;
+    const txt=etiquetaCalle(nom);
+    const largo=(+p.LongTramo)||largoMetros(pts);
+    const n=Math.min(MAX_ETIQ_CALLE,Math.max(1,Math.ceil(largo/ESPACIADO_CALLE)));
+    subdividir(pts,n).forEach(sub=>{
+      if(!sub||sub.length<2)return;
+      enderezar(sub);
+      const pl=L.polyline(sub,{opacity:0,weight:2,interactive:false,pane:'rotuloPane'});
+      capa.addLayer(pl);
+      pl.setText(txt,{center:true,offset:OFFSET_CALLE,attributes:ATTR_CALLE});
+    });
+  });
+}
+/* área de click ancha e invisible para tocar líneas finas con el dedo */
+function engrosarClicks(capa,clase){
+  capa.getLayers().slice().forEach(l=>{
+    if(!l.feature||typeof l.getLatLngs!=='function')return;
+    const hit=L.polyline(l.getLatLngs(),{color:'#000',opacity:0,weight:18,pane:'hitPane',bubblingMouseEvents:false});
+    hit.bindPopup(popup(l.feature.properties,clase));
+    capa.addLayer(hit);
+  });
+}
 
 function distAFeature(yo,geom){let min=Infinity;(function w(c){if(Array.isArray(c)){if(typeof c[0]==='number'){const d=map.distance(yo,[c[1],c[0]]);if(d<min)min=d;}else c.forEach(w);}})(geom.coordinates);return min;}
 function miUbicacion(){
@@ -217,7 +459,7 @@ function popup(p,clase){
   else if(clase==='curso') titulo=p.NOMBRE_COM||'Curso de agua';
   else if(clase==='vialProv') titulo='Ruta provincial';
   else if(clase==='cruce') titulo='Cruce agua / calle';
-  else if(clase==='calle') titulo=p.Nombre||'Calle';
+  else if(clase==='calle'){const nm=p.Nombre;if(esEntrada(p)){const tp=norm(p.Tipo).includes('acceso')?'Acceso':'Entrada';titulo=nm?tp+' '+capitaliz(nm):tp;}else{titulo=nm?etiquetaCalle(nm):'Calle';}}
   else if(clase==='aguaLinea') titulo=p.Manguera?('Manguera '+p.Manguera):'Línea de agua';
   else { const num=p.NumParc!=null?p.NumParc:p.lote; if(num!=null) titulo='Parcela '+num; else { const c=valCat(p); titulo=VALORES[c]||c||p.nombre||'Detalle'; } }
   let pares;
@@ -251,14 +493,26 @@ function agregarCapa(gj,clase,nombre,overlays,visible){
   else if(clase==='aguaPunto'){opts.pointToLayer=aguaMarker;}
   else if(clase==='aguaLinea'){opts.style=f=>({color:colorAgua(valCat(f.properties)),weight:3});}
   else if(clase==='cruce'){opts.pointToLayer=cruceMarker;}
-  else if(clase==='calle'){opts.style=f=>({color:'#8a5a2b',weight:2.5,dashArray:norm((f.properties||{}).Tipo).includes('entrada')?'5,4':null});}
+  else if(clase==='calle'){opts.style=estiloCalle;}
   else if(clase==='curso'){opts.style={color:'#2b7bba',weight:2};}
   else if(clase==='vialProv'){opts.style={color:'#e67e22',weight:2.5};}
   const capa=L.geoJSON(gj,opts);
+  if(clase==='calle') etiquetarCalles(capa);
+  if(clase==='calle'||clase==='curso'||clase==='vialProv'||clase==='aguaLinea') engrosarClicks(capa,clase);
   overlays[nombre]=capa; if(visible)capa.addTo(map);
   return capa;
 }
 
+let ultimoBounds=null;
+function encuadrar(){
+  map.invalidateSize();
+  if(ultimoBounds&&ultimoBounds.isValid()){
+    const b=ultimoBounds.pad(0.01);
+    let z=map.getBoundsZoom(b,false);
+    z=Math.max(14,Math.min(17,z));
+    map.setView(b.getCenter(),z);
+  }
+}
 async function init(){
   const overlays={}; let n=0,bounds=null;
   for(const c of CAPAS){
@@ -272,10 +526,10 @@ async function init(){
   }
   if(n===0){document.getElementById('aviso').textContent='No se pudieron cargar las capas. Revisá la carpeta data/.';document.getElementById('aviso').style.display='block';}
   L.control.layers(null,overlays,{collapsed:false}).addTo(map);
-  if(bounds&&bounds.isValid()){map.fitBounds(bounds.pad(0.01),{maxZoom:17}); if(map.getZoom()<15) map.setZoom(15);}
+  if(bounds&&bounds.isValid()){ultimoBounds=bounds; encuadrar();}
 }
 init();
-window.addEventListener('load',()=>setTimeout(()=>map.invalidateSize(),200));
+window.addEventListener('load',()=>setTimeout(encuadrar,200));
 </script>
 </body>
 </html>
