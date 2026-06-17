@@ -16,13 +16,14 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .btn-back{color:#9ecfb0;font-size:22px;background:none;border:none;text-decoration:none;cursor:pointer}
 #map{flex:1;background:#cdd9cd}
 .aviso{background:#faeeda;color:#854f0b;font-size:12px;padding:7px 16px;display:none}
-.leyenda{background:#f5f5f0;font-size:12px;border-top:0.5px solid #e0e0d8}
-.leyenda summary{padding:9px 16px;cursor:pointer;font-weight:500;color:#2d5a3d;list-style:none}
+.panel{border-top:0.5px solid #e0e0d8}
+.leyenda{background:#f5f5f0;font-size:12px}
+.leyenda summary{padding:13px 16px;cursor:pointer;font-weight:700;font-size:15px;color:#fff;background:#2d5a3d;list-style:none;display:flex;align-items:center;gap:9px}
 .leyenda summary::-webkit-details-marker{display:none}
-.leyenda summary::before{content:'▸ ';font-size:11px}
-.leyenda[open] summary::before{content:'▾ '}
-.items{padding:0 16px 10px;display:flex;flex-direction:column;gap:8px}
-.grp{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.leyenda summary .chev{margin-left:auto;font-size:13px;transition:transform .2s}
+.leyenda[open] summary .chev{transform:rotate(90deg)}
+.items{padding:10px 16px}
+.grp{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
 .glabel{font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.4px;width:100%}
 .ll{display:inline-flex;align-items:center;gap:6px}
 .ll i{font-size:16px}
@@ -35,8 +36,18 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .ico i{line-height:1;text-shadow:0 0 2px #fff,0 0 3px #fff}
 .ico-galpon i{color:#1d6fb8;font-size:22px}
 .ico-dique i{color:#7f5bd0;font-size:22px}
-.ico-tranq i{color:#6b4f2a;font-size:17px}
 .ico-cruce i{color:#e03131;font-size:16px;font-weight:bold}
+.descargas summary{padding:13px 16px;cursor:pointer;font-weight:700;font-size:15px;color:#2d5a3d;background:#e8f0e4;list-style:none;display:flex;align-items:center;gap:9px;border-top:0.5px solid #d6e2d4}
+.descargas summary::-webkit-details-marker{display:none}
+.descargas summary .chev{margin-left:auto;font-size:13px;transition:transform .2s}
+.descargas[open] summary .chev{transform:rotate(90deg)}
+.descargas .items{background:#f5f5f0}
+.descargas p{font-size:12.5px;color:#666;margin-bottom:10px;line-height:1.4}
+.dl{display:flex;align-items:center;gap:10px;text-decoration:none;color:#1a1a1a;background:#fff;border:1px solid #d6e2d4;border-radius:10px;padding:11px 13px;margin-bottom:8px;font-size:14px;font-weight:500}
+.dl i{color:#2d5a3d;font-size:20px}
+.dl small{display:block;color:#999;font-weight:400;font-size:11.5px}
+.lbl-barrio{background:rgba(122,67,38,.92);border:0;color:#fff;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:5px;box-shadow:0 1px 4px rgba(0,0,0,.35);white-space:nowrap}
+.lbl-barrio::before{display:none}
 .popup b{font-size:15px;color:#2d5a3d;display:block;margin-bottom:4px}
 .popup .row{font-size:13px;padding:1px 0}
 .popup .k{color:#888}
@@ -46,13 +57,14 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 </head>
 <body>
 <div class="topbar">
-  <a class="btn-back" href="index.html"><i class="ti ti-arrow-left"></i></a>
+  <a class="btn-back" href="index.html#app"><i class="ti ti-arrow-left"></i></a>
   <h1>Mapa</h1>
 </div>
 <div id="aviso" class="aviso"></div>
 <div id="map"></div>
-<details class="leyenda">
-  <summary>Referencias</summary>
+
+<details class="leyenda panel">
+  <summary><i class="ti ti-list-details"></i> Referencias <span class="chev">▸</span></summary>
   <div class="items">
     <div class="grp"><span class="glabel">Parcelas</span>
       <span class="ll"><span class="sw ume"></span> Umepay</span>
@@ -71,7 +83,6 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
       <span class="ll"><span class="line" style="border-color:#22b8cf"></span> 3/4"</span>
     </div>
     <div class="grp"><span class="glabel">Otras</span>
-      <span class="ll"><i class="ti ti-circle-filled" style="color:#6b4f2a"></i> Tranquera</span>
       <span class="ll"><i class="ti ti-x" style="color:#e03131;font-weight:bold"></i> Cruce agua/calle</span>
       <span class="ll"><span class="line" style="border-color:#8a5a2b"></span> Calles</span>
       <span class="ll"><span class="line" style="border-color:#2b7bba"></span> Cursos de agua</span>
@@ -80,15 +91,24 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
   </div>
 </details>
 
+<details class="descargas panel">
+  <summary><i class="ti ti-download"></i> Descargas para Maps.me <span class="chev">▸</span></summary>
+  <div class="items">
+    <p>Descargá estos archivos y abrilos en la app <b>Maps.me</b> para tener la red de agua en tu celular <b>sin internet</b>, en el campo.</p>
+    <a class="dl" href="descargas/umepay_agua_puntos.kmz" download><i class="ti ti-droplet"></i> <span>Puntos de agua <small>Acopios, tanques, dique, brigada (KMZ)</small></span></a>
+    <a class="dl" href="descargas/umepay_mangueras.kmz" download><i class="ti ti-line"></i> <span>Mangueras <small>Red de distribución por diámetro (KMZ)</small></span></a>
+  </div>
+</details>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const CENTRO=[-31.8543,-64.7210];
+const CENTRO=[-32.199,-64.743];
 const FORM_URL='';
 const CAPAS=[
   {archivo:'data/parcelas.geojson',                nombre:'Parcelas',          clase:'parcela',  visible:true},
+  {archivo:'data/barrios.geojson',                 nombre:'Barrios',           clase:'barrio',   visible:false},
   {archivo:'data/puntos.geojson',                  nombre:'Puntos de agua',    clase:'aguaPunto',visible:true},
   {archivo:'data/lineas.geojson',                  nombre:'Mangueras',         clase:'aguaLinea',visible:true},
-  {archivo:'data/Vial_puntos.geojson',             nombre:'Tranqueras',        clase:'tranquera',visible:true},
   {archivo:'data/Intersec_lineas_calles.geojson',  nombre:'Cruces agua/calle', clase:'cruce',    visible:false},
   {archivo:'data/ejes_calles_int.geojson',         nombre:'Calles',            clase:'calle',    visible:true},
   {archivo:'data/Cursos_de_agua_2021.geojson',     nombre:'Cursos de agua',    clase:'curso',    visible:false},
@@ -107,6 +127,7 @@ function estiloParcela(f){
   const base=ume?'#2d5a3d':'#9a9e93';
   return {color:base,weight:1.5,dashArray:reg?null:'5,4',fillColor:base,fillOpacity:ume?0.30:0.10};
 }
+function estiloBarrio(){return {color:'#7a4326',weight:1.6,dashArray:'4,4',fillColor:'#c79a6a',fillOpacity:0.10};}
 function colorAgua(v){v=norm(v);
   if(v.includes('casa')) return '#d4a017';
   if(v.includes('tanqacopio')) return '#2e9e54';
@@ -121,7 +142,6 @@ function colorAgua(v){v=norm(v);
 }
 function valCat(p){p=p||{};return p.Descripcio||p.Manguera||p.codigo||p.Codigo||p.Tipo||'';}
 
-const SIMB={circulo:'ti-circle-filled',estrella:'ti-star-filled',cuadrado:'ti-square-filled',luna:'ti-moon-filled',triangulo:'ti-triangle-filled'};
 function icoTab(cls,glyph,size){return L.divIcon({html:'<i class="ti '+glyph+'"></i>',className:'ico '+cls,iconSize:[size,size],iconAnchor:[size/2,size/2]});}
 function aguaMarker(f,ll){
   const cat=norm(valCat(f.properties));
@@ -134,28 +154,27 @@ function aguaMarker(f,ll){
   else if(cat==='t') r=4;
   return L.circleMarker(ll,{radius:r,color:'#fff',weight:2,fillColor:colorAgua(valCat(f.properties)),fillOpacity:1});
 }
-function tranqMarker(f,ll){const s=norm((f.properties||{}).Simbolo);return L.marker(ll,{icon:icoTab('ico-tranq',SIMB[s]||'ti-square-filled',19)});}
 function cruceMarker(f,ll){return L.marker(ll,{icon:icoTab('ico-cruce','ti-x',18)});}
 
-const ETIQUETAS={Barrio:'Barrio',NumParc:'Parcela N°',EstadoCat:'Estado catastral',TipoTitula:'Titularidad',Titular_es:'Titular',Umepay:'Umepay','Sup(m2)':'Superficie',Descripcio:'Tipo',Manguera:'Manguera',TipoRed:'Red',NivelRed:'Nivel',AcopioMadr:'Acopio madre',Litros:'Litros',Observacio:'Observación',AutoBomba:'Carga autobomba',Acople:'Acople',Disponibil:'Disponibilidad',Nombre_Ref:'Referencia',LoteNro:'Lote',Propietari:'Propietario',H:'Altura',Simbolo:'Símbolo',Nombre:'Nombre',Tipo:'Tipo',NOMBRE_COM:'Nombre',TIPO:'Tipo',ORDEN:'Orden',DEPARTAMEN:'Departamento',CUENCA:'Cuenca','Estado_de_':'Estado',red:'Red',rst:'Calzada',gna:'Tipo de vía'};
+const ETIQUETAS={Barrio:'Barrio',NumParc:'Parcela N°',EstadoCat:'Estado catastral',TipoTitula:'Titularidad',Titular_es:'Titular',Umepay:'Umepay','Sup(m2)':'Superficie',Sup_ha:'Superficie',Descripcio:'Tipo',Manguera:'Manguera',TipoRed:'Red',NivelRed:'Nivel',AcopioMadr:'Acopio madre',Litros:'Litros',Observacio:'Observación',AutoBomba:'Carga autobomba',Acople:'Acople',Disponibil:'Disponibilidad',Nombre_Ref:'Referencia',LoteNro:'Lote',Propietari:'Propietario',H:'Altura',Simbolo:'Símbolo',Nombre:'Nombre',Tipo:'Tipo',NOMBRE_COM:'Nombre',TIPO:'Tipo',ORDEN:'Orden',DEPARTAMEN:'Departamento',CUENCA:'Cuenca','Estado_de_':'Estado',red:'Red',rst:'Calzada',gna:'Tipo de vía'};
 const VALORES={SinRegistrar:'Sin registrar',Registrado:'Registrado',TitularUnico:'Titular único',Si:'Sí',No:'No',TanqAcopio:'Tanque acopio',TanqCasa:'Tanque casa',Acopio:'Acopio madre',Dique:'Dique','Estacion Brigada':'Estación brigada',T:'Bifurcación'};
 const OCULTAR=['lote','NumParc','FID','FID_2','id','Norte','Este','x','y'];
 const CAMPOS={
+  barrio:[],
   curso:['TIPO','ORDEN','DEPARTAMEN','CUENCA','Estado_de_'],
   vialProv:['red','gna','rst'],
-  tranquera:['Simbolo','Observacio','Barrio'],
   cruce:['Manguera','TipoRed','Nombre','AcopioMadr','Barrio'],
   calle:['Tipo','Barrio']
 };
 function pretty(k){return ETIQUETAS[k]||(k.charAt(0).toUpperCase()+k.slice(1).replace(/_/g,' '));}
 function vacio(v){return v===null||v===''||String(v).toUpperCase()==='NULL';}
-function valor(k,v){if(/sup/i.test(k)&&!isNaN(parseFloat(v)))return (parseFloat(v)/10000).toLocaleString('es-AR',{maximumFractionDigits:2})+' ha';return VALORES[v]||v;}
+function valor(k,v){if(/sup\(m2\)|sup_m2/i.test(k)&&!isNaN(parseFloat(v)))return (parseFloat(v)/10000).toLocaleString('es-AR',{maximumFractionDigits:2})+' ha';return VALORES[v]||v;}
 function popup(p,clase){
   p=p||{};
   let titulo;
-  if(clase==='curso') titulo=p.NOMBRE_COM||'Curso de agua';
+  if(clase==='barrio') titulo=p.barrio||p.Barrio||'Barrio';
+  else if(clase==='curso') titulo=p.NOMBRE_COM||'Curso de agua';
   else if(clase==='vialProv') titulo='Ruta provincial';
-  else if(clase==='tranquera') titulo=p.Tipo||'Tranquera';
   else if(clase==='cruce') titulo='Cruce agua / calle';
   else if(clase==='calle') titulo=p.Nombre||'Calle';
   else if(clase==='aguaLinea') titulo=p.Manguera?('Manguera '+p.Manguera):'Línea de agua';
@@ -171,9 +190,17 @@ function popup(p,clase){
 function agregarCapa(gj,clase,nombre,overlays,visible){
   const opts={onEachFeature:(f,l)=>l.bindPopup(popup(f.properties,clase))};
   if(clase==='parcela'){opts.style=estiloParcela;opts.pane='parcelasPane';}
+  else if(clase==='barrio'){
+    opts.style=estiloBarrio;
+    opts.filter=f=>norm((f.properties||{}).Umepay)==='si';
+    opts.onEachFeature=(f,l)=>{
+      l.bindPopup(popup(f.properties,'barrio'));
+      const nom=(f.properties||{}).barrio||(f.properties||{}).Barrio;
+      if(nom) l.bindTooltip(String(nom),{permanent:true,direction:'center',className:'lbl-barrio'});
+    };
+  }
   else if(clase==='aguaPunto'){opts.pointToLayer=aguaMarker;}
   else if(clase==='aguaLinea'){opts.style=f=>({color:colorAgua(valCat(f.properties)),weight:3});}
-  else if(clase==='tranquera'){opts.pointToLayer=tranqMarker;}
   else if(clase==='cruce'){opts.pointToLayer=cruceMarker;}
   else if(clase==='calle'){opts.style=f=>({color:'#8a5a2b',weight:2.5,dashArray:norm((f.properties||{}).Tipo).includes('entrada')?'5,4':null});}
   else if(clase==='curso'){opts.style={color:'#2b7bba',weight:2};}
