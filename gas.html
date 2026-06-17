@@ -32,7 +32,7 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
 </head>
 <body>
 <div class="topbar">
-  <a class="btn-back" href="index.html"><i class="ti ti-arrow-left"></i></a>
+  <a class="btn-back" href="index.html#app"><i class="ti ti-arrow-left"></i></a>
   <h1>UmeGas</h1>
 </div>
 <div class="content">
@@ -62,6 +62,12 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
         <div><div style="font-size:12px;color:#888">15 K</div><input class="inp" type="number" id="g15" min="0" value="0" style="margin:4px 0 0;text-align:center" oninput="calcGas()"/></div>
         <div><div style="font-size:12px;color:#888">10 K</div><input class="inp" type="number" id="g10" min="0" value="0" style="margin:4px 0 0;text-align:center" oninput="calcGas()"/></div>
       </div>
+      <div style="font-size:13px;color:#888;margin-bottom:6px">Tipo de pedido</div>
+      <div style="display:flex;gap:8px;margin-bottom:6px">
+        <button id="btn-recarga" onclick="setTipo('recarga')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #2d5a3d;background:#eaf3de;color:#2d5a3d;font-size:13px;cursor:pointer">Recarga</button>
+        <button id="btn-nuevo" onclick="setTipo('nuevo')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #ddd;background:#fff;color:#888;font-size:13px;cursor:pointer">Tubo nuevo</button>
+      </div>
+      <div id="nota-tipo" class="muted" style="margin-bottom:12px">Recarga: cambiás tu tubo vacío por uno lleno.</div>
       <div style="font-size:13px;color:#888;margin-bottom:6px">Forma de pago</div>
       <div style="display:flex;gap:8px;margin-bottom:12px">
         <button id="btn-ef" onclick="setPago('efectivo')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #2d5a3d;background:#eaf3de;color:#2d5a3d;font-size:13px;cursor:pointer">Efectivo</button>
@@ -107,7 +113,7 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
       <i class="ti ti-circle-check"></i>
       <h2>¡Pedido concretado!</h2>
       <p>Lalo lo va a marcar como entregado cuando lleve tu gas. Gracias.</p>
-      <a class="btn-s" href="index.html" style="display:block;text-align:center;text-decoration:none">Volver al inicio</a>
+      <a class="btn-s" href="index.html#app" style="display:block;text-align:center;text-decoration:none">Volver al inicio</a>
     </div>
   </div>
 
@@ -117,7 +123,7 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
 // Pegá acá la URL de tu app web de Apps Script (termina en /exec)
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyiQa1i38nEC5LSyT7A69mvzgXqtaa_OcxUjE_Ti-sF9EGsb9gHz1En09gNsndGjgCc-Q/exec';
 
-let pagoMode='efectivo', urgMode='tranquila', totalNum=0, pedidoActual=null;
+let pagoMode='efectivo', urgMode='tranquila', tipoMode='recarga', totalNum=0, pedidoActual=null;
 
 function calcGas(){
   const p={45:113000,30:78000,15:50000,10:37000};
@@ -126,6 +132,18 @@ function calcGas(){
   totalNum=c45*p[45]+c30*p[30]+c15*p[15]+c10*p[10];
   if(totalNum>0 && pagoMode==='transferencia') totalNum+=300;
   document.getElementById('total-gas').textContent='Total: $'+totalNum.toLocaleString('es-AR');
+}
+function setTipo(m){
+  tipoMode=m;
+  document.getElementById('btn-recarga').style.background=m==='recarga'?'#eaf3de':'#fff';
+  document.getElementById('btn-recarga').style.color=m==='recarga'?'#2d5a3d':'#888';
+  document.getElementById('btn-recarga').style.borderColor=m==='recarga'?'#2d5a3d':'#ddd';
+  document.getElementById('btn-nuevo').style.background=m==='nuevo'?'#eaf3de':'#fff';
+  document.getElementById('btn-nuevo').style.color=m==='nuevo'?'#2d5a3d':'#888';
+  document.getElementById('btn-nuevo').style.borderColor=m==='nuevo'?'#2d5a3d':'#ddd';
+  document.getElementById('nota-tipo').textContent = m==='nuevo'
+    ? 'Tubo nuevo: comprás el envase. El precio puede diferir, lo coordinás con Lalo.'
+    : 'Recarga: cambiás tu tubo vacío por uno lleno.';
 }
 function setPago(m){
   pagoMode=m;
@@ -160,10 +178,11 @@ async function hacerPedido(){
   if(c45+c30+c15+c10===0){alert('Agregá al menos una garrafa');return;}
   calcGas();
   const id='P'+Date.now()+Math.floor(Math.random()*900+100);
-  pedidoActual={accion:'pedido',id,lote,c45,c30,c15,c10,pago:pagoMode,urgencia:urgMode,total:totalNum};
+  pedidoActual={accion:'pedido',id,lote,c45,c30,c15,c10,tipoPedido:tipoMode,pago:pagoMode,urgencia:urgMode,total:totalNum};
   try{ await enviar(pedidoActual); }catch(e){}
   const partes=[]; if(c45)partes.push('45K x'+c45); if(c30)partes.push('30K x'+c30); if(c15)partes.push('15K x'+c15); if(c10)partes.push('10K x'+c10);
-  document.getElementById('resumen').textContent=lote+' · '+partes.join(', ');
+  const tipoTxt=tipoMode==='nuevo'?'Tubo nuevo':'Recarga';
+  document.getElementById('resumen').textContent=tipoTxt+' · '+lote+' · '+partes.join(', ');
   document.getElementById('totalPago').textContent='$'+totalNum.toLocaleString('es-AR');
   mostrar('paso2');
 }
