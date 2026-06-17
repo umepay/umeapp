@@ -102,6 +102,11 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
       <div class="row"><div class="lname">Alias</div><div style="font-weight:500">gas.centro.mejor</div></div>
       <div class="muted" style="margin-top:8px">Titular: Norma Torres · si es transferencia ya incluye los $300</div>
     </div>
+    <div class="slabel">Aclaración para la entrega (opcional)</div>
+    <div class="card">
+      <div style="font-size:13px;color:#888;margin-bottom:8px">Algo que ayude a encontrar tu casa o a saber dónde dejar el gas.</div>
+      <textarea class="inp" id="gas-aclaracion" rows="3" placeholder="Ej: mi casa es la del fondo a la derecha, portón verde." style="resize:vertical;font-family:inherit;margin-bottom:0"></textarea>
+    </div>
     <div class="slabel">Comprobante</div>
     <div class="card">
       <div style="font-size:13px;color:#888;margin-bottom:10px">Subí el comprobante de transferencia o una foto de dónde dejaste el dinero.</div>
@@ -226,9 +231,10 @@ function comprimir(file, cb){
 function enviarComprobante(){
   const f=document.getElementById('comprobante').files[0];
   if(!f){alert('Elegí o sacá una foto del comprobante');return;}
+  const acl=(document.getElementById('gas-aclaracion').value||'').trim();
   const btn=document.getElementById('btnComp'); btn.textContent='Enviando...'; btn.disabled=true;
   comprimir(f, async(b64)=>{
-    try{ await enviar({accion:'comprobante', id:pedidoActual.id, imagen:b64, tipo:'image/jpeg'}); }catch(e){}
+    try{ await enviar({accion:'comprobante', id:pedidoActual.id, imagen:b64, tipo:'image/jpeg', aclaracion:acl}); }catch(e){}
     mostrar('paso3');
   });
 }
