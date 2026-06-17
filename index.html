@@ -9,10 +9,11 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
   :root{
-    --verde:#2d5a3d;          /* color del ícono de la app */
+    --verde:#2d5a3d;
     --verde-osc:#214330;
     --crema:#f4ece0;
     --tinta:#2b241d;
+    --rojo:#9a2f2f;
     --serif:Georgia,'Iowan Old Style','Palatino Linotype',Palatino,serif;
     --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
     --sombra:0 14px 40px rgba(20,30,20,.30);
@@ -36,8 +37,7 @@
   .wordmark{
     font-family:var(--serif);color:#fff;
     font-size:clamp(44px,14vw,72px);font-weight:700;letter-spacing:.14em;line-height:.95;
-    padding-left:.14em;
-    text-shadow:0 2px 20px rgba(0,0,0,.5);
+    padding-left:.14em;text-shadow:0 2px 20px rgba(0,0,0,.5);
     animation:subir .9s cubic-bezier(.2,.7,.2,1) both;
   }
   #btnIngresar{
@@ -72,10 +72,15 @@
   .tarjeta:nth-child(3){animation-delay:.19s}
   @keyframes entrar{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
+  /* Bomberos resaltado (emergencia) */
+  .tarjeta.emergencia{background:#fdf1ef;border-color:rgba(154,47,47,.20)}
+  .tarjeta.emergencia .ico{background:#f6dedb;color:var(--rojo)}
+
   .ico{flex:0 0 52px;height:52px;border-radius:14px;display:grid;place-items:center;background:#efe7da;color:var(--verde)}
   .ico svg{width:30px;height:30px}
   .txt{flex:1;min-width:0}
-  .txt h2{font-size:19px;font-weight:700}
+  .txt h2{font-size:18px;font-weight:700}
+  .txt span{display:block;font-size:13px;color:#82715b;margin-top:2px}
   .flecha{flex:0 0 auto;color:#c7b9a4}
   .flecha svg{width:22px;height:22px}
 </style>
@@ -93,21 +98,21 @@
     <div class="cabecera"><h1>UmeApp</h1></div>
     <nav class="grilla">
 
-      <a class="tarjeta" href="bomberos.html">
+      <a class="tarjeta emergencia" href="bomberos.html">
         <span class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2s5 4.5 5 9a5 5 0 0 1-10 0c0-1.4.6-2.6 1.4-3.6C9 9.5 12 8 12 6c0 0 2 2 2 4 0-2-2-4-2-8Z" fill="currentColor"/></svg></span>
-        <span class="txt"><h2>Bomberos</h2></span>
+        <span class="txt"><h2>Bomberos · Emergencias</h2><span>Teléfonos de emergencia y mapa de acceso</span></span>
         <span class="flecha"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
       <a class="tarjeta" href="mapa.html">
         <span class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.8 7-11a7 7 0 1 0-14 0c0 5.2 7 11 7 11Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></span>
-        <span class="txt"><h2>Mapa</h2></span>
+        <span class="txt"><h2>Mapa</h2><span>Parcelas, barrios, calles y red de agua</span></span>
         <span class="flecha"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
       <a class="tarjeta" href="gas.html">
         <span class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="7" y="8" width="10" height="13" rx="2.4" stroke="currentColor" stroke-width="2"/><path d="M10 8V6.2A1.2 1.2 0 0 1 11.2 5h1.6A1.2 1.2 0 0 1 14 6.2V8" stroke="currentColor" stroke-width="2"/><path d="M12 12.5c1.4 1 1.4 2.6 0 3.5-1.4-.9-1.4-2.5 0-3.5Z" fill="currentColor"/></svg></span>
-        <span class="txt"><h2>UmeGas</h2></span>
+        <span class="txt"><h2>UmeGas</h2><span>Pedí tu garrafa de gas</span></span>
         <span class="flecha"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
@@ -125,11 +130,7 @@
   }
   function yaEntro(){try{return sessionStorage.getItem('ume_entrado')==='1';}catch(e){return false;}}
   function marcarEntrado(){try{sessionStorage.setItem('ume_entrado','1');}catch(e){}}
-
-  // Si ya entró en esta sesión (volvió desde una sección) o viene con #app,
-  // mostrar el INICIO directo, sin pasar por la pantalla de ingreso.
   if(location.hash==='#app' || yaEntro()){ abrirInicio(false); }
-
   document.getElementById('btnIngresar').addEventListener('click',function(){
     marcarEntrado();
     location.hash='app';
