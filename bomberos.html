@@ -39,9 +39,9 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .lbl::before{display:none}
 .lbl-barrio{background:rgba(122,67,38,.92);border:0;color:#fff;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:5px;box-shadow:0 1px 4px rgba(0,0,0,.35);white-space:nowrap}
 .lbl-barrio::before{display:none}
-.lbl-calle{background:rgba(255,255,255,.94);border:1px solid #c8a36e;color:#5a3a1a;font-weight:700;font-size:var(--calle-size,11px);padding:1px 6px;border-radius:3px;box-shadow:0 1px 2px rgba(0,0,0,.25);white-space:nowrap}
+.lbl-calle{background:transparent;border:0;box-shadow:none;color:#5a3a1a;font-weight:700;font-size:var(--calle-size,11px);padding:0;white-space:nowrap;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 2px #fff,1px 1px 2px #fff}
 .lbl-calle::before{display:none}
-.lbl-curso{background:rgba(255,255,255,.9);border:0;color:#1565c0;font-style:italic;font-weight:600;font-size:11px;padding:1px 5px;box-shadow:0 1px 2px rgba(0,0,0,.2);white-space:nowrap}
+.lbl-curso{background:transparent;border:0;box-shadow:none;color:#15639a;font-style:italic;font-weight:700;font-size:11px;padding:0;white-space:nowrap;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 2px #fff}
 .lbl-curso::before{display:none}
 .lbl-salida{background:#2b8a3e;border:0;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .lbl-salida::before{display:none}
@@ -54,7 +54,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 </head>
 <body>
 <div class="topbar">
-  <a class="btn-back" href="index.html"><i class="ti ti-arrow-left"></i></a>
+  <a class="btn-back" href="index.html#app"><i class="ti ti-arrow-left"></i></a>
   <h1>Bomberos · Emergencias</h1>
 </div>
 <div class="barra">
@@ -90,17 +90,17 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const CENTRO=[-31.8543,-64.7210];
+const CENTRO=[-32.199,-64.743];
 
 /* ====== nombres de campo (ajustables según tus geojson) ====== */
-const CAMPO_BARRIO=['Barrio','barrio','Nombre','nombre','NOMBRE'];
+const CAMPO_BARRIO=['barrio','Barrio','Nombre','nombre','NOMBRE'];
 const CAMPO_CALLE =['Nombre','nombre','Calle','calle'];
-const CAMPO_CURSO =['Nombre','nombre','Curso','curso','Name'];
-const CAMPO_PERM  =['Permanente','permanente','Tipo','tipo','Permanenci','Regimen','regimen','Régimen'];
+const CAMPO_CURSO =['NOMBRE_COM','NOMBRE_CUR','Nombre','nombre'];
+const CAMPO_PERM  =['Permanente','permanente','Regimen','regimen','Régimen','Permanenci']; // régimen explícito, si algún día lo agregás
 
 const CAPAS=[
   {archivo:'data/barrios.geojson',                nombre:'Barrios',          clase:'barrio',   visible:true},
-  {archivo:'data/cursos_agua.geojson',            nombre:'Cursos de agua',   clase:'curso',    visible:true},
+  {archivo:'data/Cursos_de_agua_2021.geojson',    nombre:'Cursos de agua',   clase:'curso',    visible:true},
   {archivo:'data/ejes_calles_int.geojson',        nombre:'Calles internas',  clase:'calle',    visible:true},
   {archivo:'data/red_vial_provincial.geojson',    nombre:'Ruta provincial',  clase:'vialProv', visible:true},
   {archivo:'data/puntos.geojson',                 nombre:'Puntos de agua',   clase:'aguaPunto',visible:true},
@@ -117,15 +117,22 @@ function primer(p,campos){p=p||{};for(const k of campos){const v=p[k];if(v!==und
 
 /* ¿el curso es permanente? */
 function esPermanente(p){
+  p=p||{};
+  // 1) si hay un campo de régimen explícito, mandar ese
   const v=norm(primer(p,CAMPO_PERM));
-  if(!v) return false;
-  if(v==='si'||v==='sí'||v==='true'||v==='1') return true;
-  if(v==='no'||v==='false'||v==='0') return false;
-  if(v.includes('intermit')||v.includes('tempor')||v.includes('estacional')||v.startsWith('no ')||v.includes('no perman')) return false;
-  return v.includes('perman');
+  if(v){
+    if(v==='si'||v==='sí'||v==='true'||v==='1') return true;
+    if(v==='no'||v==='false'||v==='0') return false;
+    if(v.includes('intermit')||v.includes('tempor')||v.includes('estacional')||v.startsWith('no ')||v.includes('no perman')) return false;
+    if(v.includes('perman')) return true;
+  }
+  // 2) PROVISORIO: este geojson de catastro no trae régimen → proxy por TIPO
+  const t=norm(p.TIPO);
+  if(!t||t==='canada') return false;     // cañada o sin clasificar → no permanente
+  return true;                            // río, arroyo, vertiente → permanente
 }
 /* ¿la vía es entrada o calle? */
-function esEntrada(p){return norm((p||{}).Tipo).includes('entrada');}
+function esEntrada(p){const t=norm((p||{}).Tipo);return t.includes('entrada')||t.includes('acceso');}
 
 function colorAgua(v){v=norm(v);
   if(v.includes('casa')) return '#d4a017';
@@ -154,7 +161,7 @@ function estiloBarrio(){return {color:'#7a4326',weight:1.6,dashArray:'4,4',fillC
 function estiloCalle(f){const e=esEntrada(f.properties);return {color:e?'#b07a45':'#8a5a2b',weight:e?3:4,dashArray:e?'7,5':null,lineCap:'round'};}
 function estiloCurso(f){const perm=esPermanente(f.properties);return {color:perm?'#1971c2':'#5aa0e0',weight:perm?3.2:2.4,dashArray:perm?null:'6,5',opacity:perm?1:0.85};}
 
-const ETIQUETAS={Barrio:'Barrio',Litros:'Litros',Observacio:'Observación',AutoBomba:'Carga autobomba',Acople:'Acople',Disponibil:'Disponibilidad',Nombre_Ref:'Referencia',Simbolo:'Símbolo',Nombre:'Nombre',Tipo:'Tipo',Manguera:'Manguera',TipoRed:'Red',AcopioMadr:'Acopio madre',red:'Red',rst:'Calzada',gna:'Tipo de vía',Permanente:'Régimen',Permanenci:'Régimen',Regimen:'Régimen'};
+const ETIQUETAS={Barrio:'Barrio',Litros:'Litros',Observacio:'Observación',AutoBomba:'Carga autobomba',Acople:'Acople',Disponibil:'Disponibilidad',Nombre_Ref:'Referencia',Simbolo:'Símbolo',Nombre:'Nombre',Tipo:'Tipo',Manguera:'Manguera',TipoRed:'Red',AcopioMadr:'Acopio madre',red:'Red',rst:'Calzada',gna:'Tipo de vía',Permanente:'Régimen',Permanenci:'Régimen',Regimen:'Régimen',TIPO:'Tipo',ORDEN:'Orden'};
 const VALORES={TanqAcopio:'Tanque acopio',TanqCasa:'Tanque casa',Acopio:'Acopio madre',Dique:'Dique','Estacion Brigada':'Estación brigada',T:'Bifurcación',Si:'Sí',No:'No'};
 function pretty(k){return ETIQUETAS[k]||(k.charAt(0).toUpperCase()+k.slice(1).replace(/_/g,' '));}
 function vacio(v){return v===null||v===''||String(v).toUpperCase()==='NULL';}
@@ -163,7 +170,7 @@ function popup(p,clase){
   p=p||{};
   let titulo, lista;
   if(clase==='barrio'){titulo=primer(p,CAMPO_BARRIO)||'Barrio';lista=['Observacio'];}
-  else if(clase==='curso'){titulo=primer(p,CAMPO_CURSO)||'Curso de agua';lista=['Permanente','Permanenci','Tipo','Observacio'];}
+  else if(clase==='curso'){titulo=primer(p,CAMPO_CURSO)||'Curso de agua';lista=['TIPO','ORDEN'];}
   else if(clase==='tranquera'){titulo=p.Tipo||'Tranquera';lista=['Simbolo','Observacio','Barrio'];}
   else if(clase==='calle'){titulo=(esEntrada(p)?'Entrada ':'Calle ')+(primer(p,CAMPO_CALLE)||(p.FID!=null?p.FID:''));lista=['Nombre','Tipo','Barrio'];}
   else if(clase==='vialProv'){titulo='Ruta provincial';lista=['red','gna','rst'];}
@@ -195,6 +202,7 @@ function agregar(gj,clase,nombre,overlays,visible){
   const opts={};
   if(clase==='barrio'){
     opts.style=estiloBarrio; opts.pane='barriosPane';
+    opts.filter=f=>norm((f.properties||{}).Umepay)==='si';
     opts.onEachFeature=(f,l)=>{
       l.bindPopup(popup(f.properties,'barrio'));
       const nom=primer(f.properties,CAMPO_BARRIO);
@@ -205,8 +213,10 @@ function agregar(gj,clase,nombre,overlays,visible){
     opts.onEachFeature=(f,l)=>{
       l.bindPopup(popup(f.properties,clase));
       if(clase==='calle'){
-        const nom=primer(f.properties,CAMPO_CALLE);
-        if(nom) l.bindTooltip(String(nom),{permanent:true,direction:'center',className:'lbl lbl-calle'});
+        if(!esEntrada(f.properties)){
+          const nom=primer(f.properties,CAMPO_CALLE);
+          if(nom) l.bindTooltip(String(nom),{permanent:true,direction:'center',className:'lbl-calle'});
+        }
       } else if(clase==='curso'){
         if(esPermanente(f.properties)){
           const nom=primer(f.properties,CAMPO_CURSO);
@@ -245,7 +255,7 @@ async function init(){
     try{
       const r=await fetch(c.archivo,{cache:'no-store'}); if(!r.ok)throw 0;
       const gj=await r.json(); agregar(gj,c.clase,c.nombre,overlays,c.visible);
-      if(c.clase==='barrio'){const b=L.geoJSON(gj).getBounds();if(b.isValid())bounds=b;}
+      if(c.clase==='barrio'){const b=L.geoJSON(gj,{filter:f=>norm((f.properties||{}).Umepay)==='si'}).getBounds();if(b.isValid())bounds=b;}
     }catch(e){}
   }
   L.control.layers(null,overlays,{collapsed:true}).addTo(map);
