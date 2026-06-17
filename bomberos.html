@@ -32,7 +32,8 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .ico i{line-height:1;text-shadow:0 0 2px #fff,0 0 3px #fff}
 .ico-galpon i{color:#1d6fb8;font-size:28px}.ico-dique i{color:#7f5bd0;font-size:26px}
 .ico-tranq i{color:#6b4f2a;font-size:13px}.ico-cruce i{color:#e03131;font-size:16px;font-weight:bold}
-.ico-t{display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#fff;border:1.6px solid #888;color:#555;font-weight:800;font-size:13px;line-height:1}
+.ico-tg{display:flex;align-items:center;justify-content:center;color:#0b7285;font-weight:800;font-size:14px;line-height:1;text-shadow:0 0 2px #fff,0 0 3px #fff,0 0 3px #fff}
+.ico-cisterna{width:14px;height:14px;background:#1d4ed8;border:2px solid #fff;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
 .ico-salida i{color:#2b8a3e;font-size:24px}
 
 /* etiquetas */
@@ -77,8 +78,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
   <span class="ll"><span class="sq" style="background:#7a4326"></span> Barrio</span>
   <span class="ll"><span class="line" style="border-color:#8a5a2b"></span> Calle</span>
   <span class="ll"><span class="line dash" style="border-color:#b07a45"></span> Entrada</span>
-  <span class="ll"><span class="line" style="border-color:#1971c2"></span> Curso perm.</span>
-  <span class="ll"><span class="line dash" style="border-color:#5aa0e0"></span> Curso no perm.</span>
+  <span class="ll"><span class="line" style="border-color:#1971c2"></span> Curso de agua</span>
   <span class="ll"><i class="ti ti-rectangle-filled" style="color:#6b4f2a"></i> Tranquera</span>
   <span class="ll"><span class="dot" style="background:#1d4ed8;width:15px;height:15px"></span> Acopio</span>
   <span class="ll"><span class="dot" style="background:#2e9e54"></span> T. acopio</span>
@@ -105,7 +105,7 @@ const CAPAS=[
   {archivo:'data/ejes_calles_int.geojson',        nombre:'Calles internas',  clase:'calle',    visible:true},
   {archivo:'data/red_vial_provincial.geojson',    nombre:'Ruta provincial',  clase:'vialProv', visible:true},
   {archivo:'data/puntos.geojson',                 nombre:'Puntos de agua',   clase:'aguaPunto',visible:true},
-  {archivo:'data/Vial_puntos.geojson',            nombre:'Tranqueras',       clase:'tranquera',visible:true},
+  {archivo:'data/Vial_puntos.geojson',            nombre:'Tranqueras',       clase:'tranquera',visible:false},
   {archivo:'data/salidas.geojson',                nombre:'Salidas',          clase:'salida',   visible:true}
 ];
 
@@ -152,9 +152,10 @@ function aguaMarker(f,ll){
   const cat=norm(valCat(f.properties));
   if(cat.includes('brigada')) return L.marker(ll,{icon:icoTab('ico-galpon','ti-building-warehouse',34)}).bindTooltip('Brigada',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
   if(cat.includes('dique')) return L.marker(ll,{icon:icoTab('ico-dique','ti-ripple',32)}).bindTooltip('Dique',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
-  if(cat==='t') return L.marker(ll,{icon:L.divIcon({html:'T',className:'ico-t',iconSize:[20,20],iconAnchor:[10,10]})});
+  if(cat.includes('cisterna')) return L.marker(ll,{icon:L.divIcon({html:'',className:'ico-cisterna',iconSize:[14,14],iconAnchor:[7,7]})});
+  if(cat==='t') return L.marker(ll,{icon:L.divIcon({html:'T',className:'ico-tg',iconSize:[16,16],iconAnchor:[8,8]})});
   let r=5;
-  if(cat.includes('tanqacopio')) r=7; else if(cat.includes('acopio')) r=9; else if(cat.includes('cisterna')) r=6; else if(cat.includes('casa')) r=5;
+  if(cat.includes('tanqacopio')) r=7; else if(cat.includes('acopio')) r=9; else if(cat.includes('casa')) r=5;
   return L.circleMarker(ll,{radius:r,color:'#fff',weight:2,fillColor:colorAgua(valCat(f.properties)),fillOpacity:1});
 }
 function tranqMarker(f,ll){const s=norm((f.properties||{}).Simbolo);return L.marker(ll,{icon:icoTab('ico-tranq',SIMB[s]||'ti-rectangle-filled',14)});}
@@ -162,7 +163,7 @@ function tranqMarker(f,ll){const s=norm((f.properties||{}).Simbolo);return L.mar
 /* estilos */
 function estiloBarrio(){return {color:'#7a4326',weight:1.6,dashArray:'4,4',fillColor:'#c79a6a',fillOpacity:0.12};}
 function estiloCalle(f){const e=esEntrada(f.properties);return {color:e?'#b07a45':'#8a5a2b',weight:e?3:4,dashArray:e?'7,5':null,lineCap:'round'};}
-function estiloCurso(f){const perm=esPermanente(f.properties);return {color:perm?'#1971c2':'#5aa0e0',weight:perm?3.2:2.4,dashArray:perm?null:'6,5',opacity:perm?1:0.85};}
+function estiloCurso(){return {color:'#1971c2',weight:2.6};}
 
 const ETIQUETAS={Barrio:'Barrio',Litros:'Litros',Observacio:'Observación',AutoBomba:'Carga autobomba',Acople:'Acople',Disponibil:'Disponibilidad',Nombre_Ref:'Referencia',Simbolo:'Símbolo',Nombre:'Nombre',Tipo:'Tipo',Manguera:'Manguera',TipoRed:'Red',AcopioMadr:'Acopio madre',red:'Red',rst:'Calzada',gna:'Tipo de vía',Permanente:'Régimen',Permanenci:'Régimen',Regimen:'Régimen',TIPO:'Tipo',ORDEN:'Orden'};
 const VALORES={TanqAcopio:'Tanque acopio',TanqCasa:'Tanque casa',Acopio:'Acopio madre',Dique:'Dique','Estacion Brigada':'Estación brigada',T:'Bifurcación',Si:'Sí',No:'No'};
@@ -221,10 +222,8 @@ function agregar(gj,clase,nombre,overlays,visible){
           if(nom) l.bindTooltip(String(nom),{permanent:true,direction:'center',className:'lbl-calle'});
         }
       } else if(clase==='curso'){
-        if(esPermanente(f.properties)){
-          const nom=primer(f.properties,CAMPO_CURSO);
-          if(nom) l.bindTooltip(String(nom),{permanent:true,direction:'center',className:'lbl-curso'});
-        }
+        const nom=primer(f.properties,CAMPO_CURSO);
+        if(nom) l.bindTooltip(String(nom),{permanent:true,direction:'center',className:'lbl-curso'});
       } else if(clase==='salida'){
         const t=f.properties||{};const txt=t.Salida||t.Nombre||t.Destino||t.destino||'Salida';
         l.bindTooltip(txt,{permanent:true,direction:'top',className:'lbl-salida'});
