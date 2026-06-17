@@ -229,7 +229,7 @@ function agregar(gj,clase,nombre,overlays,visible){
         l.bindTooltip(txt,{permanent:true,direction:'top',className:'lbl-salida'});
       }
     };
-    if(clase==='aguaPunto') opts.pointToLayer=aguaMarker;
+    if(clase==='aguaPunto'){opts.pointToLayer=aguaMarker;opts.filter=f=>norm(valCat(f.properties))!=='t';}
     else if(clase==='tranquera') opts.pointToLayer=tranqMarker;
     else if(clase==='salida'){opts.style={color:'#2b8a3e',weight:5};opts.pointToLayer=(f,ll)=>L.marker(ll,{icon:icoTab('ico-salida','ti-door-exit',28)});}
     else if(clase==='calle') opts.style=estiloCalle;
@@ -250,7 +250,15 @@ function escalaCalles(){
 map.on('zoomend',escalaCalles); escalaCalles();
 
 let ultimoBounds=null;
-function encuadrar(){map.invalidateSize();if(ultimoBounds&&ultimoBounds.isValid()){map.fitBounds(ultimoBounds.pad(0.01),{maxZoom:17}); if(map.getZoom()<15) map.setZoom(15);}}
+function encuadrar(){
+  map.invalidateSize();
+  if(ultimoBounds&&ultimoBounds.isValid()){
+    const b=ultimoBounds.pad(0.01);
+    let z=map.getBoundsZoom(b,false);
+    z=Math.max(14,Math.min(17,z));
+    map.setView(b.getCenter(),z);
+  }
+}
 async function init(){
   const overlays={}; let bounds=null;
   for(const c of CAPAS){
