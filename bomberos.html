@@ -32,6 +32,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .ico i{line-height:1;text-shadow:0 0 2px #fff,0 0 3px #fff}
 .ico-galpon i{color:#1d6fb8;font-size:28px}.ico-dique i{color:#7f5bd0;font-size:26px}
 .ico-tranq i{color:#6b4f2a;font-size:13px}.ico-cruce i{color:#e03131;font-size:16px;font-weight:bold}
+.ico-t{display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#fff;border:1.6px solid #888;color:#555;font-weight:800;font-size:13px;line-height:1}
 .ico-salida i{color:#2b8a3e;font-size:24px}
 
 /* etiquetas */
@@ -135,6 +136,7 @@ function esPermanente(p){
 function esEntrada(p){const t=norm((p||{}).Tipo);return t.includes('entrada')||t.includes('acceso');}
 
 function colorAgua(v){v=norm(v);
+  if(v.includes('cisterna')) return '#1098ad';
   if(v.includes('casa')) return '#d4a017';
   if(v.includes('tanqacopio')) return '#2e9e54';
   if(v.includes('acopio')) return '#1d4ed8';
@@ -150,8 +152,9 @@ function aguaMarker(f,ll){
   const cat=norm(valCat(f.properties));
   if(cat.includes('brigada')) return L.marker(ll,{icon:icoTab('ico-galpon','ti-building-warehouse',34)}).bindTooltip('Brigada',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
   if(cat.includes('dique')) return L.marker(ll,{icon:icoTab('ico-dique','ti-ripple',32)}).bindTooltip('Dique',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
+  if(cat==='t') return L.marker(ll,{icon:L.divIcon({html:'T',className:'ico-t',iconSize:[20,20],iconAnchor:[10,10]})});
   let r=5;
-  if(cat.includes('tanqacopio')) r=7; else if(cat.includes('acopio')) r=9; else if(cat.includes('casa')) r=5; else if(cat==='t') r=4;
+  if(cat.includes('tanqacopio')) r=7; else if(cat.includes('acopio')) r=9; else if(cat.includes('cisterna')) r=6; else if(cat.includes('casa')) r=5;
   return L.circleMarker(ll,{radius:r,color:'#fff',weight:2,fillColor:colorAgua(valCat(f.properties)),fillOpacity:1});
 }
 function tranqMarker(f,ll){const s=norm((f.properties||{}).Simbolo);return L.marker(ll,{icon:icoTab('ico-tranq',SIMB[s]||'ti-rectangle-filled',14)});}
@@ -248,7 +251,7 @@ function escalaCalles(){
 map.on('zoomend',escalaCalles); escalaCalles();
 
 let ultimoBounds=null;
-function encuadrar(){map.invalidateSize();if(ultimoBounds&&ultimoBounds.isValid())map.fitBounds(ultimoBounds.pad(0.05),{maxZoom:16});}
+function encuadrar(){map.invalidateSize();if(ultimoBounds&&ultimoBounds.isValid()){map.fitBounds(ultimoBounds.pad(0.01),{maxZoom:17}); if(map.getZoom()<15) map.setZoom(15);}}
 async function init(){
   const overlays={}; let bounds=null;
   for(const c of CAPAS){
