@@ -3,24 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>UmeApp · Comunidad Umepay</title>
-<meta name="theme-color" content="#2f3a2b">
+<title>UmeApp</title>
+<meta name="theme-color" content="#2d5a3d">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
   :root{
-    --tierra:#9c5a35;        /* clay / terracota */
-    --tierra-osc:#7a4326;
-    --verde:#3a5a40;         /* bosque */
-    --verde-osc:#2f3a2b;
+    --verde:#2d5a3d;          /* color del ícono de la app */
+    --verde-osc:#214330;
     --crema:#f4ece0;
-    --crema-2:#ece1d0;
     --tinta:#2b241d;
-    --naranja:#c9772f;
-    --rojo:#9a2f2f;
-    --sombra:0 14px 40px rgba(30,20,10,.28);
     --serif:Georgia,'Iowan Old Style','Palatino Linotype',Palatino,serif;
     --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    --sombra:0 14px 40px rgba(20,30,20,.30);
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%}
@@ -29,207 +24,119 @@
   /* ====== PANTALLA DE INGRESO ====== */
   #entrada{
     position:fixed;inset:0;z-index:30;
-    display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
+    display:flex;flex-direction:column;justify-content:center;align-items:center;gap:32px;
     text-align:center;
     background:
-      linear-gradient(to bottom, rgba(30,38,28,.18) 0%, rgba(30,38,28,.05) 32%, rgba(30,38,28,.55) 72%, rgba(25,32,23,.86) 100%),
-      url('assets/centro-umepay.jpg') center 30% / cover no-repeat;
-    padding:0 26px calc(env(safe-area-inset-bottom) + 46px);
+      linear-gradient(to bottom, rgba(25,40,28,.30) 0%, rgba(25,40,28,.12) 40%, rgba(20,33,24,.62) 100%),
+      url('assets/centro-umepay.jpg') center 32% / cover no-repeat;
+    padding:0 26px calc(env(safe-area-inset-bottom) + 20px);
     transition:opacity .6s ease, transform .6s ease;
   }
   #entrada.salir{opacity:0;transform:scale(1.04);pointer-events:none}
-
-  .marca{
-    margin-bottom:auto;margin-top:calc(env(safe-area-inset-top) + 16vh);
-    display:flex;flex-direction:column;align-items:center;gap:18px;
-    animation:subir .9s cubic-bezier(.2,.7,.2,1) both;
-  }
-  .sello{
-    width:96px;height:96px;border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #b97a4e, var(--tierra) 70%);
-    display:grid;place-items:center;
-    box-shadow:0 0 0 6px rgba(244,236,224,.16), var(--sombra);
-  }
-  .sello svg{width:52px;height:52px}
   .wordmark{
     font-family:var(--serif);color:#fff;
-    font-size:clamp(40px,13vw,62px);font-weight:700;
-    letter-spacing:.14em;line-height:.95;
-    text-shadow:0 2px 18px rgba(0,0,0,.45);
+    font-size:clamp(44px,14vw,72px);font-weight:700;letter-spacing:.14em;line-height:.95;
     padding-left:.14em;
+    text-shadow:0 2px 20px rgba(0,0,0,.5);
+    animation:subir .9s cubic-bezier(.2,.7,.2,1) both;
   }
-  .lema{
-    color:rgba(255,255,255,.92);font-size:14px;letter-spacing:.32em;
-    text-transform:uppercase;font-weight:600;
-    text-shadow:0 1px 10px rgba(0,0,0,.5);
-  }
-  .lema small{display:block;letter-spacing:.16em;font-weight:400;font-size:11.5px;opacity:.82;margin-top:6px;text-transform:none}
-
   #btnIngresar{
-    width:100%;max-width:340px;border:none;cursor:pointer;
+    width:100%;max-width:320px;border:none;cursor:pointer;
     font-family:var(--sans);font-size:18px;font-weight:700;letter-spacing:.06em;
-    color:#fff;padding:18px 24px;border-radius:18px;
-    background:linear-gradient(135deg,var(--tierra),var(--tierra-osc));
+    color:#fff;padding:18px 24px;border-radius:16px;background:var(--verde);
     box-shadow:var(--sombra);
     animation:subir 1s .15s cubic-bezier(.2,.7,.2,1) both;
     transition:transform .12s ease, filter .2s ease;
   }
-  #btnIngresar:active{transform:translateY(2px) scale(.99);filter:brightness(1.05)}
-  .pista{color:rgba(255,255,255,.7);font-size:12px;margin-top:14px;letter-spacing:.04em;
-    animation:subir 1s .25s cubic-bezier(.2,.7,.2,1) both}
-
+  #btnIngresar:active{transform:translateY(2px) scale(.99);filter:brightness(1.12)}
   @keyframes subir{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 
-  /* ====== MENÚ DE MÓDULOS ====== */
-  #menu{
-    min-height:100%;
-    background:
-      radial-gradient(120% 60% at 50% 0%, rgba(58,90,64,.10), transparent 60%),
-      var(--crema);
-    opacity:0;transition:opacity .6s ease .15s;
-  }
+  /* ====== PANTALLA DE INICIO ====== */
+  #menu{min-height:100%;background:var(--crema);opacity:0;transition:opacity .5s ease .12s}
   #menu.ver{opacity:1}
-  .tope{
-    position:relative;height:128px;overflow:hidden;
-    border-bottom:3px solid rgba(124,67,38,.35);
-  }
-  .tope img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block;filter:saturate(1.02)}
-  .tope::after{content:"";position:absolute;inset:0;
-    background:linear-gradient(to top, rgba(30,38,28,.78), rgba(30,38,28,.05))}
-  .tope .sello-mini{
-    position:absolute;left:50%;bottom:-26px;transform:translateX(-50%);
-    width:64px;height:64px;border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #b97a4e, var(--tierra) 70%);
-    display:grid;place-items:center;border:3px solid var(--crema);box-shadow:var(--sombra);
-  }
-  .sello-mini svg{width:34px;height:34px}
+  .cabecera{text-align:center;padding:calc(env(safe-area-inset-top) + 42px) 20px 10px}
+  .cabecera h1{font-family:var(--serif);font-size:30px;letter-spacing:.04em;color:var(--verde)}
 
-  .cabecera{text-align:center;padding:42px 20px 6px}
-  .cabecera h1{font-family:var(--serif);font-size:26px;letter-spacing:.1em;color:var(--verde-osc)}
-  .cabecera p{font-size:13px;color:#7a6a55;margin-top:4px;letter-spacing:.02em}
-
-  .grilla{display:flex;flex-direction:column;gap:16px;padding:22px 18px calc(env(safe-area-inset-bottom) + 34px);max-width:560px;margin:0 auto}
+  .grilla{display:flex;flex-direction:column;gap:14px;padding:24px 18px calc(env(safe-area-inset-bottom) + 34px);max-width:560px;margin:0 auto}
   .tarjeta{
-    display:flex;align-items:center;gap:18px;text-decoration:none;color:var(--tinta);
-    background:#fff;border-radius:20px;padding:20px 20px;
+    display:flex;align-items:center;gap:16px;text-decoration:none;color:var(--tinta);
+    background:#fff;border-radius:18px;padding:18px 20px;
     box-shadow:0 8px 22px rgba(40,28,15,.10);
-    border:1px solid rgba(124,67,38,.10);
-    border-left:7px solid var(--ac,#999);
+    border:1px solid rgba(40,28,15,.06);
     transition:transform .14s ease, box-shadow .2s ease;
-    animation:entrarTarjeta .5s both;
+    animation:entrar .5s both;
   }
   .tarjeta:active{transform:scale(.985);box-shadow:0 4px 14px rgba(40,28,15,.14)}
   .tarjeta:nth-child(1){animation-delay:.05s}
-  .tarjeta:nth-child(2){animation-delay:.13s}
-  .tarjeta:nth-child(3){animation-delay:.21s}
-  @keyframes entrarTarjeta{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .tarjeta:nth-child(2){animation-delay:.12s}
+  .tarjeta:nth-child(3){animation-delay:.19s}
+  @keyframes entrar{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
-  .ico{flex:0 0 58px;height:58px;border-radius:16px;display:grid;place-items:center;background:var(--bg,#eee)}
-  .ico svg{width:32px;height:32px}
+  .ico{flex:0 0 52px;height:52px;border-radius:14px;display:grid;place-items:center;background:#efe7da;color:var(--verde)}
+  .ico svg{width:30px;height:30px}
   .txt{flex:1;min-width:0}
-  .txt h2{font-size:19px;font-weight:700;letter-spacing:.01em}
-  .txt span{font-size:13.5px;color:#82715b;display:block;margin-top:2px}
+  .txt h2{font-size:19px;font-weight:700}
   .flecha{flex:0 0 auto;color:#c7b9a4}
   .flecha svg{width:22px;height:22px}
-
-  .urgencia{font-size:11px;font-weight:700;color:#fff;background:var(--rojo);
-    padding:2px 8px;border-radius:999px;letter-spacing:.06em;display:inline-block;margin-top:6px}
-
-  .pie{text-align:center;padding:6px 20px 30px;color:#9a8a73;font-size:11.5px;letter-spacing:.04em}
 </style>
 </head>
 <body>
 
-  <!-- ============ INGRESO ============ -->
+  <!-- PANTALLA DE INGRESO -->
   <section id="entrada">
-    <div class="marca">
-      <div class="sello">
-        <!-- gota + hoja: agua + aldea -->
-        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
-          <path d="M24 5C24 5 36 19 36 29a12 12 0 0 1-24 0C12 19 24 5 24 5Z" fill="#fff" fill-opacity=".95"/>
-          <path d="M24 33c-4 0-7-2.6-7.6-6.4 4.2.2 6.6 2.6 7.6 6.4Z" fill="#3a5a40"/>
-          <path d="M24 33c4 0 7-2.6 7.6-6.4-4.2.2-6.6 2.6-7.6 6.4Z" fill="#3a5a40" fill-opacity=".7"/>
-        </svg>
-      </div>
-      <div class="wordmark">UMEPAY</div>
-      <div class="lema"><small>Villa Yacanto · Córdoba</small></div>
-    </div>
-
+    <div class="wordmark">UMEPAY</div>
     <button id="btnIngresar">Ingresar</button>
   </section>
 
-  <!-- ============ MENÚ ============ -->
+  <!-- PANTALLA DE INICIO -->
   <main id="menu" aria-hidden="true">
-    <div class="tope">
-      <img src="assets/centro-umepay.jpg" alt="Centro Umepay">
-      <div class="sello-mini">
-        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
-          <path d="M24 5C24 5 36 19 36 29a12 12 0 0 1-24 0C12 19 24 5 24 5Z" fill="#fff"/>
-          <path d="M24 33c-4 0-7-2.6-7.6-6.4 4.2.2 6.6 2.6 7.6 6.4Z" fill="#3a5a40"/>
-        </svg>
-      </div>
-    </div>
-
-    <div class="cabecera">
-      <h1>UmeApp</h1>
-      <p>Herramientas de la comunidad</p>
-    </div>
-
+    <div class="cabecera"><h1>UmeApp</h1></div>
     <nav class="grilla">
 
-      <a class="tarjeta" href="bomberos.html" style="--ac:#9a2f2f">
-        <span class="ico" style="--bg:#f6e2df">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2s5 4.5 5 9a5 5 0 0 1-10 0c0-1.4.6-2.6 1.4-3.6C9 9.5 12 8 12 6c0 0 2 2 2 4 0-2-2-4-2-8Z" fill="#9a2f2f"/></svg>
-        </span>
-        <span class="txt">
-          <h2>Bomberos</h2>
-          <span>Emergencias y mapa de acceso</span>
-          <span class="urgencia">EMERGENCIA</span>
-        </span>
+      <a class="tarjeta" href="bomberos.html">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2s5 4.5 5 9a5 5 0 0 1-10 0c0-1.4.6-2.6 1.4-3.6C9 9.5 12 8 12 6c0 0 2 2 2 4 0-2-2-4-2-8Z" fill="currentColor"/></svg></span>
+        <span class="txt"><h2>Bomberos</h2></span>
         <span class="flecha"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
-      <a class="tarjeta" href="mapa.html" style="--ac:#3a5a40">
-        <span class="ico" style="--bg:#e3ece2">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.8 7-11a7 7 0 1 0-14 0c0 5.2 7 11 7 11Z" stroke="#3a5a40" stroke-width="2"/><circle cx="12" cy="10" r="2.6" fill="#3a5a40"/></svg>
-        </span>
-        <span class="txt">
-          <h2>Mapa</h2>
-          <span>Parcelas, barrios, calles y red de agua</span>
-        </span>
+      <a class="tarjeta" href="mapa.html">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.8 7-11a7 7 0 1 0-14 0c0 5.2 7 11 7 11Z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.6" fill="currentColor"/></svg></span>
+        <span class="txt"><h2>Mapa</h2></span>
         <span class="flecha"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
-      <a class="tarjeta" href="gas.html" style="--ac:#c9772f">
-        <span class="ico" style="--bg:#f7e8d6">
-          <svg viewBox="0 0 24 24" fill="none"><rect x="7" y="8" width="10" height="13" rx="2.4" stroke="#c9772f" stroke-width="2"/><path d="M10 8V6.2A1.2 1.2 0 0 1 11.2 5h1.6A1.2 1.2 0 0 1 14 6.2V8" stroke="#c9772f" stroke-width="2"/><path d="M12 12.5c1.4 1 1.4 2.6 0 3.5-1.4-.9-1.4-2.5 0-3.5Z" fill="#c9772f"/></svg>
-        </span>
-        <span class="txt">
-          <h2>UmeGas</h2>
-          <span>Pedí tu garrafa de gas</span>
-        </span>
+      <a class="tarjeta" href="gas.html">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="7" y="8" width="10" height="13" rx="2.4" stroke="currentColor" stroke-width="2"/><path d="M10 8V6.2A1.2 1.2 0 0 1 11.2 5h1.6A1.2 1.2 0 0 1 14 6.2V8" stroke="currentColor" stroke-width="2"/><path d="M12 12.5c1.4 1 1.4 2.6 0 3.5-1.4-.9-1.4-2.5 0-3.5Z" fill="currentColor"/></svg></span>
+        <span class="txt"><h2>UmeGas</h2></span>
         <span class="flecha"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
     </nav>
-
-    <div class="pie">Cooperativa de agua Umepay</div>
   </main>
 
 <script>
   var entrada=document.getElementById('entrada');
   var menu=document.getElementById('menu');
-  document.getElementById('btnIngresar').addEventListener('click',function(){
-    entrada.classList.add('salir');
+  function abrirInicio(animar){
+    if(animar){entrada.classList.add('salir');setTimeout(function(){entrada.style.display='none';},650);}
+    else{entrada.style.display='none';}
     menu.classList.add('ver');
     menu.setAttribute('aria-hidden','false');
-    setTimeout(function(){ entrada.style.display='none'; }, 650);
-  });
+  }
+  function yaEntro(){try{return sessionStorage.getItem('ume_entrado')==='1';}catch(e){return false;}}
+  function marcarEntrado(){try{sessionStorage.setItem('ume_entrado','1');}catch(e){}}
 
+  // Si ya entró en esta sesión (volvió desde una sección) o viene con #app,
+  // mostrar el INICIO directo, sin pasar por la pantalla de ingreso.
+  if(location.hash==='#app' || yaEntro()){ abrirInicio(false); }
+
+  document.getElementById('btnIngresar').addEventListener('click',function(){
+    marcarEntrado();
+    location.hash='app';
+    abrirInicio(true);
+  });
   if('serviceWorker' in navigator){
-    window.addEventListener('load',function(){
-      navigator.serviceWorker.register('sw.js').catch(function(){});
-    });
+    window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
   }
 </script>
 </body>
