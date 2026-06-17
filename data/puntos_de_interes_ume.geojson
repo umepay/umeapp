@@ -1,0 +1,15 @@
+{
+"type": "FeatureCollection",
+"name": "puntos_de_interes_ume",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"xy_coordinate_resolution": 1e-15,
+"features": [
+{ "type": "Feature", "properties": { "FID": 1, "Lugar": "Despensa", "Descripcio": "Despensa" }, "geometry": { "type": "Point", "coordinates": [ -64.752619385605854, -32.19129967987125 ] } },
+{ "type": "Feature", "properties": { "FID": 2, "Lugar": "Siembra Dicha", "Descripcio": "Casa de Te" }, "geometry": { "type": "Point", "coordinates": [ -64.752567978080464, -32.191886474432089 ] } },
+{ "type": "Feature", "properties": { "FID": 3, "Lugar": "Escuela", "Descripcio": "Escuela Umepay" }, "geometry": { "type": "Point", "coordinates": [ -64.752331186705533, -32.192744459364015 ] } },
+{ "type": "Feature", "properties": { "FID": 4, "Lugar": "Dique", "Descripcio": "Estacion de bomberos, Dique" }, "geometry": { "type": "Point", "coordinates": [ -64.743991731742597, -32.193077330614067 ] } },
+{ "type": "Feature", "properties": { "FID": 5, "Lugar": "Plaza", "Descripcio": "Plaza de ninxs, Acacias" }, "geometry": { "type": "Point", "coordinates": [ -64.734485110840254, -32.193095997777206 ] } },
+{ "type": "Feature", "properties": { "FID": 6, "Lugar": "Poli", "Descripcio": "Polideportivo" }, "geometry": { "type": "Point", "coordinates": [ -64.732212779601554, -32.199105655445599 ] } },
+{ "type": "Feature", "properties": { "FID": 7, "Lugar": "Centro Umepay", "Descripcio": null }, "geometry": { "type": "Point", "coordinates": [ -64.738020779398283, -32.212354881680959 ] } }
+]
+}
