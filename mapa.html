@@ -31,7 +31,8 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .sw.ume{background:#2d5a3d52;border:1.6px solid #2d5a3d}
 .sw.otra{background:#9a9e9329;border:1.6px solid #9a9e93}
 .dot{width:12px;height:12px;border-radius:50%;display:inline-block;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.2)}
-.tbadge{width:16px;height:16px;border-radius:50%;background:#fff;border:1.5px solid #888;color:#555;font-weight:800;font-size:11px;line-height:14px;text-align:center;display:inline-block}
+.sqm{width:13px;height:13px;border-radius:3px;display:inline-block;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.tbadge{color:#0b7285;font-weight:800;font-size:14px;display:inline-block;width:14px;text-align:center;text-shadow:0 0 2px #fff}
 .line{width:18px;border-top:3px solid;display:inline-block}
 .ico{display:flex;align-items:center;justify-content:center}
 .ico i{line-height:1;text-shadow:0 0 2px #fff,0 0 3px #fff}
@@ -39,7 +40,10 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .ico-dique i{color:#7f5bd0;font-size:22px}
 .ico-cruce i{color:#e03131;font-size:16px;font-weight:bold}
 .ico-interes i{color:#f08c00;font-size:24px}
-.ico-t{display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#fff;border:1.6px solid #888;color:#555;font-weight:800;font-size:13px;line-height:1}
+.ico-tg{display:flex;align-items:center;justify-content:center;color:#0b7285;font-weight:800;font-size:14px;line-height:1;text-shadow:0 0 2px #fff,0 0 3px #fff,0 0 3px #fff}
+.ico-cisterna{width:14px;height:14px;background:#1d4ed8;border:2px solid #fff;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.btn-loc{width:42px;height:42px;background:#fff;border:none;border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,.4);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.btn-loc i{font-size:22px;color:#2d5a3d}
 .descargas summary{padding:13px 16px;cursor:pointer;font-weight:700;font-size:15px;color:#2d5a3d;background:#e8f0e4;list-style:none;display:flex;align-items:center;gap:9px;border-top:0.5px solid #d6e2d4}
 .descargas summary::-webkit-details-marker{display:none}
 .descargas summary .chev{margin-left:auto;font-size:13px;transition:transform .2s}
@@ -77,9 +81,9 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
     </div>
     <div class="grp"><span class="glabel">Agua</span>
       <span class="ll"><span class="dot" style="background:#1d4ed8;width:15px;height:15px"></span> Acopio madre</span>
+      <span class="ll"><span class="sqm" style="background:#1d4ed8"></span> Cisterna</span>
       <span class="ll"><span class="dot" style="background:#2e9e54"></span> Tanque acopio</span>
       <span class="ll"><span class="dot" style="background:#d4a017;width:9px;height:9px"></span> Tanque casa</span>
-      <span class="ll"><span class="dot" style="background:#1098ad"></span> Cisterna</span>
       <span class="ll"><i class="ti ti-ripple" style="color:#7f5bd0"></i> Dique</span>
       <span class="ll"><i class="ti ti-building-warehouse" style="color:#1d6fb8"></i> Estación brigada</span>
       <span class="ll"><span class="tbadge">T</span> Bifurcación</span>
@@ -88,7 +92,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
       <span class="ll"><span class="line" style="border-color:#6f42c1"></span> 1"</span>
       <span class="ll"><span class="line" style="border-color:#e24b4a"></span> 1/2"</span>
       <span class="ll"><span class="line" style="border-color:#22b8cf"></span> 3/4"</span>
-      <span class="ll"><span class="line" style="border-color:#e64980"></span> 1 1/2"</span>
+      <span class="ll"><span class="line" style="border-color:#e64980"></span> 1 1/4"</span>
     </div>
     <div class="grp"><span class="glabel">Otras</span>
       <span class="ll"><i class="ti ti-star-filled" style="color:#f08c00"></i> Punto de interés</span>
@@ -116,18 +120,23 @@ const FORM_URL='';
 const CAPAS=[
   {archivo:'data/parcelas.geojson',                nombre:'Parcelas',          clase:'parcela',  visible:true},
   {archivo:'data/barrios.geojson',                 nombre:'Barrios',           clase:'barrio',   visible:false},
-  {archivo:'data/puntos.geojson',                  nombre:'Puntos de agua',    clase:'aguaPunto',visible:true},
-  {archivo:'data/lineas.geojson',                  nombre:'Mangueras',         clase:'aguaLinea',visible:true},
+  {archivo:'data/puntos.geojson',                  nombre:'Puntos de agua',    clase:'aguaPunto',visible:false},
+  {archivo:'data/lineas.geojson',                  nombre:'Mangueras',         clase:'aguaLinea',visible:false},
   {archivo:'data/Intersec_lineas_calles.geojson',  nombre:'Cruces agua/calle', clase:'cruce',    visible:false},
   {archivo:'data/ejes_calles_int.geojson',         nombre:'Calles',            clase:'calle',    visible:true},
   {archivo:'data/puntos_de_interes_ume.geojson',   nombre:'Puntos de interés', clase:'interes',  visible:true},
   {archivo:'data/Cursos_de_agua_2021.geojson',     nombre:'Cursos de agua',    clase:'curso',    visible:false},
-  {archivo:'data/red_vial_provincial.geojson',     nombre:'Ruta provincial',   clase:'vialProv', visible:false}
+  {archivo:'data/red_vial_provincial.geojson',     nombre:'Ruta provincial',   clase:'vialProv', visible:true}
 ];
 
 const map=L.map('map').setView(CENTRO,16);
 map.createPane('parcelasPane'); map.getPane('parcelasPane').style.zIndex=350;
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+
+const DATOS={}; let marcadorYo=null;
+const ctlLoc=L.control({position:'bottomright'});
+ctlLoc.onAdd=function(){const b=L.DomUtil.create('button','btn-loc');b.innerHTML='<i class="ti ti-current-location"></i>';b.title='Mi ubicación';L.DomEvent.on(b,'click',function(e){L.DomEvent.stop(e);miUbicacion();});return b;};
+ctlLoc.addTo(map);
 
 function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();}
 function estiloParcela(f){
@@ -138,13 +147,12 @@ function estiloParcela(f){
 }
 function estiloBarrio(){return {color:'#7a4326',weight:1.6,dashArray:'4,4',fillColor:'#c79a6a',fillOpacity:0.10};}
 function colorAgua(v){v=norm(v);
-  if(v.includes('cisterna')) return '#1098ad';
   if(v.includes('casa')) return '#d4a017';
   if(v.includes('tanqacopio')) return '#2e9e54';
   if(v.includes('acopio')) return '#1d4ed8';
   if(v.includes('dique')) return '#7f5bd0';
   if(v.includes('brigada')) return '#4aa3df';
-  if(v==='1 1/2'||v==='1.5'||v.includes('1 1/2')) return '#e64980';
+  if(v.includes('mang1y15')||v==='1 1/4'||v==='1.25') return '#e64980';
   if(v.includes('1/2')) return '#e24b4a';
   if(v.includes('3/4')) return '#22b8cf';
   if(v==='1'||v.includes('mang')) return '#6f42c1';
@@ -158,15 +166,34 @@ function aguaMarker(f,ll){
   const cat=norm(valCat(f.properties));
   if(cat.includes('brigada')) return L.marker(ll,{icon:icoTab('ico-galpon','ti-building-warehouse',26)});
   if(cat.includes('dique')) return L.marker(ll,{icon:icoTab('ico-dique','ti-ripple',24)});
-  if(cat==='t') return L.marker(ll,{icon:L.divIcon({html:'T',className:'ico-t',iconSize:[20,20],iconAnchor:[10,10]})});
+  if(cat.includes('cisterna')) return L.marker(ll,{icon:L.divIcon({html:'',className:'ico-cisterna',iconSize:[14,14],iconAnchor:[7,7]})});
+  if(cat==='t') return L.marker(ll,{icon:L.divIcon({html:'T',className:'ico-tg',iconSize:[16,16],iconAnchor:[8,8]})});
   let r=5;
   if(cat.includes('tanqacopio')) r=7;
   else if(cat.includes('acopio')) r=9;
-  else if(cat.includes('cisterna')) r=6;
   else if(cat.includes('casa')) r=5;
   return L.circleMarker(ll,{radius:r,color:'#fff',weight:2,fillColor:colorAgua(valCat(f.properties)),fillOpacity:1});
 }
 function cruceMarker(f,ll){return L.marker(ll,{icon:icoTab('ico-cruce','ti-x',18)});}
+
+function distAFeature(yo,geom){let min=Infinity;(function w(c){if(Array.isArray(c)){if(typeof c[0]==='number'){const d=map.distance(yo,[c[1],c[0]]);if(d<min)min=d;}else c.forEach(w);}})(geom.coordinates);return min;}
+function miUbicacion(){
+  if(!navigator.geolocation){alert('Tu dispositivo no comparte ubicación.');return;}
+  navigator.geolocation.getCurrentPosition(function(pos){
+    const yo=[pos.coords.latitude,pos.coords.longitude];
+    if(marcadorYo)map.removeLayer(marcadorYo);
+    marcadorYo=L.circleMarker(yo,{radius:8,color:'#fff',weight:3,fillColor:'#1565c0',fillOpacity:1}).addTo(map);
+    let mejorP=null,dP=Infinity;
+    (DATOS.puntos||[]).forEach(function(f){const d=distAFeature(yo,f.geometry);if(d<dP){dP=d;mejorP=f;}});
+    let dM=Infinity;
+    (DATOS.lineas||[]).forEach(function(f){const d=distAFeature(yo,f.geometry);if(d<dM)dM=d;});
+    let txt='<b>Estás acá</b>';
+    if(mejorP){const p=mejorP.properties||{};const t=VALORES[valCat(p)]||valCat(p)||'Punto de agua';txt+='<br>Agua más cercana: '+t+' · '+Math.round(dP)+' m';}
+    if(dM<Infinity)txt+='<br>Manguera más cercana: '+Math.round(dM)+' m';
+    marcadorYo.bindPopup(txt).openPopup();
+    map.setView(yo,Math.max(map.getZoom(),17));
+  },function(){alert('No pude obtener tu ubicación. Activá el GPS y permití el acceso.');},{enableHighAccuracy:true,timeout:8000});
+}
 
 const ETIQUETAS={Barrio:'Barrio',NumParc:'Parcela N°',EstadoCat:'Estado catastral',TipoTitula:'Titularidad',Titular_es:'Titular',Umepay:'Umepay','Sup(m2)':'Superficie',Sup_ha:'Superficie',Descripcio:'Descripción',Manguera:'Manguera',TipoRed:'Red',NivelRed:'Nivel',AcopioMadr:'Acopio madre',Litros:'Litros',Observacio:'Observación',AutoBomba:'Carga autobomba',Acople:'Acople',Disponibil:'Disponibilidad',Nombre_Ref:'Referencia',LoteNro:'Lote',Propietari:'Propietario',H:'Altura',Simbolo:'Símbolo',Nombre:'Nombre',Lugar:'Lugar',Tipo:'Tipo',NOMBRE_COM:'Nombre',TIPO:'Tipo',ORDEN:'Orden',DEPARTAMEN:'Departamento',CUENCA:'Cuenca','Estado_de_':'Estado',red:'Red',rst:'Calzada',gna:'Tipo de vía'};
 const VALORES={SinRegistrar:'Sin registrar',Registrado:'Registrado',TitularUnico:'Titular único',Si:'Sí',No:'No',TanqAcopio:'Tanque acopio',TanqCasa:'Tanque casa',Acopio:'Acopio madre',Dique:'Dique','Estacion Brigada':'Estación brigada',T:'Bifurcación',Cisterna:'Cisterna'};
@@ -237,7 +264,9 @@ async function init(){
   for(const c of CAPAS){
     try{
       const r=await fetch(c.archivo,{cache:'no-store'}); if(!r.ok)throw 0;
-      const gj=await r.json(); agregarCapa(gj,c.clase,c.nombre,overlays,c.visible); n++;
+      const gj=await r.json();
+      if(c.clase==='aguaPunto')DATOS.puntos=gj.features; else if(c.clase==='aguaLinea')DATOS.lineas=gj.features;
+      agregarCapa(gj,c.clase,c.nombre,overlays,c.visible); n++;
       if(c.clase==='parcela'){const ume=L.geoJSON(gj,{filter:f=>String((f.properties||{}).Umepay||'').trim().toLowerCase()==='si'});const b=ume.getBounds();bounds=b.isValid()?b:L.geoJSON(gj).getBounds();}
     }catch(e){}
   }
