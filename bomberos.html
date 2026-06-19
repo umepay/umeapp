@@ -82,11 +82,14 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
   <span class="ll"><span class="line dash" style="border-color:#b07a45"></span> Entrada</span>
   <span class="ll"><span class="line" style="border-color:#1971c2"></span> Curso de agua</span>
   <span class="ll"><i class="ti ti-rectangle-filled" style="color:#6b4f2a"></i> Tranquera</span>
+  <span class="ll"><i class="ti ti-grid-dots" style="color:#6b4f2a"></i> Guardaganados</span>
   <span class="ll"><span class="dot" style="background:#1d4ed8;width:15px;height:15px"></span> Acopio</span>
   <span class="ll"><span class="dot" style="background:#2e9e54"></span> T. acopio</span>
   <span class="ll"><span class="dot" style="background:#d4a017;width:9px;height:9px"></span> T. casa</span>
   <span class="ll"><i class="ti ti-ripple" style="color:#7f5bd0"></i> Dique</span>
   <span class="ll"><i class="ti ti-building-warehouse" style="color:#1d6fb8"></i> Brigada</span>
+  <span class="ll"><i class="ti ti-bolt" style="color:#e8590c"></i> Generador</span>
+  <span class="ll"><i class="ti ti-engine" style="color:#0c8599"></i> Bomba</span>
   <span class="ll"><span class="line" style="border-color:#e8590c"></span> Ruta prov.</span>
   <span class="ll"><span class="line" style="border-color:#2b8a3e;border-top-width:5px"></span> Salida</span>
 </div>
@@ -339,9 +342,8 @@ function aguaMarker(f,ll){
   const cat=norm(valCat(f.properties));
   if(cat.includes('brigada')) return L.marker(ll,{icon:icoTab('ico-galpon','ti-building-warehouse',34)}).bindTooltip('Brigada',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
   if(cat.includes('dique')) return L.marker(ll,{icon:icoTab('ico-dique','ti-ripple',32)}).bindTooltip('Dique',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
-  if(cat.includes('generador')) return L.marker(ll,{icon:icoTab('ico-gen','ti-bolt',26)}).bindTooltip('Generador',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
-  if(cat.includes('bomba')) return L.marker(ll,{icon:icoTab('ico-bomba','ti-engine',26)}).bindTooltip('Bomba',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
-  if(cat.includes('panel')) return L.marker(ll,{icon:icoTab('ico-panel','ti-solar-panel',26)}).bindTooltip('Paneles',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
+  if(cat.includes('generador')) return L.marker(ll,{icon:icoTab('ico-gen','ti-bolt',26)}).bindTooltip('Generador',{permanent:true,direction:'bottom',offset:[0,10],className:'lbl'});
+  if(cat.includes('bomba')) return L.marker(ll,{icon:icoTab('ico-bomba','ti-engine',26)}).bindTooltip('Bomba',{permanent:true,direction:'right',offset:[10,0],className:'lbl'});
   if(cat.includes('cisterna')) return L.marker(ll,{icon:L.divIcon({html:'',className:'ico-cisterna',iconSize:[14,14],iconAnchor:[7,7]})});
   if(cat==='t') return L.marker(ll,{icon:L.divIcon({html:'T',className:'ico-tg',iconSize:[16,16],iconAnchor:[8,8]})});
   let r=6;
@@ -441,7 +443,7 @@ function popup(p,clase){
   else if(clase==='tranquera'){titulo=p.Tipo||'Tranquera';lista=['Simbolo','Observacio','Barrio'];}
   else if(clase==='calle'){const nm=primer(p,CAMPO_CALLE);if(esEntrada(p)){const tp=norm(p.Tipo).includes('acceso')?'Acceso':'Entrada';titulo=nm?tp+' '+capitaliz(nm):tp;}else{titulo=nm?etiquetaCalle(nm):'Calle';}lista=['Nombre','Tipo','Barrio'];}
   else if(clase==='vialProv'){titulo='Ruta provincial';lista=['red','gna','rst'];}
-  else {const c=valCat(p);titulo=VALORES[c]||c||'Punto de agua';lista=['Litros','Observacio','AutoBomba','Acople','Disponibil','Nombre_Ref','Barrio'];}
+  else {const c=valCat(p);titulo=VALORES[c]||c||'Punto de agua';lista=['Litros','Observacio','Disponibil','Nombre_Ref','Barrio'];}
   const pares=lista.map(k=>[k,p[k]]).filter(([k,v])=>!vacio(v));
   const filas=pares.map(([k,v])=>`<div class="row"><span class="k">${pretty(k)}:</span> ${valor(k,v)}</div>`).join('');
   return `<div class="popup"><b>${titulo}</b>${filas}</div>`;
@@ -489,7 +491,7 @@ function agregar(gj,clase,nombre,overlays,visible){
         l.bindTooltip(txt,{permanent:true,direction:'top',className:'lbl-salida'});
       }
     };
-    if(clase==='aguaPunto'){opts.pointToLayer=aguaMarker;opts.filter=f=>norm(valCat(f.properties))!=='t';}
+    if(clase==='aguaPunto'){opts.pointToLayer=aguaMarker;opts.filter=f=>{const c=norm(valCat(f.properties));return c!=='t'&&!c.includes('panel');};}
     else if(clase==='tranquera') opts.pointToLayer=tranqMarker;
     else if(clase==='salida'){opts.style={color:'#2b8a3e',weight:5};opts.pointToLayer=(f,ll)=>L.marker(ll,{icon:icoTab('ico-salida','ti-door-exit',28)});}
     else if(clase==='calle') opts.style=estiloCalle;
