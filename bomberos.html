@@ -30,7 +30,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .line.dash{border-top-style:dashed}
 .ico{display:flex;align-items:center;justify-content:center}
 .ico i{line-height:1;text-shadow:0 0 2px #fff,0 0 3px #fff}
-.ico-galpon i{color:#1d6fb8;font-size:28px}.ico-dique i{color:#7f5bd0;font-size:26px}
+.ico-galpon i{color:#1d6fb8;font-size:28px}.ico-dique i{color:#7f5bd0;font-size:26px}.ico-gen i{color:#e8590c;font-size:24px}.ico-bomba i{color:#0c8599;font-size:24px}.ico-panel i{color:#1c7ed6;font-size:24px}
 .ico-tranq i{color:#6b4f2a;font-size:13px}.ico-cruce i{color:#e03131;font-size:16px;font-weight:bold}
 .ico-tg{display:flex;align-items:center;justify-content:center;color:#0b7285;font-weight:800;font-size:14px;line-height:1;text-shadow:0 0 2px #fff,0 0 3px #fff,0 0 3px #fff}
 .ico-cisterna{width:14px;height:14px;background:#1d4ed8;border:2px solid #fff;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
@@ -289,7 +289,7 @@ const CAPAS=[
   {archivo:'data/ejes_calles_int.geojson',        nombre:'Calles internas',  clase:'calle',    visible:true},
   {archivo:'data/red_vial_provincial.geojson',    nombre:'Ruta provincial',  clase:'vialProv', visible:true},
   {archivo:'data/puntos.geojson',                 nombre:'Puntos de agua',   clase:'aguaPunto',visible:true},
-  {archivo:'data/Vial_puntos.geojson',            nombre:'Tranqueras',       clase:'tranquera',visible:false},
+  {archivo:'data/Vial_puntos1.geojson',            nombre:'Tranqueras',       clase:'tranquera',visible:false},
   {archivo:'data/salidas.geojson',                nombre:'Salidas',          clase:'salida',   visible:true}
 ];
 
@@ -333,19 +333,22 @@ function colorAgua(v){v=norm(v);
 }
 function valCat(p){p=p||{};return p.Descripcio||p.Manguera||p.Tipo||'';}
 
-const SIMB={circulo:'ti-circle-filled',estrella:'ti-star-filled',cuadrado:'ti-rectangle-filled',luna:'ti-moon-filled',triangulo:'ti-triangle-filled'};
+const SIMB={circulo:'ti-circle-filled',estrella:'ti-star-filled',cuadrado:'ti-rectangle-filled',luna:'ti-moon-filled',triangulo:'ti-triangle-filled',corazon:'ti-heart-filled',pez:'ti-fish',sol:'ti-sun-filled'};
 function icoTab(cls,glyph,size){return L.divIcon({html:'<i class="ti '+glyph+'"></i>',className:'ico '+cls,iconSize:[size,size],iconAnchor:[size/2,size/2]});}
 function aguaMarker(f,ll){
   const cat=norm(valCat(f.properties));
   if(cat.includes('brigada')) return L.marker(ll,{icon:icoTab('ico-galpon','ti-building-warehouse',34)}).bindTooltip('Brigada',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
   if(cat.includes('dique')) return L.marker(ll,{icon:icoTab('ico-dique','ti-ripple',32)}).bindTooltip('Dique',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
+  if(cat.includes('generador')) return L.marker(ll,{icon:icoTab('ico-gen','ti-bolt',26)}).bindTooltip('Generador',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
+  if(cat.includes('bomba')) return L.marker(ll,{icon:icoTab('ico-bomba','ti-engine',26)}).bindTooltip('Bomba',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
+  if(cat.includes('panel')) return L.marker(ll,{icon:icoTab('ico-panel','ti-solar-panel',26)}).bindTooltip('Paneles',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
   if(cat.includes('cisterna')) return L.marker(ll,{icon:L.divIcon({html:'',className:'ico-cisterna',iconSize:[14,14],iconAnchor:[7,7]})});
   if(cat==='t') return L.marker(ll,{icon:L.divIcon({html:'T',className:'ico-tg',iconSize:[16,16],iconAnchor:[8,8]})});
   let r=6;
   if(cat.includes('tanqacopio')) r=8; else if(cat.includes('acopio')) r=10; else if(cat.includes('casa')) r=6;
   return L.circleMarker(ll,{radius:r,color:'#fff',weight:2,fillColor:colorAgua(valCat(f.properties)),fillOpacity:1,pane:'puntosPane'});
 }
-function tranqMarker(f,ll){const s=norm((f.properties||{}).Simbolo);return L.marker(ll,{icon:icoTab('ico-tranq',SIMB[s]||'ti-rectangle-filled',14)});}
+function tranqMarker(f,ll){const p=f.properties||{};if(norm(p.Tipo).includes('guardaganado'))return L.marker(ll,{icon:icoTab('ico-tranq','ti-grid-dots',16)}).bindTooltip('Guardaganados',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});const s=norm(p.Simbolo);return L.marker(ll,{icon:icoTab('ico-tranq',SIMB[s]||'ti-rectangle-filled',14)});}
 
 /* estilos */
 function estiloBarrio(){return {color:'#7a4326',weight:1.6,dashArray:'4,4',fillColor:'#c79a6a',fillOpacity:0.12};}
@@ -426,7 +429,7 @@ function engrosarClicks(capa,clase){
 }
 
 const ETIQUETAS={Barrio:'Barrio',Litros:'Litros',Observacio:'Observación',AutoBomba:'Carga autobomba',Acople:'Acople',Disponibil:'Disponibilidad',Nombre_Ref:'Referencia',Simbolo:'Símbolo',Nombre:'Nombre',Tipo:'Tipo',Manguera:'Manguera',TipoRed:'Red',AcopioMadr:'Acopio madre',red:'Red',rst:'Calzada',gna:'Tipo de vía',Permanente:'Régimen',Permanenci:'Régimen',Regimen:'Régimen',TIPO:'Tipo',ORDEN:'Orden'};
-const VALORES={TanqAcopio:'Tanque acopio',TanqCasa:'Tanque casa',Acopio:'Acopio madre',Dique:'Dique','Estacion Brigada':'Estación brigada',T:'Bifurcación',Si:'Sí',No:'No'};
+const VALORES={TanqAcopio:'Tanque acopio',TanqCasa:'Tanque casa',Acopio:'Acopio madre',Dique:'Dique','Estacion Brigada':'Estación brigada',T:'Bifurcación',Si:'Sí',No:'No',Cisterna:'Cisterna',Generador:'Generador',Bomba:'Bomba',paneles:'Paneles',Paneles:'Paneles',Guardaganados:'Guardaganados',Tranquera:'Tranquera'};
 function pretty(k){return ETIQUETAS[k]||(k.charAt(0).toUpperCase()+k.slice(1).replace(/_/g,' '));}
 function vacio(v){return v===null||v===''||String(v).toUpperCase()==='NULL';}
 function valor(k,v){return VALORES[v]||v;}
