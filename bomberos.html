@@ -35,6 +35,9 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .ico-tg{display:flex;align-items:center;justify-content:center;color:#0b7285;font-weight:800;font-size:14px;line-height:1;text-shadow:0 0 2px #fff,0 0 3px #fff,0 0 3px #fff}
 .ico-cisterna{width:14px;height:14px;background:#1d4ed8;border:2px solid #fff;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
 .ico-salida i{color:#2b8a3e;font-size:24px}
+.salida-emerg{background:none;border:0}
+.se-box{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:5px;background:#2b8a3e;color:#fff;font-weight:700;font-size:12px;line-height:1;padding:4px 9px;border-radius:7px;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.4)}
+.se-box i{font-size:16px}.se-box .se-arrow{font-size:17px;font-weight:900;margin:0 1px}
 
 /* etiquetas */
 .lbl{background:#fff;border:0;box-shadow:0 1px 3px rgba(0,0,0,.3);font-size:11px;font-weight:600;color:#333;padding:1px 6px}
@@ -301,6 +304,14 @@ map.createPane('barriosPane'); map.getPane('barriosPane').style.zIndex=250;
 map.createPane('hitPane'); map.getPane('hitPane').style.zIndex=450;
 map.createPane('rotuloPane'); map.getPane('rotuloPane').style.zIndex=460; map.getPane('rotuloPane').style.pointerEvents='none';
 map.createPane('puntosPane'); map.getPane('puntosPane').style.zIndex=470;
+
+/* Salida de emergencia: cruce de Bajada Club con el camino provincial, hacia el este → Cerro Pelado */
+const SALIDA_CERRO=L.marker([-32.196462,-64.728678],{
+  pane:'puntosPane', zIndexOffset:1000,
+  icon:L.divIcon({className:'salida-emerg',iconSize:[0,0],
+    html:'<div class="se-box"><i class="ti ti-door-exit"></i><span class="se-arrow">→</span><span>a Cerro Pelado</span></div>'})
+}).addTo(map);
+SALIDA_CERRO.bindPopup('<b>Salida de emergencia</b><br>Por el camino provincial hacia el este → Cerro Pelado');
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
 
 function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();}
