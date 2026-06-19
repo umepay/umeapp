@@ -840,10 +840,10 @@ function icoTab(cls,glyph,size){return L.divIcon({html:'<i class="ti '+glyph+'">
 function aguaMarker(f,ll){
   const cat=norm(valCat(f.properties));
   if(cat.includes('brigada')) return L.marker(ll,{icon:icoTab('ico-galpon','ti-building-warehouse',26)});
-  if(cat.includes('dique')) return L.marker(ll,{icon:icoTab('ico-dique','ti-ripple',24)});
+  if(cat.includes('dique')) return L.marker(ll,{icon:icoTab('ico-dique','ti-ripple',24)}).bindTooltip('Dique',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
   if(cat.includes('generador')) return L.marker(ll,{icon:icoTab('ico-gen','ti-bolt',22)}).bindTooltip('Generador',{permanent:true,direction:'bottom',offset:[0,8],className:'lbl'});
   if(cat.includes('bomba')) return L.marker(ll,{icon:icoTab('ico-bomba','ti-engine',22)}).bindTooltip('Bomba',{permanent:true,direction:'right',offset:[8,0],className:'lbl'});
-  if(cat.includes('panel')) return L.marker(ll,{icon:icoTab('ico-panel','ti-solar-panel',22)}).bindTooltip('Paneles',{permanent:true,direction:'top',offset:[0,-6],className:'lbl'});
+  if(cat.includes('panel')) return L.marker(ll,{icon:icoTab('ico-panel','ti-solar-panel',22)}).bindTooltip('Paneles',{permanent:true,direction:'left',offset:[-8,0],className:'lbl'});
   if(cat.includes('cisterna')) return L.marker(ll,{icon:L.divIcon({html:'',className:'ico-cisterna',iconSize:[14,14],iconAnchor:[7,7]})});
   if(cat==='t') return L.marker(ll,{icon:L.divIcon({html:'T',className:'ico-tg',iconSize:[16,16],iconAnchor:[8,8]})});
   let r=6;
@@ -945,7 +945,7 @@ function miUbicacion(){
 
 const ETIQUETAS={Barrio:'Barrio',NumParc:'Parcela N°',EstadoCat:'Estado catastral',TipoTitula:'Titularidad',Titular_es:'Titular',Umepay:'Umepay','Sup(m2)':'Superficie',Sup_ha:'Superficie',Descripcio:'Descripción',Manguera:'Manguera',TipoRed:'Red',NivelRed:'Nivel',AcopioMadr:'Acopio madre',Litros:'Litros',Observacio:'Observación',AutoBomba:'Carga autobomba',Acople:'Acople',Disponibil:'Disponibilidad',Nombre_Ref:'Referencia',LoteNro:'Lote',Propietari:'Propietario',H:'Altura',Simbolo:'Símbolo',Nombre:'Nombre',Lugar:'Lugar',Tipo:'Tipo',NOMBRE_COM:'Nombre',TIPO:'Tipo',ORDEN:'Orden',DEPARTAMEN:'Departamento',CUENCA:'Cuenca','Estado_de_':'Estado',red:'Red',rst:'Calzada',gna:'Tipo de vía'};
 const VALORES={SinRegistrar:'Sin registrar',Registrado:'Registrado',TitularUnico:'Titular único',Si:'Sí',No:'No',TanqAcopio:'Tanque acopio',TanqCasa:'Tanque casa',Acopio:'Acopio madre',Dique:'Dique','Estacion Brigada':'Estación brigada',T:'Bifurcación',Cisterna:'Cisterna',Generador:'Generador',Bomba:'Bomba',paneles:'Paneles',Paneles:'Paneles',Guardaganados:'Guardaganados'};
-const OCULTAR=['lote','NumParc','FID','FID_2','id','Norte','Este','x','y','EstadoCat'];
+const OCULTAR=['lote','NumParc','FID','FID_2','id','Norte','Este','x','y','EstadoCat','NivelRed'];
 const CAMPOS={
   barrio:[],
   interes:['Descripcio'],
