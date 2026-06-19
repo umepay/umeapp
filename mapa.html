@@ -87,13 +87,16 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
       <span class="ll"><span class="dot" style="background:#d4a017;width:9px;height:9px"></span> Tanque casa</span>
       <span class="ll"><i class="ti ti-ripple" style="color:#7f5bd0"></i> Dique</span>
       <span class="ll"><i class="ti ti-building-warehouse" style="color:#1d6fb8"></i> Estación brigada</span>
+      <span class="ll"><i class="ti ti-bolt" style="color:#e8590c"></i> Generador</span>
+      <span class="ll"><i class="ti ti-engine" style="color:#0c8599"></i> Bomba</span>
+      <span class="ll"><i class="ti ti-solar-panel" style="color:#1c7ed6"></i> Paneles</span>
       <span class="ll"><span class="tbadge">T</span> Bifurcación</span>
     </div>
     <div class="grp"><span class="glabel">Mangueras</span>
-      <span class="ll"><span class="line" style="border-color:#6f42c1"></span> 1"</span>
-      <span class="ll"><span class="line" style="border-color:#e24b4a"></span> 1/2"</span>
-      <span class="ll"><span class="line" style="border-color:#22b8cf"></span> 3/4"</span>
-      <span class="ll"><span class="line" style="border-color:#e64980"></span> 1 1/4"</span>
+      <span class="ll"><span class="line" style="border-color:#f783ac"></span> 1/2"</span>
+      <span class="ll"><span class="line" style="border-color:#e64980"></span> 3/4"</span>
+      <span class="ll"><span class="line" style="border-color:#c2255c"></span> 1"</span>
+      <span class="ll"><span class="line" style="border-color:#80213f"></span> 1 1/4"</span>
     </div>
     <div class="grp"><span class="glabel">Otras</span>
       <span class="ll"><i class="ti ti-star-filled" style="color:#f08c00"></i> Punto de interés</span>
@@ -823,10 +826,10 @@ function colorAgua(v){v=norm(v);
   if(v.includes('generador')) return '#e8590c';
   if(v.includes('bomba')) return '#0c8599';
   if(v.includes('panel')) return '#1c7ed6';
-  if(v.includes('1 1/4')) return '#e64980';   // 1 1/4''
-  if(v.includes('3/4'))   return '#22b8cf';   // 3/4''
-  if(v.includes('1/2'))   return '#e24b4a';   // 1/2''
-  if(v.includes("1'")||v==='1') return '#6f42c1'; // 1''
+  if(v.includes('1 1/4')) return '#80213f';   // 1 1/4''  vino
+  if(v.includes('3/4'))   return '#e64980';   // 3/4''    rosa
+  if(v.includes('1/2'))   return '#f783ac';   // 1/2''    rosa claro
+  if(v.includes("1'")||v==='1') return '#c2255c'; // 1''   frambuesa
   if(v==='t') return '#888888';
   return '#1d9e75';
 }
@@ -837,9 +840,9 @@ function aguaMarker(f,ll){
   const cat=norm(valCat(f.properties));
   if(cat.includes('brigada')) return L.marker(ll,{icon:icoTab('ico-galpon','ti-building-warehouse',26)});
   if(cat.includes('dique')) return L.marker(ll,{icon:icoTab('ico-dique','ti-ripple',24)});
-  if(cat.includes('generador')) return L.marker(ll,{icon:icoTab('ico-gen','ti-bolt',22)}).bindTooltip('Generador',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
-  if(cat.includes('bomba')) return L.marker(ll,{icon:icoTab('ico-bomba','ti-engine',22)}).bindTooltip('Bomba',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
-  if(cat.includes('panel')) return L.marker(ll,{icon:icoTab('ico-panel','ti-solar-panel',22)}).bindTooltip('Paneles',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
+  if(cat.includes('generador')) return L.marker(ll,{icon:icoTab('ico-gen','ti-bolt',22)}).bindTooltip('Generador',{permanent:true,direction:'bottom',offset:[0,8],className:'lbl'});
+  if(cat.includes('bomba')) return L.marker(ll,{icon:icoTab('ico-bomba','ti-engine',22)}).bindTooltip('Bomba',{permanent:true,direction:'right',offset:[8,0],className:'lbl'});
+  if(cat.includes('panel')) return L.marker(ll,{icon:icoTab('ico-panel','ti-solar-panel',22)}).bindTooltip('Paneles',{permanent:true,direction:'top',offset:[0,-6],className:'lbl'});
   if(cat.includes('cisterna')) return L.marker(ll,{icon:L.divIcon({html:'',className:'ico-cisterna',iconSize:[14,14],iconAnchor:[7,7]})});
   if(cat==='t') return L.marker(ll,{icon:L.divIcon({html:'T',className:'ico-tg',iconSize:[16,16],iconAnchor:[8,8]})});
   let r=6;
@@ -902,11 +905,12 @@ function flecharMangueras(capa){
   capa.getLayers().slice().forEach(l=>{
     if(!l.feature||typeof l.getLatLngs!=='function')return;
     const col=colorAgua(valCat(l.feature.properties));
-    const dec=L.polylineDecorator(l,{patterns:[{
-      offset:'7%', repeat:90,
-      symbol:L.Symbol.arrowHead({pixelSize:9,polygon:false,pathOptions:{stroke:true,color:col,weight:2,opacity:.95}})
-    }]});
-    capa.addLayer(dec);
+    const arrow=L.Symbol.arrowHead({pixelSize:10,polygon:false,pathOptions:{stroke:true,color:col,weight:2,opacity:.95}});
+    const m=largoMetros(ptosLinea(l));
+    const patterns = m<150
+      ? [{offset:'90%',repeat:0,symbol:arrow}]      // corta: una flecha cerca del final
+      : [{offset:'8%',repeat:90,symbol:arrow}];     // larga: flechas repetidas
+    capa.addLayer(L.polylineDecorator(l,{patterns}));
   });
 }
 /* área de click ancha e invisible para tocar líneas finas con el dedo */
