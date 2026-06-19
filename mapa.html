@@ -39,6 +39,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .ico-galpon i{color:#1d6fb8;font-size:22px}
 .ico-dique i{color:#7f5bd0;font-size:22px}
 .ico-gen i{color:#e8590c;font-size:20px}.ico-bomba i{color:#0c8599;font-size:20px}.ico-panel i{color:#1c7ed6;font-size:20px}
+.lbl{background:#fff;border:0;box-shadow:0 1px 3px rgba(0,0,0,.3);font-size:11px;font-weight:600;color:#333;padding:1px 6px}
 .ico-cruce i{color:#e03131;font-size:16px;font-weight:bold}
 .ico-interes i{color:#f08c00;font-size:24px}
 .ico-tg{display:flex;align-items:center;justify-content:center;color:#0b7285;font-weight:800;font-size:14px;line-height:1;text-shadow:0 0 2px #fff,0 0 3px #fff,0 0 3px #fff}
@@ -93,10 +94,10 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
       <span class="ll"><span class="tbadge">T</span> Bifurcación</span>
     </div>
     <div class="grp"><span class="glabel">Mangueras</span>
-      <span class="ll"><span class="line" style="border-color:#f783ac"></span> 1/2"</span>
-      <span class="ll"><span class="line" style="border-color:#e64980"></span> 3/4"</span>
-      <span class="ll"><span class="line" style="border-color:#c2255c"></span> 1"</span>
-      <span class="ll"><span class="line" style="border-color:#80213f"></span> 1 1/4"</span>
+      <span class="ll"><span class="line" style="border-color:#748ffc"></span> 1/2"</span>
+      <span class="ll"><span class="line" style="border-color:#4263eb"></span> 3/4"</span>
+      <span class="ll"><span class="line" style="border-color:#2b3fa8"></span> 1"</span>
+      <span class="ll"><span class="line" style="border-color:#14215e"></span> 1 1/4"</span>
     </div>
     <div class="grp"><span class="glabel">Otras</span>
       <span class="ll"><i class="ti ti-star-filled" style="color:#f08c00"></i> Punto de interés</span>
@@ -826,10 +827,10 @@ function colorAgua(v){v=norm(v);
   if(v.includes('generador')) return '#e8590c';
   if(v.includes('bomba')) return '#0c8599';
   if(v.includes('panel')) return '#1c7ed6';
-  if(v.includes('1 1/4')) return '#80213f';   // 1 1/4''  vino
-  if(v.includes('3/4'))   return '#e64980';   // 3/4''    rosa
-  if(v.includes('1/2'))   return '#f783ac';   // 1/2''    rosa claro
-  if(v.includes("1'")||v==='1') return '#c2255c'; // 1''   frambuesa
+  if(v.includes('1 1/4')) return '#14215e';   // 1 1/4''  azul marino
+  if(v.includes('3/4'))   return '#4263eb';   // 3/4''    azul
+  if(v.includes('1/2'))   return '#748ffc';   // 1/2''    azul claro
+  if(v.includes("1'")||v==='1') return '#2b3fa8'; // 1''   azul oscuro
   if(v==='t') return '#888888';
   return '#1d9e75';
 }
