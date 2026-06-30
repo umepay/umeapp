@@ -803,7 +803,8 @@ map.createPane('parcelasPane'); map.getPane('parcelasPane').style.zIndex=350;
 map.createPane('hitPane'); map.getPane('hitPane').style.zIndex=450;
 map.createPane('rotuloPane'); map.getPane('rotuloPane').style.zIndex=460; map.getPane('rotuloPane').style.pointerEvents='none';
 map.createPane('puntosPane'); map.getPane('puntosPane').style.zIndex=470;
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+const calles=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+const satelite=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imágenes &copy; Esri'});
 
 const DATOS={}; let marcadorYo=null;
 const ctlLoc=L.control({position:'bottomright'});
@@ -1032,7 +1033,7 @@ async function init(){
     }catch(e){}
   }
   if(n===0){document.getElementById('aviso').textContent='No se pudieron cargar las capas. Revisá la carpeta data/.';document.getElementById('aviso').style.display='block';}
-  L.control.layers(null,overlays,{collapsed:false}).addTo(map);
+  L.control.layers({'Calles':calles,'Satélite':satelite},overlays,{collapsed:false}).addTo(map);
   if(bounds&&bounds.isValid()){ultimoBounds=bounds; encuadrar();}
 }
 init();

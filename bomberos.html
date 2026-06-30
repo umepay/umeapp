@@ -312,7 +312,8 @@ const SALIDA_CERRO=L.marker([-32.196462,-64.728678],{
     html:'<div class="se-box"><i class="ti ti-door-exit"></i><span class="se-arrow">→</span><span>a Cerro Pelado</span></div>'})
 }).addTo(map);
 SALIDA_CERRO.bindPopup('<b>Salida de emergencia</b><br>Por el camino provincial hacia el este → Cerro Pelado');
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+const calles=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+const satelite=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imágenes &copy; Esri'});
 
 function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();}
 function primer(p,campos){p=p||{};for(const k of campos){const v=p[k];if(v!==undefined&&v!==null&&String(v).trim()!==''&&String(v).toUpperCase()!=='NULL')return v;}return '';}
@@ -543,7 +544,7 @@ async function init(){
       if(c.clase==='barrio'){const b=L.geoJSON(gj,{filter:f=>norm((f.properties||{}).Umepay)==='si'}).getBounds();if(b.isValid())bounds=b;}
     }catch(e){}
   }
-  L.control.layers(null,overlays,{collapsed:true}).addTo(map);
+  L.control.layers({'Calles':calles,'Satélite':satelite},overlays,{collapsed:true}).addTo(map);
   if(bounds&&bounds.isValid()){ultimoBounds=bounds;encuadrar();}
 }
 init();
