@@ -83,6 +83,23 @@
   .txt span{display:block;font-size:13px;color:#82715b;margin-top:2px}
   .flecha{flex:0 0 auto;color:#c7b9a4}
   .flecha svg{width:22px;height:22px}
+
+  /* ====== Tarjeta instalar + modal ====== */
+  button.tarjeta{width:100%;font-family:inherit;text-align:left;cursor:pointer}
+  .grilla .tarjeta:nth-child(4){animation-delay:.26s}
+  .tarjeta.instalar .ico{background:#e3eddf;color:var(--verde)}
+  .modal{position:fixed;inset:0;z-index:50;display:none;align-items:flex-end;justify-content:center;background:rgba(20,30,20,.55)}
+  .modal.ver{display:flex}
+  .modal-card{background:var(--crema);width:100%;max-width:560px;border-radius:20px 20px 0 0;padding:24px 22px calc(env(safe-area-inset-bottom) + 24px);max-height:88vh;overflow-y:auto;box-shadow:var(--sombra);position:relative;animation:subeModal .3s ease both}
+  @keyframes subeModal{from{transform:translateY(30px);opacity:.6}to{transform:translateY(0);opacity:1}}
+  .modal-card h2{font-family:var(--serif);color:var(--verde);font-size:24px;margin-bottom:4px}
+  .modal-card .sub{font-size:13.5px;color:#82715b;margin-bottom:18px}
+  .modal-x{position:absolute;top:12px;right:14px;border:none;background:none;font-size:22px;color:#9a8b76;cursor:pointer;line-height:1;padding:6px}
+  .paso-inst{background:#fff;border:1px solid rgba(40,28,15,.06);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+  .paso-inst h3{font-size:15px;color:var(--verde);margin-bottom:8px}
+  .paso-inst ol{margin:0;padding-left:20px}
+  .paso-inst li{font-size:14px;line-height:1.5;margin-bottom:5px}
+  .btn-cerrar{width:100%;border:none;cursor:pointer;background:var(--verde);color:#fff;font-size:16px;font-weight:700;padding:14px;border-radius:14px;margin-top:6px}
 </style>
 </head>
 <body>
@@ -116,12 +133,49 @@
         <span class="flecha"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
+      <button class="tarjeta instalar" onclick="abrirInstalar()">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v11m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="txt"><h2>Instalar la app</h2><span>Tenela en tu teléfono con su ícono</span></span>
+        <span class="flecha"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </button>
+
     </nav>
   </main>
+
+  <!-- MODAL: instrucciones para instalar -->
+  <div id="instalar" class="modal" aria-hidden="true" onclick="if(event.target===this)cerrarInstalar()">
+    <div class="modal-card">
+      <button class="modal-x" onclick="cerrarInstalar()" aria-label="Cerrar">✕</button>
+      <h2>Instalar UmeApp</h2>
+      <p class="sub">Para tenerla como una app en tu teléfono, con su ícono en la pantalla.</p>
+
+      <div class="paso-inst">
+        <h3>📱 iPhone (Safari)</h3>
+        <ol>
+          <li>Abrí esta página en <b>Safari</b>.</li>
+          <li>Tocá el botón <b>Compartir</b> (el cuadradito con la flecha ↑, abajo en el centro).</li>
+          <li>Deslizá hacia abajo y tocá <b>“Agregar a inicio”</b>.</li>
+          <li>Tocá <b>Agregar</b> arriba a la derecha. ¡Listo, ya tenés el ícono!</li>
+        </ol>
+      </div>
+
+      <div class="paso-inst">
+        <h3>🤖 Android (Chrome)</h3>
+        <ol>
+          <li>Suele aparecer solo un cartel <b>“Instalar aplicación”</b>: tocalo.</li>
+          <li>Si no aparece: tocá el menú <b>⋮</b> (arriba a la derecha) → <b>“Instalar aplicación”</b> o <b>“Agregar a pantalla principal”</b>.</li>
+        </ol>
+      </div>
+
+      <button class="btn-cerrar" onclick="cerrarInstalar()">Entendido</button>
+    </div>
+  </div>
 
 <script>
   var entrada=document.getElementById('entrada');
   var menu=document.getElementById('menu');
+  function abrirInstalar(){document.getElementById('instalar').classList.add('ver');}
+  function cerrarInstalar(){document.getElementById('instalar').classList.remove('ver');}
   function abrirInicio(animar){
     if(animar){entrada.classList.add('salir');setTimeout(function(){entrada.style.display='none';},650);}
     else{entrada.style.display='none';}
