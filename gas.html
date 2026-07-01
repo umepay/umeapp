@@ -57,9 +57,8 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
       <select class="inp con-flecha" id="gas-barrio" style="margin-bottom:10px" onchange="filtrarLotes()">
         <option value="">Todos los barrios</option>
       </select>
-      <div style="font-size:13px;color:#888;margin-bottom:8px">Tu lote · escribí para buscar o elegí de la lista</div>
-      <input class="inp con-flecha" id="gas-lote" list="listaLotes" placeholder="Buscá tu lote..." autocomplete="off" style="margin-bottom:12px"/>
-      <datalist id="listaLotes"></datalist>
+      <div style="font-size:13px;color:#888;margin-bottom:8px">Tu lote · elegí de la lista</div>
+      <select class="inp con-flecha" id="gas-lote" style="margin-bottom:12px"></select>
       <div style="font-size:13px;color:#888;margin-bottom:8px">Cantidad por tipo</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
         <div><div style="font-size:12px;color:#888">45 K</div><input class="inp" type="number" id="g45" min="0" value="0" style="margin:4px 0 0;text-align:center" oninput="calcGas()"/></div>
@@ -145,10 +144,11 @@ function poblarBarrios(){
 }
 function filtrarLotes(){
   const b=document.getElementById('gas-barrio').value;
-  const dl=document.getElementById('listaLotes'); dl.innerHTML='';
-  LOTES.filter(x=>!b||x.b===b).forEach(x=>{const o=document.createElement('option');o.value=x.l;dl.appendChild(o);});
-  const inp=document.getElementById('gas-lote');
-  if(b){const reg=LOTES.find(x=>x.l===inp.value); if(reg && reg.b!==b) inp.value='';}
+  const sel=document.getElementById('gas-lote');
+  const actual=sel.value;
+  sel.innerHTML='<option value="">Elegí tu lote...</option>';
+  LOTES.filter(x=>!b||x.b===b).forEach(x=>{const o=document.createElement('option');o.value=x.l;o.textContent=x.l;sel.appendChild(o);});
+  sel.value=(actual && LOTES.some(x=>x.l===actual && (!b||x.b===b))) ? actual : '';
 }
 window.addEventListener('DOMContentLoaded',function(){poblarBarrios();filtrarLotes();});
 

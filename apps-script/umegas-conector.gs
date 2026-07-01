@@ -3,7 +3,7 @@
  * en la planilla, guardando el comprobante en la carpeta de Drive.
  *
  * Pestaña destino (gid):  1815523778
- * Carpeta de comprobantes: 13AnwBMvqJ5GzPWCRCdJldVqerKMzf0J4
+ * Carpeta de comprobantes: COMPROBANTES (File responses) — carpeta oficial compartida
  *
  * Columnas:
  *  A Marca temporal · B RESPONSABLE · C WHATSAPP · D BARRIO/ZONA · E LOTE
@@ -12,7 +12,7 @@
  ****************************************************************************/
 
 const SHEET_GID = 1815523778;
-const CARPETA_COMPROBANTES = '13AnwBMvqJ5GzPWCRCdJldVqerKMzf0J4';
+const CARPETA_COMPROBANTES = '1LgCi59vD6s5i-yAIx_43HPzgppN7JsPXFartuqBZj0KfN1wVICTWElqxh9KYf_jaOj8P9xyM';  // carpeta oficial COMPROBANTES (File responses)
 
 function doPost(e){
   try{
