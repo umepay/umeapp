@@ -234,6 +234,7 @@ async function hacerPedido(){
 function guardarPedidoLocal(p){
   let arr=[];
   try{ arr=JSON.parse(localStorage.getItem('umegas_pedidos')||'[]'); }catch(e){}
+  arr=arr.filter(function(x){ return x.id!==p.id; });   // evitar duplicados del mismo pedido
   arr.unshift({id:p.id, lote:p.lote, nombre:p.nombre||'', resumen:p.resumen||'', total:p.total||0, fecha:new Date().toLocaleDateString('es-AR')});
   arr=arr.slice(0,30);
   try{ localStorage.setItem('umegas_pedidos', JSON.stringify(arr)); }catch(e){}
