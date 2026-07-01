@@ -35,6 +35,7 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
 <div class="topbar">
   <a class="btn-back" href="index.html#app"><i class="ti ti-arrow-left"></i></a>
   <h1>UmeGas</h1>
+  <button class="btn-back" onclick="verMisPedidos()" title="Mis pedidos" style="cursor:pointer"><i class="ti ti-clipboard-list"></i></button>
 </div>
 <div class="content">
 
@@ -131,6 +132,13 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
     </div>
   </div>
 
+  <!-- MIS PEDIDOS -->
+  <div id="pasoMis" class="paso">
+    <div class="slabel" style="margin-top:0">Mis pedidos</div>
+    <div id="listaMis"></div>
+    <button class="btn-s" onclick="mostrar('paso1')" style="margin-top:6px">Volver a pedir</button>
+  </div>
+
 </div>
 
 <script>
@@ -216,9 +224,52 @@ async function hacerPedido(){
   try{ await enviar(pedidoActual); }catch(e){}
   const partes=[]; if(c45)partes.push('45K x'+c45); if(c30)partes.push('30K x'+c30); if(c15)partes.push('15K x'+c15); if(c10)partes.push('10K x'+c10);
   const tipoTxt=tipoMode==='nuevo'?'Tubo nuevo':'Recarga';
-  document.getElementById('resumen').textContent=tipoTxt+' · '+lote+' · '+partes.join(', ');
+  const resumenTxt=tipoTxt+' · '+lote+' · '+partes.join(', ');
+  document.getElementById('resumen').textContent=resumenTxt;
   document.getElementById('totalPago').textContent='$'+totalNum.toLocaleString('es-AR');
+  guardarPedidoLocal({id,lote,nombre,resumen:resumenTxt,total:totalNum});
   mostrar('paso2');
+}
+
+// ==== Mis pedidos (estado del pedido en el celular) ====
+function guardarPedidoLocal(p){
+  let arr=[];
+  try{ arr=JSON.parse(localStorage.getItem('umegas_pedidos')||'[]'); }catch(e){}
+  arr.unshift({id:p.id, lote:p.lote, nombre:p.nombre||'', resumen:p.resumen||'', total:p.total||0, fecha:new Date().toLocaleDateString('es-AR')});
+  arr=arr.slice(0,30);
+  try{ localStorage.setItem('umegas_pedidos', JSON.stringify(arr)); }catch(e){}
+}
+function escMis(s){return String(s).replace(/[<>&]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c];});}
+function verMisPedidos(){
+  mostrar('pasoMis');
+  const cont=document.getElementById('listaMis');
+  let arr=[];
+  try{ arr=JSON.parse(localStorage.getItem('umegas_pedidos')||'[]'); }catch(e){}
+  if(!arr.length){ cont.innerHTML='<div class="card" style="text-align:center;color:#999">Todavía no hiciste ningún pedido desde este celular.</div>'; return; }
+  cont.innerHTML='';
+  arr.forEach(function(p){
+    const d=document.createElement('div'); d.className='card';
+    d.innerHTML='<div style="font-weight:600;font-size:14px">'+escMis(p.lote||'Pedido')+'</div>'+
+      '<div class="muted" style="margin:2px 0 6px">'+escMis(p.fecha||'')+(p.resumen?(' · '+escMis(p.resumen)):'')+'</div>'+
+      '<div id="est_'+p.id+'" style="font-size:13px;font-weight:600;color:#888">Consultando estado…</div>';
+    cont.appendChild(d);
+    consultarEstado(p.id, function(r){
+      const e=document.getElementById('est_'+p.id); if(!e) return;
+      if(r && r.entregado){ e.textContent='✅ Entregado'; e.style.color='#2e9e54'; }
+      else { e.textContent='🚚 En camino'; e.style.color='#854f0b'; }
+    });
+  });
+}
+function consultarEstado(id, cb){
+  const cbName='umecb_'+String(id).replace(/[^a-zA-Z0-9]/g,'');
+  const s=document.createElement('script');
+  let done=false;
+  const finish=function(data){ if(done) return; done=true; try{ delete window[cbName]; }catch(e){ window[cbName]=undefined; } if(s.parentNode) s.parentNode.removeChild(s); cb(data); };
+  window[cbName]=function(data){ finish(data); };
+  s.onerror=function(){ finish(null); };
+  s.src=GAS_URL+'?accion=estado&id='+encodeURIComponent(id)+'&callback='+cbName;
+  document.body.appendChild(s);
+  setTimeout(function(){ finish(null); }, 7000);
 }
 
 function comprimir(file, cb){

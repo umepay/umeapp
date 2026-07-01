@@ -26,6 +26,54 @@ function doPost(e){
   }
 }
 
+// Consulta de estado del pedido (para "Mis pedidos" en la app). Responde JSONP.
+function doGet(e){
+  const p = (e && e.parameter) || {};
+  if(p.accion === 'estado'){
+    const est = estadoPedido(p.id);
+    const cb = p.callback || 'callback';
+    return ContentService.createTextOutput(cb + '(' + JSON.stringify(est) + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return ContentService.createTextOutput('UmeGas OK')
+    .setMimeType(ContentService.MimeType.TEXT);
+}
+
+function estadoPedido(id){
+  const res = { id: id, entregado: false, encontrado: false };
+  if(!id) return res;
+  const h = hoja();
+  const cId = colPorHeader(h, 'ID_APP', false);
+  if(!cId) return res;
+  const ult = h.getLastRow();
+  if(ult < 2) return res;
+  const ids = h.getRange(2, cId, ult - 1, 1).getValues();
+  for(let i = 0; i < ids.length; i++){
+    if(String(ids[i][0]) === String(id)){
+      res.encontrado = true;
+      const cEnt = colPorHeader(h, 'ENTREGADO', false);
+      if(cEnt){
+        const v = h.getRange(i + 2, cEnt).getValue();
+        const t = String(v).toLowerCase();
+        res.entregado = (v === true || t === 'si' || t === 'true' || t === '✓' || t === 'x');
+      }
+      return res;
+    }
+  }
+  return res;
+}
+
+// Busca una columna por su título exacto. Si crear=true y no existe, la agrega al final.
+function colPorHeader(h, nombre, crear){
+  const ult = Math.max(1, h.getLastColumn());
+  const headers = h.getRange(1, 1, 1, ult).getValues()[0];
+  for(let i = 0; i < headers.length; i++){
+    if(String(headers[i]).trim().toUpperCase() === nombre.toUpperCase()) return i + 1;
+  }
+  if(crear){ const c = h.getLastColumn() + 1; h.getRange(1, c).setValue(nombre); return c; }
+  return 0;
+}
+
 function hoja(){
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const hs = ss.getSheets();
@@ -56,8 +104,13 @@ function guardarPedido(d){
     ''                   // N COMPROBANTES (llega con el comprobante)
   ];
   h.appendRow(fila);
-  PropertiesService.getScriptProperties()
-    .setProperty('row_' + d.id, String(h.getLastRow()));
+  const filaNum = h.getLastRow();
+  PropertiesService.getScriptProperties().setProperty('row_' + d.id, String(filaNum));
+  // Guardar el número de pedido (para "Mis pedidos") y crear la casilla ENTREGADO
+  h.getRange(filaNum, colPorHeader(h, 'ID_APP', true)).setValue(d.id);
+  const cEnt = colPorHeader(h, 'ENTREGADO', true);
+  h.getRange(filaNum, cEnt).setDataValidation(SpreadsheetApp.newDataValidation().requireCheckbox().build());
+  h.getRange(filaNum, cEnt).setValue(false);
   return ok();
 }
 
