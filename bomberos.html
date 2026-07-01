@@ -314,6 +314,21 @@ const SALIDA_CERRO=L.marker([-32.196462,-64.728678],{
 SALIDA_CERRO.bindPopup('<b>Salida de emergencia</b><br>Por el camino provincial hacia el este → Cerro Pelado');
 const calles=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
 const satelite=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imágenes &copy; Esri'});
+let baseSat=false;
+const btnBase=L.control({position:'bottomleft'});
+btnBase.onAdd=function(){
+  const d=L.DomUtil.create('div','');
+  d.style.cssText='background:#fff;border-radius:22px;box-shadow:0 1px 6px rgba(0,0,0,.4);padding:8px 14px;display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:#9a2f2f;cursor:pointer;user-select:none';
+  const pinta=function(){d.innerHTML='<i class="ti '+(baseSat?'ti-map':'ti-satellite')+'" style="font-size:18px"></i>'+(baseSat?'Calles':'Satélite');};
+  pinta();
+  L.DomEvent.disableClickPropagation(d);
+  L.DomEvent.on(d,'click',function(){
+    if(baseSat){map.removeLayer(satelite);calles.addTo(map);}else{map.removeLayer(calles);satelite.addTo(map);}
+    baseSat=!baseSat; pinta();
+  });
+  return d;
+};
+btnBase.addTo(map);
 
 function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();}
 function primer(p,campos){p=p||{};for(const k of campos){const v=p[k];if(v!==undefined&&v!==null&&String(v).trim()!==''&&String(v).toUpperCase()!=='NULL')return v;}return '';}
@@ -544,7 +559,7 @@ async function init(){
       if(c.clase==='barrio'){const b=L.geoJSON(gj,{filter:f=>norm((f.properties||{}).Umepay)==='si'}).getBounds();if(b.isValid())bounds=b;}
     }catch(e){}
   }
-  L.control.layers({'Calles':calles,'Satélite':satelite},overlays,{collapsed:true}).addTo(map);
+  L.control.layers(null,overlays,{collapsed:true}).addTo(map);
   if(bounds&&bounds.isValid()){ultimoBounds=bounds;encuadrar();}
 }
 init();

@@ -805,6 +805,21 @@ map.createPane('rotuloPane'); map.getPane('rotuloPane').style.zIndex=460; map.ge
 map.createPane('puntosPane'); map.getPane('puntosPane').style.zIndex=470;
 const calles=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
 const satelite=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imágenes &copy; Esri'});
+let baseSat=false;
+const btnBase=L.control({position:'bottomleft'});
+btnBase.onAdd=function(){
+  const d=L.DomUtil.create('div','');
+  d.style.cssText='background:#fff;border-radius:22px;box-shadow:0 1px 6px rgba(0,0,0,.4);padding:8px 14px;display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:#2d5a3d;cursor:pointer;user-select:none';
+  const pinta=function(){d.innerHTML='<i class="ti '+(baseSat?'ti-map':'ti-satellite')+'" style="font-size:18px"></i>'+(baseSat?'Calles':'Satélite');};
+  pinta();
+  L.DomEvent.disableClickPropagation(d);
+  L.DomEvent.on(d,'click',function(){
+    if(baseSat){map.removeLayer(satelite);calles.addTo(map);}else{map.removeLayer(calles);satelite.addTo(map);}
+    baseSat=!baseSat; pinta();
+  });
+  return d;
+};
+btnBase.addTo(map);
 
 const DATOS={}; let marcadorYo=null;
 const ctlLoc=L.control({position:'bottomright'});
@@ -1033,7 +1048,7 @@ async function init(){
     }catch(e){}
   }
   if(n===0){document.getElementById('aviso').textContent='No se pudieron cargar las capas. Revisá la carpeta data/.';document.getElementById('aviso').style.display='block';}
-  L.control.layers({'Calles':calles,'Satélite':satelite},overlays,{collapsed:false}).addTo(map);
+  L.control.layers(null,overlays,{collapsed:false}).addTo(map);
   if(bounds&&bounds.isValid()){ultimoBounds=bounds; encuadrar();}
 }
 init();
