@@ -204,6 +204,7 @@ function hojaLotes(){
 }
 function leerLotes(){
   const h = hojaLotes();
+  if(h.getLastRow() < 2) seedLotes();   // primera vez: carga sola la lista actual
   const ult = h.getLastRow();
   if(ult < 2) return [];
   const vals = h.getRange(2, 1, ult - 1, 2).getValues();
