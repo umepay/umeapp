@@ -319,7 +319,7 @@ const btnBase=L.control({position:'bottomleft'});
 btnBase.onAdd=function(){
   const d=L.DomUtil.create('div','');
   d.style.cssText='background:#fff;border-radius:22px;box-shadow:0 1px 6px rgba(0,0,0,.4);padding:8px 14px;display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:#9a2f2f;cursor:pointer;user-select:none';
-  const pinta=function(){d.innerHTML='<i class="ti '+(baseSat?'ti-map':'ti-satellite')+'" style="font-size:18px"></i>'+(baseSat?'Calles':'Satélite');};
+  const pinta=function(){d.innerHTML='<i class="ti '+(baseSat?'ti-map':'ti-satellite')+'" style="font-size:18px"></i>'+(baseSat?'Mapa':'Satélite');};
   pinta();
   L.DomEvent.disableClickPropagation(d);
   L.DomEvent.on(d,'click',function(){
