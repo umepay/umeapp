@@ -42,7 +42,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 /* etiquetas */
 .lbl{background:#fff;border:0;box-shadow:0 1px 3px rgba(0,0,0,.3);font-size:11px;font-weight:600;color:#333;padding:1px 6px}
 .lbl::before{display:none}
-.lbl-barrio{background:rgba(122,67,38,.92);border:0;color:#fff;font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;border-radius:5px;box-shadow:0 1px 4px rgba(0,0,0,.35);white-space:nowrap}
+.lbl-barrio{background:rgba(122,67,38,.92);border:0;color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:5px;box-shadow:0 1px 4px rgba(0,0,0,.35);white-space:nowrap}
 .lbl-barrio::before{display:none}
 .lbl-calle{background:transparent;border:0;box-shadow:none;color:#5a3a1a;font-weight:700;font-size:var(--calle-size,11px);padding:0;white-space:nowrap;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 2px #fff,1px 1px 2px #fff}
 .lbl-calle-wrap{background:none;border:0;box-shadow:none}
@@ -52,6 +52,8 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .lbl-curso::before{display:none}
 .lbl-salida{background:#2b8a3e;border:0;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .lbl-salida::before{display:none}
+.btn-loc{width:42px;height:42px;background:#fff;border:none;border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,.4);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.btn-loc i{font-size:22px;color:#9a2f2f}
 
 .popup b{font-size:15px;color:#2d5a3d;display:block;margin-bottom:4px}
 .popup .row{font-size:13px;padding:1px 0}.popup .k{color:#888}
@@ -76,7 +78,6 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
       <a href="tel:+543546514269"><i class="ti ti-traffic-cone"></i> Guardia local / Tránsito · 3546-514269</a>
     </div>
   </details>
-  <button class="btn-ubic" onclick="miUbicacion()"><i class="ti ti-current-location"></i> Mi ubicación</button>
 </div>
 <div id="map"></div>
 <div class="leyenda">
@@ -310,8 +311,11 @@ const SALIDA_CERRO=L.marker([-32.196462,-64.728678],{
   pane:'puntosPane', zIndexOffset:1000,
   icon:L.divIcon({className:'salida-emerg',iconSize:[0,0],
     html:'<div class="se-box"><i class="ti ti-door-exit"></i><span class="se-arrow">→</span><span>a Cerro Pelado</span></div>'})
-}).addTo(map);
+});
 SALIDA_CERRO.bindPopup('<b>Salida de emergencia</b><br>Por el camino provincial hacia el este → Cerro Pelado');
+const ctlLoc=L.control({position:'bottomright'});
+ctlLoc.onAdd=function(){const b=L.DomUtil.create('button','btn-loc');b.innerHTML='<i class="ti ti-current-location"></i>';b.title='Mi ubicación';L.DomEvent.on(b,'click',function(e){L.DomEvent.stop(e);miUbicacion();});return b;};
+ctlLoc.addTo(map);
 const calles=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
 const satelite=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imágenes &copy; Esri'});
 let baseSat=false;
@@ -560,6 +564,14 @@ async function init(){
     }catch(e){}
   }
   L.control.layers(null,overlays,{collapsed:true}).addTo(map);
+  // El cartel de salida de emergencia aparece con "Calles internas" o "Ruta provincial"
+  function actualizarSalida(){
+    const on = map.hasLayer(overlays['Calles internas']) || map.hasLayer(overlays['Ruta provincial']);
+    if(on){ if(!map.hasLayer(SALIDA_CERRO)) SALIDA_CERRO.addTo(map); }
+    else if(map.hasLayer(SALIDA_CERRO)){ map.removeLayer(SALIDA_CERRO); }
+  }
+  map.on('overlayadd overlayremove', actualizarSalida);
+  actualizarSalida();
   if(bounds&&bounds.isValid()){ultimoBounds=bounds;encuadrar();}
 }
 init();
