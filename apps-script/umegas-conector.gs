@@ -49,24 +49,30 @@ function hoja(){
 }
 
 function guardarPedido(d){
-  const h = hoja();
-  h.appendRow(['']);                 // reserva una fila nueva (evita choques)
-  const fila = h.getLastRow();
-  setCel(h, fila, 'Marca temporal', new Date());
-  setCel(h, fila, 'RESPONSABLE', d.nombre || '');
-  setCel(h, fila, 'BARRIO/ZONA', d.barrio || '');
-  setCel(h, fila, 'LOTE', d.lote || '');
-  setCel(h, fila, 'TIPO', d.tipoPedido === 'nuevo' ? 'Tubo nuevo' : 'Recarga');
-  setCel(h, fila, 'MODO', d.urgencia === 'urgente' ? '🔴 URGENTE' : '💚 TRANCA');
-  if(d.c45) setCel(h, fila, '45 K', d.c45);
-  if(d.c30) setCel(h, fila, '30 K', d.c30);
-  if(d.c15) setCel(h, fila, '15 K', d.c15);
-  if(d.c10) setCel(h, fila, '10 K', d.c10);
-  setCel(h, fila, 'ID_APP', d.id);
-  const cEnt = colPorHeader(h, 'ENTREGADO', true);
-  h.getRange(fila, cEnt).setDataValidation(SpreadsheetApp.newDataValidation().requireCheckbox().build());
-  h.getRange(fila, cEnt).setValue(false);
-  PropertiesService.getScriptProperties().setProperty('row_' + d.id, String(fila));
+  const lock = LockService.getScriptLock();
+  try{ lock.waitLock(20000); }catch(e){}
+  try{
+    const h = hoja();
+    const fila = h.getLastRow() + 1;   // primera fila libre debajo de los datos
+    setCel(h, fila, 'Marca temporal', new Date());
+    setCel(h, fila, 'RESPONSABLE', d.nombre || '');
+    setCel(h, fila, 'BARRIO/ZONA', d.barrio || '');
+    setCel(h, fila, 'LOTE', d.lote || '');
+    setCel(h, fila, 'TIPO', d.tipoPedido === 'nuevo' ? 'Tubo nuevo' : 'Recarga');
+    setCel(h, fila, 'MODO', d.urgencia === 'urgente' ? '🔴 URGENTE' : '💚 TRANCA');
+    if(d.c45) setCel(h, fila, '45 K', d.c45);
+    if(d.c30) setCel(h, fila, '30 K', d.c30);
+    if(d.c15) setCel(h, fila, '15 K', d.c15);
+    if(d.c10) setCel(h, fila, '10 K', d.c10);
+    setCel(h, fila, 'ID_APP', d.id);
+    const cEnt = colPorHeader(h, 'ENTREGADO', true);
+    h.getRange(fila, cEnt).setDataValidation(SpreadsheetApp.newDataValidation().requireCheckbox().build());
+    h.getRange(fila, cEnt).setValue(false);
+    PropertiesService.getScriptProperties().setProperty('row_' + d.id, String(fila));
+    SpreadsheetApp.flush();
+  } finally {
+    try{ lock.releaseLock(); }catch(e){}
+  }
   return ok();
 }
 
@@ -81,15 +87,22 @@ function guardarComprobante(d){
     try{ archivo.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); }catch(err){}
     link = 'https://drive.google.com/open?id=' + archivo.getId();
   }
-  let fila = parseInt(PropertiesService.getScriptProperties().getProperty('row_' + d.id), 10);
-  if(!fila) fila = filaPorId(h, d.id);
-  if(!fila){
-    h.appendRow(['']); fila = h.getLastRow();
-    if(d.id) setCel(h, fila, 'ID_APP', d.id);
+  const lock = LockService.getScriptLock();
+  try{ lock.waitLock(20000); }catch(e){}
+  try{
+    let fila = parseInt(PropertiesService.getScriptProperties().getProperty('row_' + d.id), 10);
+    if(!fila) fila = filaPorId(h, d.id);
+    if(!fila){
+      fila = h.getLastRow() + 1;
+      if(d.id) setCel(h, fila, 'ID_APP', d.id);
+    }
+    if(d.whatsapp)   setCel(h, fila, 'WHATSAPP', d.whatsapp);
+    if(link)         setCel(h, fila, 'COMPROBANTES', link);
+    if(d.aclaracion) h.getRange(fila, colAclaracion(h)).setValue(d.aclaracion);
+    SpreadsheetApp.flush();
+  } finally {
+    try{ lock.releaseLock(); }catch(e){}
   }
-  if(d.whatsapp)   setCel(h, fila, 'WHATSAPP', d.whatsapp);
-  if(link)         setCel(h, fila, 'COMPROBANTES', link);
-  if(d.aclaracion) h.getRange(fila, colAclaracion(h)).setValue(d.aclaracion);
   return ok();
 }
 
