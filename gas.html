@@ -220,14 +220,13 @@ async function hacerPedido(){
   if(c45+c30+c15+c10===0){alert('Agregá al menos una garrafa');return;}
   calcGas();
   const id='P'+Date.now()+Math.floor(Math.random()*900+100);
-  pedidoActual={accion:'pedido',id,nombre,lote,barrio:reg.b,c45,c30,c15,c10,tipoPedido:tipoMode,pago:pagoMode,urgencia:urgMode,total:totalNum};
-  try{ await enviar(pedidoActual); }catch(e){}
   const partes=[]; if(c45)partes.push('45K x'+c45); if(c30)partes.push('30K x'+c30); if(c15)partes.push('15K x'+c15); if(c10)partes.push('10K x'+c10);
   const tipoTxt=tipoMode==='nuevo'?'Tubo nuevo':'Recarga';
   const resumenTxt=tipoTxt+' · '+lote+' · '+partes.join(', ');
+  // Todavía NO se manda nada: la planilla se llena recién al enviar el comprobante (paso 2)
+  pedidoActual={id,nombre,lote,barrio:reg.b,c45,c30,c15,c10,tipoPedido:tipoMode,pago:pagoMode,urgencia:urgMode,total:totalNum,resumen:resumenTxt};
   document.getElementById('resumen').textContent=resumenTxt;
   document.getElementById('totalPago').textContent='$'+totalNum.toLocaleString('es-AR');
-  guardarPedidoLocal({id,lote,nombre,resumen:resumenTxt,total:totalNum});
   mostrar('paso2');
 }
 
@@ -306,7 +305,9 @@ function enviarComprobante(){
   const acl=(document.getElementById('gas-aclaracion').value||'').trim();
   const btn=document.getElementById('btnComp'); btn.textContent='Enviando...'; btn.disabled=true;
   comprimir(f, async(b64)=>{
-    try{ await enviar({accion:'comprobante', id:pedidoActual.id, imagen:b64, tipo:'image/jpeg', whatsapp:wpp, aclaracion:acl}); }catch(e){}
+    const payload=Object.assign({}, pedidoActual, {accion:'comprobante', imagen:b64, tipo:'image/jpeg', whatsapp:wpp, aclaracion:acl});
+    try{ await enviar(payload); }catch(e){}
+    guardarPedidoLocal({id:pedidoActual.id, lote:pedidoActual.lote, nombre:pedidoActual.nombre, resumen:pedidoActual.resumen, total:pedidoActual.total});
     mostrar('paso3');
   });
 }

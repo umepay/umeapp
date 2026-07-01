@@ -93,12 +93,29 @@ function guardarComprobante(d){
     let fila = parseInt(PropertiesService.getScriptProperties().getProperty('row_' + d.id), 10);
     if(!fila) fila = filaPorId(h, d.id);
     if(!fila){
+      // fila nueva: se crea recién acá (el pedido ya no se escribe en el paso 1)
       fila = h.getLastRow() + 1;
+      setCel(h, fila, 'Marca temporal', new Date());
       if(d.id) setCel(h, fila, 'ID_APP', d.id);
+      const cEnt = colPorHeader(h, 'ENTREGADO', true);
+      h.getRange(fila, cEnt).setDataValidation(SpreadsheetApp.newDataValidation().requireCheckbox().build());
+      h.getRange(fila, cEnt).setValue(false);
     }
+    // Datos del pedido (llegan junto con el comprobante)
+    if(d.nombre != null)     setCel(h, fila, 'RESPONSABLE', d.nombre);
+    if(d.barrio != null)     setCel(h, fila, 'BARRIO/ZONA', d.barrio);
+    if(d.lote != null)       setCel(h, fila, 'LOTE', d.lote);
+    if(d.tipoPedido != null) setCel(h, fila, 'TIPO', d.tipoPedido === 'nuevo' ? 'Tubo nuevo' : 'Recarga');
+    if(d.urgencia != null)   setCel(h, fila, 'MODO', d.urgencia === 'urgente' ? '🔴 URGENTE' : '💚 TRANCA');
+    if(d.c45) setCel(h, fila, '45 K', d.c45);
+    if(d.c30) setCel(h, fila, '30 K', d.c30);
+    if(d.c15) setCel(h, fila, '15 K', d.c15);
+    if(d.c10) setCel(h, fila, '10 K', d.c10);
+    // Comprobante / whatsapp / aclaración
     if(d.whatsapp)   setCel(h, fila, 'WHATSAPP', d.whatsapp);
     if(link)         setCel(h, fila, 'COMPROBANTES', link);
     if(d.aclaracion) h.getRange(fila, colAclaracion(h)).setValue(d.aclaracion);
+    if(d.id) PropertiesService.getScriptProperties().setProperty('row_' + d.id, String(fila));
     SpreadsheetApp.flush();
   } finally {
     try{ lock.releaseLock(); }catch(e){}
