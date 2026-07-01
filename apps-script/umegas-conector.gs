@@ -2,17 +2,19 @@
  * Conector (Apps Script) que recibe los pedidos de la app UmeGas y los anota
  * en la planilla, guardando el comprobante en la carpeta de Drive.
  *
- * Pestaña destino (gid):  1815523778
- * Carpeta de comprobantes: COMPROBANTES (File responses) — carpeta oficial compartida
+ * IMPORTANTE: escribe cada dato buscando la columna POR SU NOMBRE (encabezado),
+ * así se pueden mover/reordenar las columnas sin romper nada (ej. ENTREGADO
+ * puede estar primera, última, donde sea).
  *
- * Columnas:
- *  A Marca temporal · B RESPONSABLE · C WHATSAPP · D BARRIO/ZONA · E LOTE
- *  F (vacía) · G (vacía) · H TIPO · I MODO · J 45K · K 30K · L 15K · M 10K
- *  N COMPROBANTES
+ * Pestaña destino (gid):  1815523778
+ * Carpeta de comprobantes: COMPROBANTES (File responses) — carpeta oficial
+ * Encabezados que usa: Marca temporal · RESPONSABLE · WHATSAPP · BARRIO/ZONA ·
+ *   LOTE · TIPO · MODO · 45 K · 30 K · 15 K · 10 K · COMPROBANTES ·
+ *   EXPRESIÓN ESCRITA (aclaración) · ID_APP · ENTREGADO
  ****************************************************************************/
 
 const SHEET_GID = 1815523778;
-const CARPETA_COMPROBANTES = '1LgCi59vD6s5i-yAIx_43HPzgppN7JsPXFartuqBZj0KfN1wVICTWElqxh9KYf_jaOj8P9xyM';  // carpeta oficial COMPROBANTES (File responses)
+const CARPETA_COMPROBANTES = '1LgCi59vD6s5i-yAIx_43HPzgppN7JsPXFartuqBZj0KfN1wVICTWElqxh9KYf_jaOj8P9xyM';
 
 function doPost(e){
   try{
@@ -21,8 +23,7 @@ function doPost(e){
     if(data.accion === 'comprobante') return guardarComprobante(data);
     return ok();
   }catch(err){
-    return ContentService.createTextOutput('ERROR: ' + err)
-      .setMimeType(ContentService.MimeType.TEXT);
+    return ContentService.createTextOutput('ERROR: ' + err).setMimeType(ContentService.MimeType.TEXT);
   }
 }
 
@@ -35,43 +36,7 @@ function doGet(e){
     return ContentService.createTextOutput(cb + '(' + JSON.stringify(est) + ')')
       .setMimeType(ContentService.MimeType.JAVASCRIPT);
   }
-  return ContentService.createTextOutput('UmeGas OK')
-    .setMimeType(ContentService.MimeType.TEXT);
-}
-
-function estadoPedido(id){
-  const res = { id: id, entregado: false, encontrado: false };
-  if(!id) return res;
-  const h = hoja();
-  const cId = colPorHeader(h, 'ID_APP', false);
-  if(!cId) return res;
-  const ult = h.getLastRow();
-  if(ult < 2) return res;
-  const ids = h.getRange(2, cId, ult - 1, 1).getValues();
-  for(let i = 0; i < ids.length; i++){
-    if(String(ids[i][0]) === String(id)){
-      res.encontrado = true;
-      const cEnt = colPorHeader(h, 'ENTREGADO', false);
-      if(cEnt){
-        const v = h.getRange(i + 2, cEnt).getValue();
-        const t = String(v).toLowerCase();
-        res.entregado = (v === true || t === 'si' || t === 'true' || t === '✓' || t === 'x');
-      }
-      return res;
-    }
-  }
-  return res;
-}
-
-// Busca una columna por su título exacto. Si crear=true y no existe, la agrega al final.
-function colPorHeader(h, nombre, crear){
-  const ult = Math.max(1, h.getLastColumn());
-  const headers = h.getRange(1, 1, 1, ult).getValues()[0];
-  for(let i = 0; i < headers.length; i++){
-    if(String(headers[i]).trim().toUpperCase() === nombre.toUpperCase()) return i + 1;
-  }
-  if(crear){ const c = h.getLastColumn() + 1; h.getRange(1, c).setValue(nombre); return c; }
-  return 0;
+  return ContentService.createTextOutput('UmeGas OK').setMimeType(ContentService.MimeType.TEXT);
 }
 
 function hoja(){
@@ -85,64 +50,92 @@ function hoja(){
 
 function guardarPedido(d){
   const h = hoja();
-  const tipo = d.tipoPedido === 'nuevo' ? 'Tubo nuevo' : 'Recarga';
-  const modo = d.urgencia === 'urgente' ? '🔴 URGENTE' : '💚 TRANCA';
-  const fila = [
-    new Date(),          // A Marca temporal
-    d.nombre || '',      // B RESPONSABLE (nombre de quien pide)
-    '',                  // C WHATSAPP (llega con el comprobante)
-    d.barrio || '',      // D BARRIO/ZONA
-    d.lote || '',        // E LOTE
-    '',                  // F
-    '',                  // G
-    tipo,                // H TIPO
-    modo,                // I MODO
-    d.c45 ? d.c45 : '',  // J 45 K
-    d.c30 ? d.c30 : '',  // K 30 K
-    d.c15 ? d.c15 : '',  // L 15 K
-    d.c10 ? d.c10 : '',  // M 10 K
-    ''                   // N COMPROBANTES (llega con el comprobante)
-  ];
-  h.appendRow(fila);
-  const filaNum = h.getLastRow();
-  PropertiesService.getScriptProperties().setProperty('row_' + d.id, String(filaNum));
-  // Guardar el número de pedido (para "Mis pedidos") y crear la casilla ENTREGADO
-  h.getRange(filaNum, colPorHeader(h, 'ID_APP', true)).setValue(d.id);
+  h.appendRow(['']);                 // reserva una fila nueva (evita choques)
+  const fila = h.getLastRow();
+  setCel(h, fila, 'Marca temporal', new Date());
+  setCel(h, fila, 'RESPONSABLE', d.nombre || '');
+  setCel(h, fila, 'BARRIO/ZONA', d.barrio || '');
+  setCel(h, fila, 'LOTE', d.lote || '');
+  setCel(h, fila, 'TIPO', d.tipoPedido === 'nuevo' ? 'Tubo nuevo' : 'Recarga');
+  setCel(h, fila, 'MODO', d.urgencia === 'urgente' ? '🔴 URGENTE' : '💚 TRANCA');
+  if(d.c45) setCel(h, fila, '45 K', d.c45);
+  if(d.c30) setCel(h, fila, '30 K', d.c30);
+  if(d.c15) setCel(h, fila, '15 K', d.c15);
+  if(d.c10) setCel(h, fila, '10 K', d.c10);
+  setCel(h, fila, 'ID_APP', d.id);
   const cEnt = colPorHeader(h, 'ENTREGADO', true);
-  h.getRange(filaNum, cEnt).setDataValidation(SpreadsheetApp.newDataValidation().requireCheckbox().build());
-  h.getRange(filaNum, cEnt).setValue(false);
+  h.getRange(fila, cEnt).setDataValidation(SpreadsheetApp.newDataValidation().requireCheckbox().build());
+  h.getRange(fila, cEnt).setValue(false);
+  PropertiesService.getScriptProperties().setProperty('row_' + d.id, String(fila));
   return ok();
 }
 
 function guardarComprobante(d){
   const h = hoja();
-  const props = PropertiesService.getScriptProperties();
-  const filaNum = parseInt(props.getProperty('row_' + d.id), 10);
-
   let link = '';
   if(d.imagen){
     const carpeta = carpetaComprobantes();
     const bytes = Utilities.base64Decode(d.imagen);
-    const blob = Utilities.newBlob(bytes, d.tipo || 'image/jpeg',
-      'comprobante_' + (d.id || '') + '.jpg');
+    const blob = Utilities.newBlob(bytes, d.tipo || 'image/jpeg', 'comprobante_' + (d.id || '') + '.jpg');
     const archivo = carpeta.createFile(blob);
-    try{
-      archivo.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    }catch(err){}
+    try{ archivo.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); }catch(err){}
     link = 'https://drive.google.com/open?id=' + archivo.getId();
   }
-
-  if(!filaNum){
-    // Si por algo no se encontró el pedido, igual no perdemos el comprobante.
-    h.appendRow([new Date(), '', d.whatsapp || '', '', '', '', '',
-                 '', '', '', '', '', '', link]);
-    if(d.aclaracion) h.getRange(h.getLastRow(), colAclaracion(h)).setValue(d.aclaracion);
-    return ok();
+  let fila = parseInt(PropertiesService.getScriptProperties().getProperty('row_' + d.id), 10);
+  if(!fila) fila = filaPorId(h, d.id);
+  if(!fila){
+    h.appendRow(['']); fila = h.getLastRow();
+    if(d.id) setCel(h, fila, 'ID_APP', d.id);
   }
-  if(d.whatsapp)   h.getRange(filaNum, 3).setValue(d.whatsapp);   // C WHATSAPP
-  if(link)         h.getRange(filaNum, 14).setValue(link);        // N COMPROBANTES
-  if(d.aclaracion) h.getRange(filaNum, colAclaracion(h)).setValue(d.aclaracion);
+  if(d.whatsapp)   setCel(h, fila, 'WHATSAPP', d.whatsapp);
+  if(link)         setCel(h, fila, 'COMPROBANTES', link);
+  if(d.aclaracion) h.getRange(fila, colAclaracion(h)).setValue(d.aclaracion);
   return ok();
+}
+
+function estadoPedido(id){
+  const res = { id: id, entregado: false, encontrado: false };
+  if(!id) return res;
+  const h = hoja();
+  const fila = filaPorId(h, id);
+  if(!fila) return res;
+  res.encontrado = true;
+  const cEnt = colPorHeader(h, 'ENTREGADO', false);
+  if(cEnt){
+    const v = h.getRange(fila, cEnt).getValue();
+    const t = String(v).toLowerCase();
+    res.entregado = (v === true || t === 'si' || t === 'true' || t === '✓' || t === 'x');
+  }
+  return res;
+}
+
+// Devuelve el número de fila del pedido con ese ID_APP (0 si no está).
+function filaPorId(h, id){
+  if(!id) return 0;
+  const cId = colPorHeader(h, 'ID_APP', false);
+  if(!cId) return 0;
+  const ult = h.getLastRow();
+  if(ult < 2) return 0;
+  const ids = h.getRange(2, cId, ult - 1, 1).getValues();
+  for(let i = 0; i < ids.length; i++){ if(String(ids[i][0]) === String(id)) return i + 2; }
+  return 0;
+}
+
+// Escribe un valor en la fila, buscando la columna por su encabezado (la crea si falta).
+function setCel(h, fila, header, val){
+  const c = colPorHeader(h, header, true);
+  if(c) h.getRange(fila, c).setValue(val);
+}
+
+// Busca una columna por su título exacto. Si crear=true y no existe, la agrega al final.
+function colPorHeader(h, nombre, crear){
+  const ult = Math.max(1, h.getLastColumn());
+  const headers = h.getRange(1, 1, 1, ult).getValues()[0];
+  for(let i = 0; i < headers.length; i++){
+    if(String(headers[i]).trim().toUpperCase() === nombre.toUpperCase()) return i + 1;
+  }
+  if(crear){ const c = h.getLastColumn() + 1; h.getRange(1, c).setValue(nombre); return c; }
+  return 0;
 }
 
 // La aclaración de entrega va en la columna "EXPRESIÓN ESCRITA".
@@ -157,7 +150,6 @@ function colAclaracion(h){
   return c;
 }
 
-// Usa la carpeta oficial si hay acceso; si no, una carpeta propia "Comprobantes UmeGas".
 function carpetaComprobantes(){
   if(CARPETA_COMPROBANTES){
     try{ return DriveApp.getFolderById(CARPETA_COMPROBANTES); }catch(err){}
@@ -169,6 +161,5 @@ function carpetaComprobantes(){
 }
 
 function ok(){
-  return ContentService.createTextOutput('OK')
-    .setMimeType(ContentService.MimeType.TEXT);
+  return ContentService.createTextOutput('OK').setMimeType(ContentService.MimeType.TEXT);
 }
