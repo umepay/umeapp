@@ -35,7 +35,7 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
 <div class="topbar">
   <a class="btn-back" href="index.html#app"><i class="ti ti-arrow-left"></i></a>
   <h1>UmeGas</h1>
-  <button class="btn-back" onclick="verMisPedidos()" title="Mis pedidos" style="cursor:pointer"><i class="ti ti-clipboard-list"></i></button>
+  <button onclick="verMisPedidos()" title="Mi pedido" style="background:none;border:none;color:#e8f5e2;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px"><i class="ti ti-clipboard-list" style="font-size:18px"></i>Mi pedido</button>
 </div>
 <div class="content">
 
@@ -136,7 +136,7 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
   <div id="pasoMis" class="paso">
     <div class="slabel" style="margin-top:0">Mis pedidos</div>
     <div id="listaMis"></div>
-    <button class="btn-s" onclick="mostrar('paso1')" style="margin-top:6px">Volver a pedir</button>
+    <a class="btn-s" href="index.html#app" style="display:block;text-align:center;text-decoration:none;margin-top:6px">Volver al inicio</a>
   </div>
 
 </div>
@@ -251,7 +251,10 @@ function verMisPedidos(){
     const d=document.createElement('div'); d.className='card';
     d.innerHTML='<div style="font-weight:600;font-size:14px">'+escMis(p.lote||'Pedido')+'</div>'+
       '<div class="muted" style="margin:2px 0 6px">'+escMis(p.fecha||'')+(p.resumen?(' · '+escMis(p.resumen)):'')+'</div>'+
-      '<div id="est_'+p.id+'" style="font-size:13px;font-weight:600;color:#888">Consultando estado…</div>';
+      '<div style="display:flex;justify-content:space-between;align-items:center">'+
+        '<span id="est_'+p.id+'" style="font-size:13px;font-weight:600;color:#888">Consultando estado…</span>'+
+        '<button onclick="quitarPedidoLocal(\''+p.id+'\')" style="background:none;border:none;color:#b23b3b;font-size:12px;cursor:pointer">Quitar</button>'+
+      '</div>';
     cont.appendChild(d);
     consultarEstado(p.id, function(r){
       const e=document.getElementById('est_'+p.id); if(!e) return;
@@ -259,6 +262,13 @@ function verMisPedidos(){
       else { e.textContent='🚚 En camino'; e.style.color='#854f0b'; }
     });
   });
+}
+function quitarPedidoLocal(id){
+  let arr=[];
+  try{ arr=JSON.parse(localStorage.getItem('umegas_pedidos')||'[]'); }catch(e){}
+  arr=arr.filter(function(p){ return p.id!==id; });
+  try{ localStorage.setItem('umegas_pedidos', JSON.stringify(arr)); }catch(e){}
+  verMisPedidos();
 }
 function consultarEstado(id, cb){
   const cbName='umecb_'+String(id).replace(/[^a-zA-Z0-9]/g,'');
