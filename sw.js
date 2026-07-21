@@ -1,4 +1,4 @@
-const CACHE = 'umeapp-v3';
+const CACHE = 'umeapp-v4';
 const CORE = [
   './', './index.html', './mapa.html', './bomberos.html', './cartelera.html', './gas.html',
   './manifest.json', './icon-192.png', './icon-512.png',
@@ -18,8 +18,11 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;            // no tocar los envíos (pedidos de gas, etc.)
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;  // CDN, mapas y hojas van directo a la red
+  // Pedimos siempre la copia fresca al servidor (sin caché HTTP), así una
+  // actualización de la app se ve al instante y no dentro de 10 minutos.
+  const pedido = new Request(req, { cache: 'no-cache' });
   e.respondWith(
-    fetch(req).then(res => {
+    fetch(pedido).then(res => {
       const copia = res.clone();
       caches.open(CACHE).then(c => c.put(req, copia));
       return res;
