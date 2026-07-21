@@ -54,7 +54,7 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
     <div class="card" style="margin-bottom:14px">
       <div class="row"><div class="lname">45 K (tubo alto)</div><div style="font-weight:500">$250.000</div></div>
       <div class="row"><div class="lname">15 K y 10 K (garrafa)</div><div style="font-weight:500">$160.000</div></div>
-      <div class="muted" style="margin-top:8px">Es solo el envase, sin la recarga. Si necesitás tubo nuevo, al envase sumale el precio de la carga y coordinalo con Lalo.</div>
+      <div class="muted" style="margin-top:8px">Es solo el envase, sin la recarga. Si elegís "Tubo nuevo", el total ya suma el envase + la primera carga.</div>
     </div>
 
     <div class="slabel">Tu pedido</div>
@@ -193,11 +193,21 @@ let pagoMode='efectivo', urgMode='tranquila', tipoMode='recarga', totalNum=0, pe
 
 function calcGas(){
   const p={45:125000,30:85000,15:50000,10:37000};
-  const c45=+document.getElementById('g45').value||0, c30=+document.getElementById('g30').value||0,
-        c15=+document.getElementById('g15').value||0, c10=+document.getElementById('g10').value||0;
-  totalNum=c45*p[45]+c30*p[30]+c15*p[15]+c10*p[10];
+  const env={45:250000,30:0,15:160000,10:160000};   // envase vacío (0 = sin precio publicado)
+  const c={45:+document.getElementById('g45').value||0, 30:+document.getElementById('g30').value||0,
+           15:+document.getElementById('g15').value||0, 10:+document.getElementById('g10').value||0};
+  const nuevo = tipoMode==='nuevo';
+  totalNum=0; let sinPrecio=false;
+  [45,30,15,10].forEach(function(t){
+    if(!c[t]) return;
+    if(nuevo && !env[t]) sinPrecio=true;
+    totalNum += c[t] * (p[t] + (nuevo ? env[t] : 0));
+  });
   if(totalNum>0 && pagoMode==='transferencia') totalNum+=300;
-  document.getElementById('total-gas').textContent='Total: $'+totalNum.toLocaleString('es-AR');
+  const box=document.getElementById('total-gas');
+  box.innerHTML='Total: $'+totalNum.toLocaleString('es-AR')+
+    (nuevo?'<div class="muted" style="font-weight:400;margin-top:4px">Incluye envase + primera carga</div>':'')+
+    (sinPrecio?'<div class="muted" style="font-weight:400;margin-top:4px">El envase de 30 K no tiene precio publicado: lo coordinás con Lalo.</div>':'');
 }
 function setTipo(m){
   tipoMode=m;
@@ -208,8 +218,9 @@ function setTipo(m){
   document.getElementById('btn-nuevo').style.color=m==='nuevo'?'#2d5a3d':'#888';
   document.getElementById('btn-nuevo').style.borderColor=m==='nuevo'?'#2d5a3d':'#ddd';
   document.getElementById('nota-tipo').textContent = m==='nuevo'
-    ? 'Tubo nuevo: comprás el envase. El precio puede diferir, lo coordinás con Lalo.'
+    ? 'Tubo nuevo: comprás el envase y viene con la primera carga. El total suma los dos precios.'
     : 'Recarga: cambiás tu tubo vacío por uno lleno.';
+  calcGas();
 }
 function setPago(m){
   pagoMode=m;
