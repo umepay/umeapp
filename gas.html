@@ -103,12 +103,15 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
   <!-- PASO 2: comprobante -->
   <div id="paso2" class="paso">
     <div class="slabel" style="margin-top:0">Pago</div>
-    <div class="aviso">Un paso más y registramos el pedido. Pagá y subí el comprobante.</div>
+    <div class="aviso" id="aviso2">Un paso más y registramos el pedido. Pagá y subí el comprobante.</div>
     <div class="card">
       <div id="resumen" style="font-size:13px;color:#555;margin-bottom:10px"></div>
       <div class="row"><div class="lname">Total a pagar</div><div id="totalPago" style="font-weight:600"></div></div>
-      <div class="row"><div class="lname">Alias</div><div style="font-weight:500">gas.centro.mejor</div></div>
-      <div class="muted" style="margin-top:8px">Titular: Norma Torres · si es transferencia ya incluye los $300</div>
+      <div id="bloqueAlias">
+        <div class="row"><div class="lname">Alias</div><div style="font-weight:500">gas.centro.mejor</div></div>
+        <div class="muted" style="margin-top:8px">Titular: Norma Torres · si es transferencia ya incluye los $300</div>
+      </div>
+      <div id="notaEfectivo" class="muted" style="margin-top:8px;display:none">Pagás en efectivo cuando Lalo te lleve el gas.</div>
     </div>
     <div class="slabel">WhatsApp (obligatorio)</div>
     <div class="card">
@@ -120,10 +123,12 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
       <div style="font-size:13px;color:#888;margin-bottom:8px">Algo que ayude a encontrar tu casa o a saber dónde dejar el gas.</div>
       <textarea class="inp" id="gas-aclaracion" rows="3" placeholder="" style="resize:vertical;font-family:inherit;margin-bottom:0"></textarea>
     </div>
-    <div class="slabel">Comprobante</div>
-    <div class="card">
-      <div style="font-size:13px;color:#888;margin-bottom:10px">Subí el comprobante de transferencia o una foto de dónde dejaste el dinero.</div>
-      <input class="inp" type="file" id="comprobante" accept="image/*"/>
+    <div class="slabel" id="lblComp">Comprobante</div>
+    <div class="card" id="cardComp">
+      <div style="font-size:13px;color:#888;margin-bottom:10px">Subí el comprobante de la transferencia.</div>
+      <input class="inp" type="file" id="comprobante" accept="image/*" style="margin-bottom:0"/>
+    </div>
+    <div style="margin-top:12px">
       <button class="btn-p" id="btnComp" onclick="enviarComprobante()">Enviar comprobante</button>
     </div>
   </div>
@@ -266,7 +271,21 @@ async function hacerPedido(){
   pedidoActual={id,nombre,lote,barrio:reg.b,c45,c30,c15,c10,tipoPedido:tipoMode,pago:pagoMode,urgencia:urgMode,total:totalNum,resumen:resumenTxt};
   document.getElementById('resumen').textContent=resumenTxt;
   document.getElementById('totalPago').textContent='$'+totalNum.toLocaleString('es-AR');
+  ajustarPaso2();
   mostrar('paso2');
+}
+
+// En efectivo no se pide comprobante ni se muestra el alias.
+function ajustarPaso2(){
+  const ef = pagoMode==='efectivo';
+  document.getElementById('lblComp').style.display   = ef?'none':'';
+  document.getElementById('cardComp').style.display  = ef?'none':'';
+  document.getElementById('bloqueAlias').style.display = ef?'none':'';
+  document.getElementById('notaEfectivo').style.display = ef?'':'none';
+  document.getElementById('btnComp').textContent = ef?'Confirmar pedido':'Enviar comprobante';
+  document.getElementById('aviso2').textContent = ef
+    ? 'Un paso más y registramos el pedido. Dejanos tu WhatsApp y confirmá.'
+    : 'Un paso más y registramos el pedido. Pagá y subí el comprobante.';
 }
 
 // ==== Mis pedidos (estado del pedido en el celular) ====
@@ -340,16 +359,19 @@ function comprimir(file, cb){
 function enviarComprobante(){
   const wpp=(document.getElementById('gas-wpp').value||'').trim();
   if(!wpp){alert('Por favor dejá tu número de WhatsApp para coordinar la entrega');return;}
+  const ef = pagoMode==='efectivo';
   const f=document.getElementById('comprobante').files[0];
-  if(!f){alert('Elegí o sacá una foto del comprobante');return;}
+  if(!ef && !f){alert('Elegí o sacá una foto del comprobante');return;}
   const acl=(document.getElementById('gas-aclaracion').value||'').trim();
   const btn=document.getElementById('btnComp'); btn.textContent='Enviando...'; btn.disabled=true;
-  comprimir(f, async(b64)=>{
-    const payload=Object.assign({}, pedidoActual, {accion:'comprobante', imagen:b64, tipo:'image/jpeg', whatsapp:wpp, aclaracion:acl});
+  const mandar=async function(b64){
+    const payload=Object.assign({}, pedidoActual, {accion:'comprobante', whatsapp:wpp, aclaracion:acl});
+    if(b64){ payload.imagen=b64; payload.tipo='image/jpeg'; }
     try{ await enviar(payload); }catch(e){}
     guardarPedidoLocal({id:pedidoActual.id, lote:pedidoActual.lote, nombre:pedidoActual.nombre, resumen:pedidoActual.resumen, total:pedidoActual.total});
     mostrar('paso3');
-  });
+  };
+  if(ef) mandar(null); else comprimir(f, mandar);
 }
 </script>
 </body>
