@@ -123,17 +123,9 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
       <div style="font-size:13px;color:#888;margin-bottom:8px">Algo que ayude a encontrar tu casa o a saber dónde dejar el gas.</div>
       <textarea class="inp" id="gas-aclaracion" rows="3" placeholder="" style="resize:vertical;font-family:inherit;margin-bottom:0"></textarea>
     </div>
-    <div class="slabel" id="lblEf" style="display:none">Confirmación de pago</div>
-    <div class="card" id="cardEfectivo" style="display:none">
-      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
-        <input type="checkbox" id="ck-efectivo" style="width:20px;height:20px;accent-color:#2d5a3d;margin-top:1px;flex-shrink:0"/>
-        <span style="font-size:14px">Confirmo que pago en <b>efectivo</b> al recibir el gas y que voy a tener el monto listo.</span>
-      </label>
-    </div>
-
     <div class="slabel" id="lblComp">Comprobante</div>
     <div class="card" id="cardComp">
-      <div style="font-size:13px;color:#888;margin-bottom:10px">Subí el comprobante de la transferencia.</div>
+      <div id="txtComp" style="font-size:13px;color:#888;margin-bottom:10px">Subí el comprobante de la transferencia.</div>
       <input class="inp" type="file" id="comprobante" accept="image/*" style="margin-bottom:0"/>
     </div>
     <div style="margin-top:12px">
@@ -286,16 +278,15 @@ async function hacerPedido(){
 // En efectivo no se pide comprobante ni se muestra el alias.
 function ajustarPaso2(){
   const ef = pagoMode==='efectivo';
-  document.getElementById('lblComp').style.display   = ef?'none':'';
-  document.getElementById('cardComp').style.display  = ef?'none':'';
-  document.getElementById('lblEf').style.display        = ef?'':'none';
-  document.getElementById('cardEfectivo').style.display = ef?'':'none';
-  document.getElementById('ck-efectivo').checked = false;
+  document.getElementById('lblComp').textContent = ef?'Foto del efectivo':'Comprobante';
+  document.getElementById('txtComp').textContent = ef
+    ? 'Sacá una foto de dónde dejás el efectivo (sobre la mesa, en un sobre, etc.).'
+    : 'Subí el comprobante de la transferencia.';
   document.getElementById('bloqueAlias').style.display = ef?'none':'';
   document.getElementById('notaEfectivo').style.display = ef?'':'none';
   document.getElementById('btnComp').textContent = ef?'Confirmar pedido':'Enviar comprobante';
   document.getElementById('aviso2').textContent = ef
-    ? 'Un paso más y registramos el pedido. Dejanos tu WhatsApp y confirmá.'
+    ? 'Un paso más y registramos el pedido. Sacá la foto del efectivo y confirmá.'
     : 'Un paso más y registramos el pedido. Pagá y subí el comprobante.';
 }
 
@@ -371,13 +362,8 @@ function enviarComprobante(){
   const wpp=(document.getElementById('gas-wpp').value||'').trim();
   if(!wpp){alert('Por favor dejá tu número de WhatsApp para coordinar la entrega');return;}
   const ef = pagoMode==='efectivo';
-  if(ef && !document.getElementById('ck-efectivo').checked){
-    alert('Marcá la confirmación de que pagás en efectivo');
-    document.getElementById('cardEfectivo').scrollIntoView({block:'center'});
-    return;
-  }
   const f=document.getElementById('comprobante').files[0];
-  if(!ef && !f){alert('Subí el comprobante de la transferencia para poder enviar el pedido');
+  if(!f){alert(ef?'Sacá una foto de dónde dejás el efectivo para poder enviar el pedido':'Subí el comprobante de la transferencia para poder enviar el pedido');
     document.getElementById('cardComp').scrollIntoView({block:'center'});
     return;}
   const acl=(document.getElementById('gas-aclaracion').value||'').trim();
@@ -389,7 +375,7 @@ function enviarComprobante(){
     guardarPedidoLocal({id:pedidoActual.id, lote:pedidoActual.lote, nombre:pedidoActual.nombre, resumen:pedidoActual.resumen, total:pedidoActual.total});
     mostrar('paso3');
   };
-  if(ef) mandar(null); else comprimir(f, mandar);
+  comprimir(f, mandar);
 }
 </script>
 </body>
