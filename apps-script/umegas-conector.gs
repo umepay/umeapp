@@ -9,8 +9,9 @@
  * Pestaña destino (gid):  1815523778
  * Carpeta de comprobantes: COMPROBANTES (File responses) — carpeta oficial
  * Encabezados que usa: Marca temporal · RESPONSABLE · WHATSAPP · BARRIO/ZONA ·
- *   LOTE · TIPO · MODO · 45 K · 30 K · 15 K · 10 K · COMPROBANTES ·
+ *   LOTE · TIPO · MODO · PAGO · 45 K · 30 K · 15 K · 10 K · COMPROBANTES ·
  *   EXPRESIÓN ESCRITA (aclaración) · ID_APP · ENTREGADO
+ * (columnas que falten se crean solas al final de la primera fila)
  ****************************************************************************/
 
 const SHEET_GID = 1815523778;
@@ -65,6 +66,7 @@ function guardarPedido(d){
     setCel(h, fila, 'LOTE', d.lote || '');
     setCel(h, fila, 'TIPO', d.tipoPedido === 'nuevo' ? 'Tubo nuevo' : 'Recarga');
     setCel(h, fila, 'MODO', d.urgencia === 'urgente' ? '🔴 URGENTE' : '💚 TRANCA');
+    if(d.pago != null) setCel(h, fila, 'PAGO', d.pago === 'transferencia' ? '💳 Transferencia' : '💵 Efectivo');
     if(d.c45) setCel(h, fila, '45 K', d.c45);
     if(d.c30) setCel(h, fila, '30 K', d.c30);
     if(d.c15) setCel(h, fila, '15 K', d.c15);
@@ -112,6 +114,7 @@ function guardarComprobante(d){
     if(d.lote != null)       setCel(h, fila, 'LOTE', d.lote);
     if(d.tipoPedido != null) setCel(h, fila, 'TIPO', d.tipoPedido === 'nuevo' ? 'Tubo nuevo' : 'Recarga');
     if(d.urgencia != null)   setCel(h, fila, 'MODO', d.urgencia === 'urgente' ? '🔴 URGENTE' : '💚 TRANCA');
+    if(d.pago != null)       setCel(h, fila, 'PAGO', d.pago === 'transferencia' ? '💳 Transferencia' : '💵 Efectivo');
     if(d.c45) setCel(h, fila, '45 K', d.c45);
     if(d.c30) setCel(h, fila, '30 K', d.c30);
     if(d.c15) setCel(h, fila, '15 K', d.c15);
@@ -119,6 +122,7 @@ function guardarComprobante(d){
     // Comprobante / whatsapp / aclaración
     if(d.whatsapp)   setCel(h, fila, 'WHATSAPP', d.whatsapp);
     if(link)         setCel(h, fila, 'COMPROBANTES', link);
+    else if(d.pago === 'efectivo') setCel(h, fila, 'COMPROBANTES', '— paga en efectivo —');
     if(d.aclaracion) h.getRange(fila, colAclaracion(h)).setValue(d.aclaracion);
     if(d.id) PropertiesService.getScriptProperties().setProperty('row_' + d.id, String(fila));
     SpreadsheetApp.flush();
