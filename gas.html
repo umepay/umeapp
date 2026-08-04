@@ -367,15 +367,54 @@ function enviarComprobante(){
     document.getElementById('cardComp').scrollIntoView({block:'center'});
     return;}
   const acl=(document.getElementById('gas-aclaracion').value||'').trim();
-  const btn=document.getElementById('btnComp'); btn.textContent='Enviando...'; btn.disabled=true;
+  const btn=document.getElementById('btnComp');
+  const textoOriginal=ef?'Confirmar pedido':'Enviar comprobante';
+  btn.textContent='Enviando...'; btn.disabled=true;
+
   const mandar=async function(b64){
     const payload=Object.assign({}, pedidoActual, {accion:'comprobante', whatsapp:wpp, aclaracion:acl});
     if(b64){ payload.imagen=b64; payload.tipo='image/jpeg'; }
-    try{ await enviar(payload); }catch(e){}
-    guardarPedidoLocal({id:pedidoActual.id, lote:pedidoActual.lote, nombre:pedidoActual.nombre, resumen:pedidoActual.resumen, total:pedidoActual.total});
-    mostrar('paso3');
+    // Reintentamos el envío y CONFIRMAMOS contra la planilla que la fila quedó
+    // registrada. Reenviar el mismo pedido es seguro: el conector lo identifica
+    // por ID_APP y actualiza la misma fila (no duplica).
+    let registrado=false;
+    for(let intento=1; intento<=3 && !registrado; intento++){
+      btn.textContent = intento===1 ? 'Enviando...' : 'Reintentando ('+intento+')...';
+      try{ await enviar(payload); }catch(e){}
+      btn.textContent='Confirmando...';
+      registrado = await esperarConfirmacion(pedidoActual.id, 4);
+    }
+    if(registrado){
+      guardarPedidoLocal({id:pedidoActual.id, lote:pedidoActual.lote, nombre:pedidoActual.nombre, resumen:pedidoActual.resumen, total:pedidoActual.total});
+      mostrar('paso3');
+    }else{
+      btn.textContent=textoOriginal; btn.disabled=false;
+      alert('No pudimos confirmar que tu pedido quedó registrado (puede ser la conexión). '+
+            'Tu pedido NO se perdió: tocá otra vez el botón para reintentar. '+
+            'Si sigue sin funcionar, escribinos por WhatsApp.');
+    }
   };
   comprimir(f, mandar);
+}
+
+// Le pregunta a la planilla si el pedido con ese ID ya quedó registrado.
+// Devuelve una promesa que resuelve true/false. Consulta hasta "veces" veces,
+// esperando un poco entre cada una (por si el servidor tarda en escribir la fila).
+function esperarConfirmacion(id, veces){
+  return new Promise(function(resolve){
+    let i=0;
+    const paso=function(){
+      setTimeout(function(){
+        consultarEstado(id, function(r){
+          if(r && r.encontrado){ resolve(true); return; }
+          i++;
+          if(i>=veces){ resolve(false); return; }
+          paso();
+        });
+      }, 1200);
+    };
+    paso();
+  });
 }
 </script>
 </body>
