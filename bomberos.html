@@ -31,6 +31,8 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .ico{display:flex;align-items:center;justify-content:center}
 .ico i{line-height:1;text-shadow:0 0 2px #fff,0 0 3px #fff}
 .ico-galpon i{color:#1d6fb8;font-size:28px}.ico-dique i{color:#7f5bd0;font-size:26px}.ico-gen i{color:#e8590c;font-size:24px}.ico-bomba i{color:#0c8599;font-size:24px}.ico-panel i{color:#1c7ed6;font-size:24px}
+.ico-acopio i{color:#fff;font-size:19px}
+.ico-acopio{background:#1d4ed8;border:2.5px solid #fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.5)}
 .ico-tranq i{color:#6b4f2a;font-size:13px}.ico-cruce i{color:#e03131;font-size:16px;font-weight:bold}
 .ico-tg{display:flex;align-items:center;justify-content:center;color:#0b7285;font-weight:800;font-size:14px;line-height:1;text-shadow:0 0 2px #fff,0 0 3px #fff,0 0 3px #fff}
 .ico-cisterna{width:14px;height:14px;background:#1d4ed8;border:2px solid #fff;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
@@ -48,6 +50,9 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .lbl-calle-wrap{background:none;border:0;box-shadow:none}
 .rot-calle{position:absolute;left:0;top:0;white-space:nowrap;font:700 11px/1 system-ui,'Segoe UI',Roboto,sans-serif;color:#5a3a1a;text-shadow:0 0 3px #fff,0 0 3px #fff,1px 1px 2px #fff,-1px -1px 2px #fff,0 0 2px #fff;transform-origin:center}
 .lbl-calle::before{display:none}
+.num-wrap{background:none;border:0}
+.num-calle{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:var(--num-display,inline-flex);align-items:center;justify-content:center;padding:2px 8px;background:#fff;border:2px solid #8a5a2b;border-radius:9px;color:#4a2f12;font-weight:800;font-size:var(--num-size,13px);line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.45);white-space:nowrap}
+.num-calle b{font-weight:600;opacity:.7;margin-right:3px;font-size:.82em;text-transform:uppercase;letter-spacing:.02em}
 .lbl-curso{background:transparent;border:0;box-shadow:none;color:#15639a;font-style:italic;font-weight:700;font-size:11px;padding:0;white-space:nowrap;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 2px #fff}
 .lbl-curso::before{display:none}
 .lbl-salida{background:#2b8a3e;border:0;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;box-shadow:0 1px 3px rgba(0,0,0,.3)}
@@ -82,12 +87,14 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 <div id="map"></div>
 <div class="leyenda">
   <span class="ll"><span class="sq" style="background:#7a4326"></span> Barrio</span>
-  <span class="ll"><span class="line" style="border-color:#8a5a2b"></span> Calle</span>
+  <span class="ll"><span class="line" style="border-color:#6b3f18;border-top-width:5px"></span> Calle troncal</span>
+  <span class="ll"><span class="line" style="border-color:#9a6a3a"></span> Calle</span>
   <span class="ll"><span class="line dash" style="border-color:#b07a45"></span> Entrada</span>
+  <span class="ll"><span class="line" style="border-color:#495057;border-top-style:dotted;border-top-width:3px"></span> Peatonal</span>
+  <span class="ll"><span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:#1d4ed8;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 1px rgba(0,0,0,.25)"><i class="ti ti-droplet-filled" style="color:#fff;font-size:10px"></i></span> Acopio madre</span>
   <span class="ll"><span class="line" style="border-color:#1971c2"></span> Curso de agua</span>
   <span class="ll"><i class="ti ti-rectangle-filled" style="color:#6b4f2a"></i> Tranquera</span>
   <span class="ll"><i class="ti ti-grid-dots" style="color:#6b4f2a"></i> Guardaganados</span>
-  <span class="ll"><span class="dot" style="background:#1d4ed8;width:15px;height:15px"></span> Acopio</span>
   <span class="ll"><span class="dot" style="background:#2e9e54"></span> T. acopio</span>
   <span class="ll"><span class="dot" style="background:#d4a017;width:9px;height:9px"></span> T. casa</span>
   <span class="ll"><i class="ti ti-ripple" style="color:#7f5bd0"></i> Dique</span>
@@ -377,6 +384,7 @@ function aguaMarker(f,ll){
   if(cat.includes('bomba')) return L.marker(ll,{icon:icoTab('ico-bomba','ti-engine',26)}).bindTooltip('Bomba',{permanent:true,direction:'right',offset:[10,0],className:'lbl'});
   if(cat.includes('cisterna')) return L.marker(ll,{icon:L.divIcon({html:'',className:'ico-cisterna',iconSize:[14,14],iconAnchor:[7,7]})});
   if(cat==='t') return L.marker(ll,{icon:L.divIcon({html:'T',className:'ico-tg',iconSize:[16,16],iconAnchor:[8,8]})});
+  if(cat.includes('acopio')&&!cat.includes('tanq')) return L.marker(ll,{pane:'puntosPane',icon:icoTab('ico-acopio','ti-droplet-filled',30)}).bindTooltip('Acopio madre',{permanent:true,direction:'top',offset:[0,-4],className:'lbl'});
   let r=6;
   if(cat.includes('tanqacopio')) r=8; else if(cat.includes('acopio')) r=10; else if(cat.includes('casa')) r=6;
   return L.circleMarker(ll,{radius:r,color:'#fff',weight:2,fillColor:colorAgua(valCat(f.properties)),fillOpacity:1,pane:'puntosPane'});
@@ -385,7 +393,17 @@ function tranqMarker(f,ll){const p=f.properties||{};if(norm(p.Tipo).includes('gu
 
 /* estilos */
 function estiloBarrio(){return {color:'#7a4326',weight:1.6,dashArray:'4,4',fillColor:'#c79a6a',fillOpacity:0.12};}
-function estiloCalle(f){const e=esEntrada(f.properties);return {color:e?'#b07a45':'#8a5a2b',weight:e?3:4,dashArray:e?'7,5':null,lineCap:'round'};}
+function esPeatonal(p){return norm((p||{}).Tipo).includes('peatonal');}
+/* ==== calles troncales (editá esta lista): grosor mayor para las principales ==== */
+const TRONCALES=[1,6,8,30,32,34,40,41,42];
+function esTroncal(p){const n=(p||{}).CalleNum;return n!==null&&n!==undefined&&String(n).trim()!==''&&TRONCALES.includes(+n);}
+function estiloCalle(f){
+  const p=f.properties||{};
+  if(esPeatonal(p)) return {color:'#495057',weight:3,dashArray:'1,6',lineCap:'round'};
+  if(esEntrada(p))  return {color:'#b07a45',weight:3,dashArray:'7,5',lineCap:'round'};
+  if(esTroncal(p))  return {color:'#6b3f18',weight:6,lineCap:'round',lineJoin:'round'};
+  return {color:'#9a6a3a',weight:3.5,lineCap:'round'};
+}
 function estiloCurso(){return {color:'#1971c2',weight:2.6};}
 
 /* ====== rótulos de calle: N etiquetas según longitud, derechas y alineadas ====== */
@@ -451,6 +469,42 @@ function etiquetarCalles(capa){
     });
   });
 }
+/* ====== números de calle: un badge en cada punta (comienzo y fin) ====== */
+function puntoFrac(pts,frac){
+  const segs=[];let tot=0;
+  for(let i=1;i<pts.length;i++){const d=pts[i-1].distanceTo(pts[i]);segs.push(d);tot+=d;}
+  let target=tot*frac,acc=0;
+  for(let i=0;i<segs.length;i++){
+    if(acc+segs[i]>=target){
+      const t=(target-acc)/(segs[i]||1),a=pts[i],b=pts[i+1];
+      return L.latLng(a.lat+(b.lat-a.lat)*t,a.lng+(b.lng-a.lng)*t);
+    }
+    acc+=segs[i];
+  }
+  return pts[pts.length-1];
+}
+const ESPACIADO_NUM=450;  /* metros por etiqueta de número (más alto = menos etiquetas) */
+const MAX_NUM=3;          /* tope de etiquetas por calle */
+function numerarCalles(capa){
+  capa.getLayers().slice().forEach(l=>{
+    const p=(l.feature&&l.feature.properties)||{};
+    const num=p.CalleNum;
+    if(num===null||num===undefined||String(num).trim()===''||typeof l.getLatLngs!=='function')return;
+    const pts=ptosLinea(l); if(!pts||pts.length<2)return;
+    const largo=(+p.LongTramo)||largoMetros(pts);
+    let fracs;
+    if(largo<130){ fracs=[0.5]; }
+    else{
+      const n=Math.max(2,Math.min(MAX_NUM,Math.round(largo/ESPACIADO_NUM)+1));
+      fracs=[]; for(let k=0;k<n;k++) fracs.push(0.08+0.84*k/(n-1));  /* puntas + tramos intermedios */
+    }
+    fracs.forEach(fr=>{
+      const pt=puntoFrac(pts,fr);
+      capa.addLayer(L.marker(pt,{pane:'rotuloPane',interactive:false,
+        icon:L.divIcon({className:'num-wrap',iconSize:[0,0],html:'<div class="num-calle"><b>Calle</b>'+num+'</div>'})}));
+    });
+  });
+}
 /* área de click ancha e invisible para que las líneas finas se puedan tocar fácil */
 function engrosarClicks(capa,clase){
   capa.getLayers().slice().forEach(l=>{
@@ -461,7 +515,7 @@ function engrosarClicks(capa,clase){
   });
 }
 
-const ETIQUETAS={Barrio:'Barrio',Litros:'Litros',Observacio:'Observación',AutoBomba:'Carga autobomba',Acople:'Acople',Disponibil:'Disponibilidad',Nombre_Ref:'Referencia',Simbolo:'Símbolo',Nombre:'Nombre',Tipo:'Tipo',Manguera:'Manguera',TipoRed:'Red',AcopioMadr:'Acopio madre',red:'Red',rst:'Calzada',gna:'Tipo de vía',Permanente:'Régimen',Permanenci:'Régimen',Regimen:'Régimen',TIPO:'Tipo',ORDEN:'Orden'};
+const ETIQUETAS={CalleNum:'N° de calle',Barrio:'Barrio',Litros:'Litros',Observacio:'Observación',AutoBomba:'Carga autobomba',Acople:'Acople',Disponibil:'Disponibilidad',Nombre_Ref:'Referencia',Simbolo:'Símbolo',Nombre:'Nombre',Tipo:'Tipo',Manguera:'Manguera',TipoRed:'Red',AcopioMadr:'Acopio madre',red:'Red',rst:'Calzada',gna:'Tipo de vía',Permanente:'Régimen',Permanenci:'Régimen',Regimen:'Régimen',TIPO:'Tipo',ORDEN:'Orden'};
 const VALORES={TanqAcopio:'Tanque acopio',TanqCasa:'Tanque casa',Acopio:'Acopio madre',Dique:'Dique','Estacion Brigada':'Estación brigada',T:'Bifurcación',Si:'Sí',No:'No',Cisterna:'Cisterna',Generador:'Generador',Bomba:'Bomba',paneles:'Paneles',Paneles:'Paneles',Guardaganados:'Guardaganados',Tranquera:'Tranquera'};
 function pretty(k){return ETIQUETAS[k]||(k.charAt(0).toUpperCase()+k.slice(1).replace(/_/g,' '));}
 function vacio(v){return v===null||v===''||String(v).toUpperCase()==='NULL';}
@@ -472,7 +526,13 @@ function popup(p,clase){
   if(clase==='barrio'){titulo=primer(p,CAMPO_BARRIO)||'Barrio';lista=['Observacio'];}
   else if(clase==='curso'){titulo=primer(p,CAMPO_CURSO)||'Curso de agua';lista=['TIPO','ORDEN'];}
   else if(clase==='tranquera'){titulo=p.Tipo||'Tranquera';lista=['Simbolo','Observacio','Barrio'];}
-  else if(clase==='calle'){const nm=primer(p,CAMPO_CALLE);if(esEntrada(p)){const tp=norm(p.Tipo).includes('acceso')?'Acceso':'Entrada';titulo=nm?tp+' '+capitaliz(nm):tp;}else{titulo=nm?etiquetaCalle(nm):'Calle';}lista=['Nombre','Tipo','Barrio'];}
+  else if(clase==='calle'){
+    const nm=primer(p,CAMPO_CALLE);const num=p.CalleNum;const hayNum=num!==null&&num!==undefined&&String(num).trim()!=='';
+    if(esEntrada(p)){const tp=norm(p.Tipo).includes('acceso')?'Acceso':'Entrada';titulo=nm?tp+' '+capitaliz(nm):tp;}
+    else if(esPeatonal(p)){titulo=nm?'Peatonal '+capitaliz(nm):'Peatonal';}
+    else{titulo=hayNum?('Calle '+num):(nm?etiquetaCalle(nm):'Calle');}
+    lista=['CalleNum','Nombre','Tipo','Barrio'];
+  }
   else if(clase==='vialProv'){titulo='Ruta provincial';lista=['red','gna','rst'];}
   else {const c=valCat(p);titulo=VALORES[c]||c||'Punto de agua';lista=['Litros','Observacio','Disponibil','Nombre_Ref','Barrio'];}
   const pares=lista.map(k=>[k,p[k]]).filter(([k,v])=>!vacio(v));
@@ -530,19 +590,21 @@ function agregar(gj,clase,nombre,overlays,visible){
     else if(clase==='vialProv') opts.style={color:'#e8590c',weight:3.5};
   }
   const capa=L.geoJSON(gj,opts);
-  if(clase==='calle') etiquetarCalles(capa);
+  if(clase==='calle') numerarCalles(capa);
   if(clase==='calle'||clase==='curso'||clase==='vialProv') engrosarClicks(capa,clase);
   overlays[nombre]=capa; if(visible)capa.addTo(map);
   return capa;
 }
 
-/* etiquetas de calle moldeables a la escala del mapa */
-function escalaCalles(){
+/* números de calle: tamaño y visibilidad según el zoom */
+function escalaNumeros(){
   const z=map.getZoom();
-  const s=Math.max(9,Math.min(18,Math.round(11+(z-16)*1.8)));
-  document.documentElement.style.setProperty('--calle-size',s+'px');
+  let size;
+  if(z>=18) size=16; else if(z===17) size=15; else if(z===16) size=13; else if(z===15) size=12; else size=11;
+  document.documentElement.style.setProperty('--num-size',size+'px');
+  document.documentElement.style.setProperty('--num-display', z>=14 ? 'inline-flex' : 'none');
 }
-map.on('zoomend',escalaCalles); escalaCalles();
+map.on('zoomend',escalaNumeros); escalaNumeros();
 
 let ultimoBounds=null;
 function encuadrar(){
