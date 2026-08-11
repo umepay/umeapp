@@ -51,7 +51,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .rot-calle{position:absolute;left:0;top:0;white-space:nowrap;font:700 11px/1 system-ui,'Segoe UI',Roboto,sans-serif;color:#5a3a1a;text-shadow:0 0 3px #fff,0 0 3px #fff,1px 1px 2px #fff,-1px -1px 2px #fff,0 0 2px #fff;transform-origin:center}
 .lbl-calle::before{display:none}
 .num-wrap{background:none;border:0}
-.num-calle{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:var(--num-display,inline-flex);align-items:center;justify-content:center;width:calc(var(--num-size,11px) + 11px);height:calc(var(--num-size,11px) + 11px);background:#fff;border:2px solid #8a5a2b;border-radius:50%;color:#4a2f12;font-weight:800;font-size:var(--num-size,11px);line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.45);white-space:nowrap}
+.num-calle{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:var(--num-display,inline-flex);align-items:center;justify-content:center;width:calc(var(--num-size,10px) + 9px);height:calc(var(--num-size,10px) + 9px);background:#fff;border:2px solid #8a5a2b;border-radius:50%;color:#4a2f12;font-weight:800;font-size:var(--num-size,10px);line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.45);white-space:nowrap}
 .num-calle b{font-weight:600;opacity:.7;margin-right:3px;font-size:.82em;text-transform:uppercase;letter-spacing:.02em}
 .cll-lbl{position:absolute;left:0;top:0;transform:translate(-50%,-50%) rotate(var(--rot,0deg)) translateY(-12px);transform-origin:center;display:var(--nom-display,inline-flex);align-items:center;justify-content:center;padding:1px 6px;background:#fff;border:1.5px solid #8a5a2b;border-radius:7px;color:#4a2f12;font-weight:700;font-size:var(--nom-size,11px);line-height:1;box-shadow:0 1px 2px rgba(0,0,0,.35);white-space:nowrap}
 .cll-lbl b{font-weight:600;opacity:.7;margin-right:3px;font-size:.82em;text-transform:uppercase;letter-spacing:.02em}
@@ -412,8 +412,8 @@ function estiloCurso(){return {color:'#1971c2',weight:2.6};}
 const TIPOVIA=/^(calle|camino|bajada|subida|av\.?|avda\.?|avenida|pasaje|pje\.?|ruta|sendero|senda|diagonal|paseo|boulevard|bv\.?)\b/i;
 function capitaliz(s){s=String(s).trim();return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
 function etiquetaCalle(nombre){const n=capitaliz(nombre);return TIPOVIA.test(n)?n:'Calle '+n;}
-const ESPACIADO_CALLE=600;  /* metros por etiqueta (ajustable): más alto = menos etiquetas */
-const MAX_ETIQ_CALLE=4;     /* tope de etiquetas por calle (ajustable) */
+const ESPACIADO_CALLE=350;  /* metros por etiqueta (ajustable): más alto = menos etiquetas */
+const MAX_ETIQ_CALLE=6;     /* tope de etiquetas por calle (ajustable) */
 const ATTR_CALLE={'class':'nom-calle',fill:'#5a3a1a','font-weight':'700','font-family':"system-ui,'Segoe UI',Roboto,sans-serif",stroke:'#ffffff','stroke-width':'3','stroke-linejoin':'round','paint-order':'stroke'};
 const OFFSET_CALLE=-7;      /* px: negativo = el texto va por ENCIMA de la línea (ajustable) */
 function ptosLinea(layer){
@@ -606,12 +606,12 @@ function agregar(gj,clase,nombre,overlays,visible){
 function escalaNumeros(){
   const z=map.getZoom();
   let num,nom,nomD,numD;
-  if(z>=18){ num=13; nom=12; nomD='inline-flex'; numD='inline-flex'; }
-  else if(z===17){ num=12; nom=11; nomD='inline-flex'; numD='inline-flex'; }
-  else if(z===16){ num=11; nom=10; nomD='inline-flex'; numD='inline-flex'; }
-  else if(z===15){ num=10; nom=10; nomD='none';        numD='inline-flex'; }
-  else if(z===14){ num=9;  nom=10; nomD='none';        numD='inline-flex'; }
-  else           { num=9;  nom=10; nomD='none';        numD='none'; }
+  if(z>=18){ num=12; nom=14; nomD='inline-flex'; numD='inline-flex'; }
+  else if(z===17){ num=11; nom=13; nomD='inline-flex'; numD='inline-flex'; }
+  else if(z===16){ num=10; nom=12; nomD='inline-flex'; numD='inline-flex'; }
+  else if(z===15){ num=10; nom=11; nomD='none';        numD='inline-flex'; }
+  else if(z===14){ num=9;  nom=11; nomD='none';        numD='inline-flex'; }
+  else           { num=9;  nom=11; nomD='none';        numD='none'; }
   const s=document.documentElement.style;
   s.setProperty('--num-size',num+'px');
   s.setProperty('--num-display',numD);
