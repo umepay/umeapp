@@ -53,6 +53,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .num-wrap{background:none;border:0}
 .num-calle{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:var(--num-display,inline-flex);align-items:center;justify-content:center;padding:1px 5px;background:#fff;border:1.5px solid #8a5a2b;border-radius:7px;color:#4a2f12;font-weight:800;font-size:var(--num-size,11px);line-height:1;box-shadow:0 1px 2px rgba(0,0,0,.4);white-space:nowrap}
 .num-calle b{font-weight:600;opacity:.7;margin-right:3px;font-size:.82em;text-transform:uppercase;letter-spacing:.02em}
+.nom-calle{font-size:var(--nom-size,11px);display:var(--nom-display,inline)}
 .lbl-curso{background:transparent;border:0;box-shadow:none;color:#15639a;font-style:italic;font-weight:700;font-size:11px;padding:0;white-space:nowrap;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 2px #fff}
 .lbl-curso::before{display:none}
 .lbl-salida{background:#2b8a3e;border:0;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;box-shadow:0 1px 3px rgba(0,0,0,.3)}
@@ -412,7 +413,7 @@ function capitaliz(s){s=String(s).trim();return s?s.charAt(0).toUpperCase()+s.sl
 function etiquetaCalle(nombre){const n=capitaliz(nombre);return TIPOVIA.test(n)?n:'Calle '+n;}
 const ESPACIADO_CALLE=600;  /* metros por etiqueta (ajustable): más alto = menos etiquetas */
 const MAX_ETIQ_CALLE=4;     /* tope de etiquetas por calle (ajustable) */
-const ATTR_CALLE={fill:'#5a3a1a','font-weight':'700','font-size':'11','font-family':"system-ui,'Segoe UI',Roboto,sans-serif",stroke:'#ffffff','stroke-width':'3','stroke-linejoin':'round','paint-order':'stroke'};
+const ATTR_CALLE={'class':'nom-calle',fill:'#5a3a1a','font-weight':'700','font-family':"system-ui,'Segoe UI',Roboto,sans-serif",stroke:'#ffffff','stroke-width':'3','stroke-linejoin':'round','paint-order':'stroke'};
 const OFFSET_CALLE=-7;      /* px: negativo = el texto va por ENCIMA de la línea (ajustable) */
 function ptosLinea(layer){
   let ll=layer.getLatLngs();
@@ -596,10 +597,18 @@ function agregar(gj,clase,nombre,overlays,visible){
 /* números de calle: tamaño y visibilidad según el zoom */
 function escalaNumeros(){
   const z=map.getZoom();
-  let size;
-  if(z>=18) size=13; else if(z===17) size=12; else if(z===16) size=11; else if(z===15) size=10; else size=10;
-  document.documentElement.style.setProperty('--num-size',size+'px');
-  document.documentElement.style.setProperty('--num-display', z>=14 ? 'inline-flex' : 'none');
+  let num,nom,nomD,numD;
+  if(z>=18){ num=13; nom=12; nomD='inline'; numD='inline-flex'; }
+  else if(z===17){ num=12; nom=11; nomD='inline'; numD='inline-flex'; }
+  else if(z===16){ num=11; nom=10; nomD='inline'; numD='inline-flex'; }
+  else if(z===15){ num=10; nom=10; nomD='none';   numD='inline-flex'; }
+  else if(z===14){ num=9;  nom=10; nomD='none';   numD='inline-flex'; }
+  else           { num=9;  nom=10; nomD='none';   numD='none'; }
+  const s=document.documentElement.style;
+  s.setProperty('--num-size',num+'px');
+  s.setProperty('--num-display',numD);
+  s.setProperty('--nom-size',nom+'px');
+  s.setProperty('--nom-display',nomD);
 }
 map.on('zoomend',escalaNumeros); escalaNumeros();
 
