@@ -65,15 +65,60 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .popup .k{color:#888}
 .popup .corr{display:inline-block;margin-top:8px;font-size:12px;color:#2d5a3d;font-weight:500;text-decoration:none;border:1px solid #2d5a3d;border-radius:6px;padding:4px 9px}
 .leaflet-popup-content{margin:10px 12px}
+.btn-acceso{display:flex;align-items:center;gap:6px;background:#e8f5e2;color:#2d5a3d;border:none;border-radius:8px;padding:7px 11px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn-acceso i{font-size:16px}
+.btn-acceso.on{background:#2b8a3e;color:#fff}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:14px;padding:20px 18px 18px;width:100%;max-width:330px;position:relative;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.modal h2{font-size:18px;color:#2d5a3d;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.modal-sub{font-size:13px;color:#666;margin-bottom:14px;line-height:1.35}
+.modal label{display:block;font-size:12px;color:#555;font-weight:600;margin-bottom:10px}
+.modal input{display:block;width:100%;margin-top:4px;padding:10px;border:1.5px solid #cdd9cd;border-radius:8px;font-size:16px}
+.modal input:focus{outline:none;border-color:#2d5a3d}
+.modal-error{color:#c92a2a;font-size:13px;min-height:18px;margin:2px 0 8px}
+.modal-btn{width:100%;background:#2d5a3d;color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:600;cursor:pointer}
+.modal-btn:disabled{opacity:.6}
+.modal-x{position:absolute;top:10px;right:10px;background:none;border:none;color:#999;font-size:20px;cursor:pointer;line-height:1}
+.btn-descargas{width:100%;display:flex;align-items:center;gap:9px;background:#e8f0e4;color:#2d5a3d;border:none;border-top:0.5px solid #d6e2d4;padding:14px 16px;font-size:15px;font-weight:700;cursor:pointer;text-align:left}
+.btn-descargas .chev-r{margin-left:auto;font-size:16px;color:#7aa886}
+.pd-bg{position:fixed;inset:0;background:#f5f5f0;display:none;flex-direction:column;z-index:1100}
+.pd-bg.show{display:flex}
+.pd-top{background:#2d5a3d;display:flex;align-items:center;gap:10px;padding:14px 16px}
+.pd-top h2{color:#e8f5e2;font-size:17px;font-weight:600}
+.pd-back{background:none;border:none;color:#9ecfb0;font-size:22px;cursor:pointer;line-height:1}
+.pd-body{padding:16px;overflow-y:auto;flex:1}
+.pd-intro{font-size:13.5px;color:#555;line-height:1.5;margin-bottom:16px}
+.pd-grid{display:flex;flex-direction:column;gap:10px}
+.pd-card{display:flex;align-items:center;gap:13px;background:#fff;border:1px solid #d6e2d4;border-radius:12px;padding:14px;text-decoration:none;color:#1a1a1a}
+.pd-card>i:first-child{color:#2d5a3d;font-size:26px}
+.pd-card b{display:block;font-size:15px;font-weight:600}
+.pd-card small{display:block;color:#999;font-size:12px;margin-top:2px}
+.pd-card .pd-dl{margin-left:auto;color:#2b8a3e;font-size:22px}
+.pd-tip{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:#777;margin-top:16px;background:#eef3ea;border-radius:10px;padding:11px 12px;line-height:1.4}
+.pd-tip i{color:#2d5a3d;font-size:16px;margin-top:1px;flex-shrink:0}
 </style>
 </head>
 <body>
 <div class="topbar">
   <a class="btn-back" href="index.html#app"><i class="ti ti-arrow-left"></i></a>
   <h1>Mapa</h1>
+  <button id="btnAcceso" class="btn-acceso" title="Acceso Cooperativa"><i class="ti ti-lock"></i><span id="btnAccesoTxt">Ingresar</span></button>
 </div>
 <div id="aviso" class="aviso"></div>
 <div id="map"></div>
+
+<div id="modalAcceso" class="modal-bg">
+  <div class="modal">
+    <button class="modal-x" id="mCerrar" title="Cerrar"><i class="ti ti-x"></i></button>
+    <h2><i class="ti ti-lock"></i> Ingresar</h2>
+    <p class="modal-sub">Acceso de la Cooperativa de agua para ver las capas de la red.</p>
+    <label>Usuario<input id="mUsuario" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"/></label>
+    <label>Contraseña<input id="mClave" type="password" autocomplete="current-password"/></label>
+    <div id="mError" class="modal-error"></div>
+    <button id="mEntrar" class="modal-btn">Entrar</button>
+  </div>
+</div>
 
 <details class="leyenda panel">
   <summary><i class="ti ti-list-details"></i> Referencias <span class="chev">▸</span></summary>
@@ -110,14 +155,32 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
   </div>
 </details>
 
-<details class="descargas panel">
-  <summary><i class="ti ti-download"></i> Descargas <span class="chev">▸</span></summary>
-  <div class="items">
-    <p>Descargá la red de agua para tenerla en tu celular <b>sin internet</b>, en el campo. Se abren con apps de mapas offline (Maps.me, Organic Maps) o Google Earth.</p>
-    <a class="dl" href="descargas/umepay_agua_puntos.kmz" download><i class="ti ti-droplet"></i> <span>Puntos de agua <small>Acopios, tanques, dique, intersecciones (KMZ)</small></span></a>
-    <a class="dl" href="descargas/umepay_mangueras.kmz" download><i class="ti ti-line"></i> <span>Mangueras <small>Red de distribución por diámetro (KMZ)</small></span></a>
+<button id="btnDescargas" class="btn-descargas panel" style="display:none">
+  <i class="ti ti-download"></i> Descargas de la red <i class="ti ti-chevron-right chev-r"></i>
+</button>
+
+<div id="panelDescargas" class="pd-bg">
+  <div class="pd-top">
+    <button class="pd-back" id="pdCerrar" title="Volver al mapa"><i class="ti ti-arrow-left"></i></button>
+    <h2>Descargas de la red</h2>
   </div>
-</details>
+  <div class="pd-body">
+    <p class="pd-intro">Descargá la red de agua para tenerla en tu celular <b>sin internet</b>, en el campo. Se abren con apps de mapas offline (Maps.me, Organic Maps) o Google Earth.</p>
+    <div class="pd-grid">
+      <a class="pd-card" href="descargas/umepay_agua_puntos.kmz" download>
+        <i class="ti ti-droplet"></i>
+        <div><b>Puntos de agua</b><small>Acopios, tanques, dique, intersecciones · KMZ</small></div>
+        <i class="ti ti-download pd-dl"></i>
+      </a>
+      <a class="pd-card" href="descargas/umepay_mangueras.kmz" download>
+        <i class="ti ti-line"></i>
+        <div><b>Mangueras</b><small>Red de distribución por diámetro · KMZ</small></div>
+        <i class="ti ti-download pd-dl"></i>
+      </a>
+    </div>
+    <p class="pd-tip"><i class="ti ti-info-circle"></i> Los KMZ se abren con Google Earth, Maps.me u Organic Maps. Guardalos en el teléfono antes de salir al campo para tenerlos sin señal.</p>
+  </div>
+</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -799,6 +862,13 @@ const CAPAS=[
   {archivo:'data/red_vial_provincial.geojson',     nombre:'Ruta provincial',   clase:'vialProv', visible:true}
 ];
 
+/* ====== Acceso (Cooperativa / Admin) ====== */
+const ACCESOS_URL='https://script.google.com/macros/s/AKfycbygcye6l4qghtUGheeSViPuWdyNY_4JrNg7jC51hKIpG3VXsC54vZ8vI0T-8FTzTOkH/exec';
+const CLASES_PROTEGIDAS=['aguaPunto','aguaLinea','cruce'];   // capas que piden login
+const TOKEN_KEY='ume_acceso_token', ROL_KEY='ume_acceso_rol';
+let sesion=null;                       // {rol} cuando hay sesión iniciada
+let OVERLAYS={}, ctlCapas=null, protegidasCargadas=false;
+
 const map=L.map('map').setView(CENTRO,16);
 map.createPane('parcelasPane'); map.getPane('parcelasPane').style.zIndex=350;
 map.createPane('hitPane'); map.getPane('hitPane').style.zIndex=450;
@@ -1054,21 +1124,163 @@ function encuadrar(){
     map.setView(b.getCenter(),z);
   }
 }
+function rebuildControl(){
+  if(ctlCapas) map.removeControl(ctlCapas);
+  ctlCapas=L.control.layers(null,OVERLAYS,{collapsed:false}).addTo(map);
+}
+async function cargarUna(c){
+  const r=await fetch(c.archivo,{cache:'no-store'}); if(!r.ok)throw 0;
+  const gj=await r.json();
+  if(c.clase==='aguaPunto')DATOS.puntos=gj.features; else if(c.clase==='aguaLinea')DATOS.lineas=gj.features;
+  agregarCapa(gj,c.clase,c.nombre,OVERLAYS,c.visible);
+  return gj;
+}
 async function init(){
-  const overlays={}; let n=0,bounds=null;
+  let n=0,bounds=null;
   for(const c of CAPAS){
+    if(CLASES_PROTEGIDAS.includes(c.clase)) continue;   // protegidas: recién al iniciar sesión
     try{
-      const r=await fetch(c.archivo,{cache:'no-store'}); if(!r.ok)throw 0;
-      const gj=await r.json();
-      if(c.clase==='aguaPunto')DATOS.puntos=gj.features; else if(c.clase==='aguaLinea')DATOS.lineas=gj.features;
-      agregarCapa(gj,c.clase,c.nombre,overlays,c.visible); n++;
+      const gj=await cargarUna(c); n++;
       if(c.clase==='parcela'){const ume=L.geoJSON(gj,{filter:f=>String((f.properties||{}).Umepay||'').trim().toLowerCase()==='si'});const b=ume.getBounds();bounds=b.isValid()?b:L.geoJSON(gj).getBounds();}
     }catch(e){}
   }
   if(n===0){document.getElementById('aviso').textContent='No se pudieron cargar las capas. Revisá la carpeta data/.';document.getElementById('aviso').style.display='block';}
-  L.control.layers(null,overlays,{collapsed:false}).addTo(map);
+  rebuildControl();
   if(bounds&&bounds.isValid()){ultimoBounds=bounds; encuadrar();}
+  restaurarSesion();
 }
+
+/* ---- capas protegidas: cargar / activar / quitar ---- */
+async function cargarProtegidas(activar){
+  if(!protegidasCargadas){
+    for(const c of CAPAS){
+      if(!CLASES_PROTEGIDAS.includes(c.clase)) continue;
+      try{ await cargarUna(c); }catch(e){}
+    }
+    protegidasCargadas=true;
+    rebuildControl();
+  }
+  if(activar){
+    for(const c of CAPAS){
+      if(!CLASES_PROTEGIDAS.includes(c.clase)) continue;
+      const capa=OVERLAYS[c.nombre]; if(capa && !map.hasLayer(capa)) capa.addTo(map);
+    }
+  }
+}
+function quitarProtegidas(){
+  for(const c of CAPAS){
+    if(!CLASES_PROTEGIDAS.includes(c.clase)) continue;
+    const capa=OVERLAYS[c.nombre];
+    if(capa){ if(map.hasLayer(capa)) map.removeLayer(capa); delete OVERLAYS[c.nombre]; }
+  }
+  protegidasCargadas=false;
+  rebuildControl();
+}
+
+/* ---- comunicación con el conector (mismo mecanismo que UmeGas) ---- */
+function jsonp(url){
+  return new Promise(function(resolve,reject){
+    const cb='ume_cb_'+Math.random().toString(36).slice(2);
+    const s=document.createElement('script'); let done=false;
+    function limpiar(){ try{delete window[cb];}catch(e){window[cb]=undefined;} if(s.parentNode)s.parentNode.removeChild(s); }
+    window[cb]=function(data){ done=true; resolve(data); limpiar(); };
+    s.onerror=function(){ if(!done){ limpiar(); reject(new Error('red')); } };
+    s.src=url+(url.indexOf('?')<0?'?':'&')+'callback='+cb+'&t='+Date.now();
+    document.body.appendChild(s);
+    setTimeout(function(){ if(!done){ limpiar(); reject(new Error('timeout')); } },12000);
+  });
+}
+const esperar=ms=>new Promise(r=>setTimeout(r,ms));
+async function loginRemoto(usuario,clave){
+  const reqid='q'+Math.random().toString(36).slice(2)+Date.now();
+  try{
+    await fetch(ACCESOS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({accion:'login',usuario:usuario,clave:clave,reqid:reqid})});
+  }catch(e){ return {ok:false,error:'Sin conexión. Revisá internet e intentá de nuevo.'}; }
+  for(let i=0;i<8;i++){
+    await esperar(i===0?700:750);
+    try{
+      const res=await jsonp(ACCESOS_URL+'?accion=resultado&reqid='+encodeURIComponent(reqid));
+      if(res && !res.pendiente) return res;
+    }catch(e){}
+  }
+  return {ok:false,error:'El servidor no respondió. Probá de nuevo.'};
+}
+async function validarRemoto(token){
+  try{ return await jsonp(ACCESOS_URL+'?accion=validar&token='+encodeURIComponent(token)); }
+  catch(e){ return {ok:false,offline:true}; }
+}
+
+/* ---- estado de sesión + interfaz ---- */
+function nombreRol(rol){ return rol==='admin'?'Administrador':'Cooperativa'; }
+function pintarAcceso(){
+  const b=document.getElementById('btnAcceso'), t=document.getElementById('btnAccesoTxt');
+  if(!b) return;
+  if(sesion){ b.classList.add('on'); b.querySelector('i').className='ti ti-lock-open'; t.textContent=nombreRol(sesion.rol); b.title='Sesión: '+nombreRol(sesion.rol)+' — tocá para cerrar'; }
+  else { b.classList.remove('on'); b.querySelector('i').className='ti ti-lock'; t.textContent='Ingresar'; b.title='Acceso Cooperativa'; }
+  const bd=document.getElementById('btnDescargas');
+  if(bd) bd.style.display = sesion ? 'flex' : 'none';
+}
+function mostrarAviso(txt){
+  const a=document.getElementById('aviso'); if(!a) return;
+  a.textContent=txt; a.style.display='block';
+  clearTimeout(mostrarAviso._t); mostrarAviso._t=setTimeout(()=>{a.style.display='none';},6000);
+}
+function setSesion(rol,token){
+  sesion={rol:rol};
+  if(token){ localStorage.setItem(TOKEN_KEY,token); localStorage.setItem(ROL_KEY,rol); }
+  pintarAcceso();
+}
+function cerrarSesion(){
+  localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(ROL_KEY);
+  sesion=null; quitarProtegidas(); cerrarDescargas(); pintarAcceso();
+  mostrarAviso('Cerraste la sesión. Las capas de la red quedaron ocultas.');
+}
+async function restaurarSesion(){
+  const t=localStorage.getItem(TOKEN_KEY); if(!t){ pintarAcceso(); return; }
+  const res=await validarRemoto(t);
+  if(res && res.ok){ setSesion(res.rol,null); await cargarProtegidas(false); }
+  else if(res && res.offline){ setSesion(localStorage.getItem(ROL_KEY)||'coop',null); await cargarProtegidas(false); }
+  else { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(ROL_KEY); }
+  pintarAcceso();
+}
+
+/* ---- modal ---- */
+function abrirModal(){ document.getElementById('mError').textContent=''; document.getElementById('modalAcceso').classList.add('show'); setTimeout(()=>document.getElementById('mUsuario').focus(),50); }
+function cerrarModal(){ document.getElementById('modalAcceso').classList.remove('show'); document.getElementById('mClave').value=''; }
+async function hacerLogin(){
+  const u=document.getElementById('mUsuario').value.trim();
+  const c=document.getElementById('mClave').value;
+  const err=document.getElementById('mError'); err.textContent='';
+  if(!u||!c){ err.textContent='Completá usuario y contraseña.'; return; }
+  const btn=document.getElementById('mEntrar'); btn.disabled=true; const prev=btn.textContent; btn.textContent='Entrando…';
+  const res=await loginRemoto(u,c);
+  btn.disabled=false; btn.textContent=prev;
+  if(res && res.ok){
+    setSesion(res.rol,res.token);
+    await cargarProtegidas(true);
+    cerrarModal();
+    mostrarAviso('Entraste como '+nombreRol(res.rol)+'. Activá las capas de la red en el listado.');
+  } else {
+    err.textContent=(res&&res.error)||'No se pudo ingresar.';
+  }
+}
+document.getElementById('btnAcceso').addEventListener('click',function(){
+  if(sesion){ if(confirm('¿Cerrar la sesión de '+nombreRol(sesion.rol)+'?')) cerrarSesion(); }
+  else abrirModal();
+});
+document.getElementById('mCerrar').addEventListener('click',cerrarModal);
+document.getElementById('modalAcceso').addEventListener('click',function(e){ if(e.target===this) cerrarModal(); });
+document.getElementById('mEntrar').addEventListener('click',hacerLogin);
+document.getElementById('mClave').addEventListener('keydown',function(e){ if(e.key==='Enter') hacerLogin(); });
+
+/* ---- panel de descargas (solo con sesión) ---- */
+function abrirDescargas(){ document.getElementById('panelDescargas').classList.add('show'); }
+function cerrarDescargas(){ document.getElementById('panelDescargas').classList.remove('show'); }
+document.getElementById('btnDescargas').addEventListener('click',abrirDescargas);
+document.getElementById('pdCerrar').addEventListener('click',cerrarDescargas);
+
+pintarAcceso();
 init();
 window.addEventListener('load',()=>setTimeout(encuadrar,200));
 </script>
