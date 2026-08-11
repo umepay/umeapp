@@ -110,6 +110,16 @@
   .paso-inst li{font-size:14px;line-height:1.5;margin-bottom:5px}
   .ico-ios{width:15px;height:15px;vertical-align:-2px;fill:none;stroke:#2d5a3d;stroke-width:2;margin:0 1px}
   .btn-cerrar{width:100%;border:none;cursor:pointer;background:var(--verde);color:#fff;font-size:16px;font-weight:700;padding:14px;border-radius:14px;margin-top:6px}
+
+  /* ====== acceso admin ====== */
+  .cabecera{position:relative}
+  .btn-admin{position:absolute;top:calc(env(safe-area-inset-top) + 40px);right:16px;width:34px;height:34px;border:none;background:rgba(45,90,61,.10);color:#9a8b76;border-radius:10px;display:grid;place-items:center;cursor:pointer}
+  .btn-admin svg{width:18px;height:18px}
+  .btn-admin.on{background:var(--verde);color:#fff}
+  .tarjeta.admin-only{display:none}
+  .tarjeta.admin-only.ver{display:flex}
+  .tarjeta.borrador .ico{background:#eee4cf;color:#9a7b3c}
+  .badge-borr{display:inline-block;font-size:11px;font-weight:700;color:#9a7b3c;background:#f1e6cf;border-radius:6px;padding:1px 7px;margin-left:7px;vertical-align:1px}
 </style>
 </head>
 <body>
@@ -125,7 +135,12 @@
 
   <!-- PANTALLA DE INICIO -->
   <main id="menu" aria-hidden="true">
-    <div class="cabecera"><h1>UmeApp</h1></div>
+    <div class="cabecera">
+      <h1>UmeApp</h1>
+      <button id="btnAdmin" class="btn-admin" title="Acceso administración" aria-label="Acceso administración">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/></svg>
+      </button>
+    </div>
     <nav class="grilla">
 
       <a class="tarjeta emergencia" href="bomberos.html">
@@ -143,6 +158,18 @@
       <a class="tarjeta" href="gas.html">
         <span class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="7" y="8" width="10" height="13" rx="2.4" stroke="currentColor" stroke-width="2"/><path d="M10 8V6.2A1.2 1.2 0 0 1 11.2 5h1.6A1.2 1.2 0 0 1 14 6.2V8" stroke="currentColor" stroke-width="2"/><path d="M12 12.5c1.4 1 1.4 2.6 0 3.5-1.4-.9-1.4-2.5 0-3.5Z" fill="currentColor"/></svg></span>
         <span class="txt"><h2>UmeGas</h2><span>Pedí tu garrafa de gas</span></span>
+        <span class="flecha"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+
+      <a class="tarjeta admin-only borrador" href="cartelera.html">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 9h8M8 13h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="txt"><h2>Cartelera<span class="badge-borr">sin publicar</span></h2><span>Avisos y novedades de la comunidad</span></span>
+        <span class="flecha"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </a>
+
+      <a class="tarjeta admin-only borrador" href="umeblog.html">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h11l3 3v13H5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 10h8M8 14h8M8 18h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <span class="txt"><h2>Umeblog<span class="badge-borr">sin publicar</span></h2><span>Notas y textos de Umepay</span></span>
         <span class="flecha"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
 
@@ -200,6 +227,21 @@
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
   }
+</script>
+<script src="acceso.js"></script>
+<script>
+  function pintarAdmin(ses){
+    var admin = !!(ses && ses.rol==='admin');
+    var tiles=document.querySelectorAll('.tarjeta.admin-only');
+    for(var i=0;i<tiles.length;i++) tiles[i].classList.toggle('ver', admin);
+    var b=document.getElementById('btnAdmin');
+    if(b){ b.classList.toggle('on', !!ses); b.title = ses ? ('Sesión: '+Acceso.nombreRol(ses.rol)+' — tocá para cerrar') : 'Acceso administración'; }
+  }
+  Acceso.onCambio(pintarAdmin);
+  document.getElementById('btnAdmin').addEventListener('click',function(){
+    if(Acceso.haySesion()){ if(confirm('¿Cerrar la sesión de '+Acceso.nombreRol(Acceso.rol())+'?')) Acceso.cerrarSesion(); }
+    else Acceso.abrirLogin();
+  });
 </script>
 </body>
 </html>

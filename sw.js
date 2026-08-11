@@ -1,6 +1,7 @@
-const CACHE = 'umeapp-v4';
+const CACHE = 'umeapp-v5';
 const CORE = [
-  './', './index.html', './mapa.html', './bomberos.html', './cartelera.html', './gas.html',
+  './', './index.html', './mapa.html', './bomberos.html', './cartelera.html', './gas.html', './umeblog.html',
+  './acceso.js',
   './manifest.json', './icon-192.png', './icon-512.png',
   './assets/centro-umepay.jpg'
 ];
