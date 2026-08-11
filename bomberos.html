@@ -51,9 +51,10 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .rot-calle{position:absolute;left:0;top:0;white-space:nowrap;font:700 11px/1 system-ui,'Segoe UI',Roboto,sans-serif;color:#5a3a1a;text-shadow:0 0 3px #fff,0 0 3px #fff,1px 1px 2px #fff,-1px -1px 2px #fff,0 0 2px #fff;transform-origin:center}
 .lbl-calle::before{display:none}
 .num-wrap{background:none;border:0}
-.num-calle{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:var(--num-display,inline-flex);align-items:center;justify-content:center;padding:1px 5px;background:#fff;border:1.5px solid #8a5a2b;border-radius:7px;color:#4a2f12;font-weight:800;font-size:var(--num-size,11px);line-height:1;box-shadow:0 1px 2px rgba(0,0,0,.4);white-space:nowrap}
+.num-calle{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:var(--num-display,inline-flex);align-items:center;justify-content:center;width:calc(var(--num-size,11px) + 11px);height:calc(var(--num-size,11px) + 11px);background:#fff;border:2px solid #8a5a2b;border-radius:50%;color:#4a2f12;font-weight:800;font-size:var(--num-size,11px);line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.45);white-space:nowrap}
 .num-calle b{font-weight:600;opacity:.7;margin-right:3px;font-size:.82em;text-transform:uppercase;letter-spacing:.02em}
-.nom-calle{font-size:var(--nom-size,11px);display:var(--nom-display,inline)}
+.cll-lbl{position:absolute;left:0;top:0;transform:translate(-50%,-50%) rotate(var(--rot,0deg)) translateY(-12px);transform-origin:center;display:var(--nom-display,inline-flex);align-items:center;justify-content:center;padding:1px 6px;background:#fff;border:1.5px solid #8a5a2b;border-radius:7px;color:#4a2f12;font-weight:700;font-size:var(--nom-size,11px);line-height:1;box-shadow:0 1px 2px rgba(0,0,0,.35);white-space:nowrap}
+.cll-lbl b{font-weight:600;opacity:.7;margin-right:3px;font-size:.82em;text-transform:uppercase;letter-spacing:.02em}
 .lbl-curso{background:transparent;border:0;box-shadow:none;color:#15639a;font-style:italic;font-weight:700;font-size:11px;padding:0;white-space:nowrap;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 2px #fff}
 .lbl-curso::before{display:none}
 .lbl-salida{background:#2b8a3e;border:0;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;box-shadow:0 1px 3px rgba(0,0,0,.3)}
@@ -452,22 +453,29 @@ function enderezar(sub){   /* invierte el tramo si el texto quedaría al revés 
   if((pb.x-pa.x)<0) sub.reverse();
   return sub;
 }
+function anguloEn(pts,frac){   /* ángulo de la calle en ese punto, en grados de pantalla */
+  const a=map.latLngToLayerPoint(puntoFrac(pts,Math.max(0,frac-0.03)));
+  const b=map.latLngToLayerPoint(puntoFrac(pts,Math.min(1,frac+0.03)));
+  let ang=Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI;
+  if(ang>90)ang-=180; else if(ang<-90)ang+=180;   /* mantener el texto derecho */
+  return ang;
+}
 function etiquetarCalles(capa){
-  capa.getLayers().forEach(l=>{
+  capa.getLayers().slice().forEach(l=>{
     const p=(l.feature&&l.feature.properties)||{};
     if(esEntrada(p))return;
-    const nom=primer(p,CAMPO_CALLE); if(!nom)return;
+    const num=p.CalleNum;
+    if(num===null||num===undefined||String(num).trim()===''||typeof l.getLatLngs!=='function')return;
     const pts=ptosLinea(l); if(!pts||pts.length<2)return;
-    const txt=etiquetaCalle(nom);
     const largo=(+p.LongTramo)||largoMetros(pts);
     const n=Math.min(MAX_ETIQ_CALLE,Math.max(1,Math.ceil(largo/ESPACIADO_CALLE)));
-    subdividir(pts,n).forEach(sub=>{
-      if(!sub||sub.length<2)return;
-      enderezar(sub);
-      const pl=L.polyline(sub,{opacity:0,weight:2,interactive:false,pane:'rotuloPane'});
-      capa.addLayer(pl);
-      pl.setText(txt,{center:true,offset:OFFSET_CALLE,attributes:ATTR_CALLE});
-    });
+    for(let k=0;k<n;k++){
+      const fr=(k+0.5)/n;                          /* centro de cada tramo (lejos de las puntas) */
+      const pt=puntoFrac(pts,fr), ang=anguloEn(pts,fr);
+      capa.addLayer(L.marker(pt,{pane:'rotuloPane',interactive:false,
+        icon:L.divIcon({className:'cll-wrap',iconSize:[0,0],
+          html:'<div class="cll-lbl" style="--rot:'+ang.toFixed(1)+'deg"><b>Calle</b>'+num+'</div>'})}));
+    }
   });
 }
 /* ====== números de calle: un badge en cada punta (comienzo y fin) ====== */
@@ -598,12 +606,12 @@ function agregar(gj,clase,nombre,overlays,visible){
 function escalaNumeros(){
   const z=map.getZoom();
   let num,nom,nomD,numD;
-  if(z>=18){ num=13; nom=12; nomD='inline'; numD='inline-flex'; }
-  else if(z===17){ num=12; nom=11; nomD='inline'; numD='inline-flex'; }
-  else if(z===16){ num=11; nom=10; nomD='inline'; numD='inline-flex'; }
-  else if(z===15){ num=10; nom=10; nomD='none';   numD='inline-flex'; }
-  else if(z===14){ num=9;  nom=10; nomD='none';   numD='inline-flex'; }
-  else           { num=9;  nom=10; nomD='none';   numD='none'; }
+  if(z>=18){ num=13; nom=12; nomD='inline-flex'; numD='inline-flex'; }
+  else if(z===17){ num=12; nom=11; nomD='inline-flex'; numD='inline-flex'; }
+  else if(z===16){ num=11; nom=10; nomD='inline-flex'; numD='inline-flex'; }
+  else if(z===15){ num=10; nom=10; nomD='none';        numD='inline-flex'; }
+  else if(z===14){ num=9;  nom=10; nomD='none';        numD='inline-flex'; }
+  else           { num=9;  nom=10; nomD='none';        numD='none'; }
   const s=document.documentElement.style;
   s.setProperty('--num-size',num+'px');
   s.setProperty('--num-display',numD);
