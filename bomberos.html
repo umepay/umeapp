@@ -51,7 +51,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .rot-calle{position:absolute;left:0;top:0;white-space:nowrap;font:700 11px/1 system-ui,'Segoe UI',Roboto,sans-serif;color:#5a3a1a;text-shadow:0 0 3px #fff,0 0 3px #fff,1px 1px 2px #fff,-1px -1px 2px #fff,0 0 2px #fff;transform-origin:center}
 .lbl-calle::before{display:none}
 .num-wrap{background:none;border:0}
-.num-calle{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:var(--num-display,inline-flex);align-items:center;justify-content:center;padding:2px 8px;background:#fff;border:2px solid #8a5a2b;border-radius:9px;color:#4a2f12;font-weight:800;font-size:var(--num-size,13px);line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.45);white-space:nowrap}
+.num-calle{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:var(--num-display,inline-flex);align-items:center;justify-content:center;padding:1px 5px;background:#fff;border:1.5px solid #8a5a2b;border-radius:7px;color:#4a2f12;font-weight:800;font-size:var(--num-size,11px);line-height:1;box-shadow:0 1px 2px rgba(0,0,0,.4);white-space:nowrap}
 .num-calle b{font-weight:600;opacity:.7;margin-right:3px;font-size:.82em;text-transform:uppercase;letter-spacing:.02em}
 .lbl-curso{background:transparent;border:0;box-shadow:none;color:#15639a;font-style:italic;font-weight:700;font-size:11px;padding:0;white-space:nowrap;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 2px #fff}
 .lbl-curso::before{display:none}
@@ -87,9 +87,9 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 <div id="map"></div>
 <div class="leyenda">
   <span class="ll"><span class="sq" style="background:#7a4326"></span> Barrio</span>
-  <span class="ll"><span class="line" style="border-color:#6b3f18;border-top-width:5px"></span> Calle troncal</span>
-  <span class="ll"><span class="line" style="border-color:#9a6a3a"></span> Calle</span>
-  <span class="ll"><span class="line dash" style="border-color:#b07a45"></span> Entrada</span>
+  <span class="ll"><span class="line" style="border-color:#f3d780;border-top-width:5px"></span> Calle troncal</span>
+  <span class="ll"><span class="line" style="border-color:#ecc11f"></span> Calle</span>
+  <span class="ll"><span class="line" style="border-color:#b07a45;border-top-style:dotted;border-top-width:3px"></span> Entrada</span>
   <span class="ll"><span class="line" style="border-color:#495057;border-top-style:dotted;border-top-width:3px"></span> Peatonal</span>
   <span class="ll"><span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:#1d4ed8;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 1px rgba(0,0,0,.25)"><i class="ti ti-droplet-filled" style="color:#fff;font-size:10px"></i></span> Acopio madre</span>
   <span class="ll"><span class="line" style="border-color:#1971c2"></span> Curso de agua</span>
@@ -400,9 +400,9 @@ function esTroncal(p){const n=(p||{}).CalleNum;return n!==null&&n!==undefined&&S
 function estiloCalle(f){
   const p=f.properties||{};
   if(esPeatonal(p)) return {color:'#495057',weight:3,dashArray:'1,6',lineCap:'round'};
-  if(esEntrada(p))  return {color:'#b07a45',weight:3,dashArray:'7,5',lineCap:'round'};
-  if(esTroncal(p))  return {color:'#6b3f18',weight:6,lineCap:'round',lineJoin:'round'};
-  return {color:'#9a6a3a',weight:3.5,lineCap:'round'};
+  if(esEntrada(p))  return {color:'#b07a45',weight:3,dashArray:'2,7',lineCap:'round'};
+  if(esTroncal(p))  return {color:'#f3d780',weight:5,lineCap:'round',lineJoin:'round'};
+  return {color:'#ecc11f',weight:3.5,lineCap:'round'};
 }
 function estiloCurso(){return {color:'#1971c2',weight:2.6};}
 
@@ -413,7 +413,7 @@ function etiquetaCalle(nombre){const n=capitaliz(nombre);return TIPOVIA.test(n)?
 const ESPACIADO_CALLE=600;  /* metros por etiqueta (ajustable): más alto = menos etiquetas */
 const MAX_ETIQ_CALLE=4;     /* tope de etiquetas por calle (ajustable) */
 const ATTR_CALLE={fill:'#5a3a1a','font-weight':'700','font-size':'11','font-family':"system-ui,'Segoe UI',Roboto,sans-serif",stroke:'#ffffff','stroke-width':'3','stroke-linejoin':'round','paint-order':'stroke'};
-const OFFSET_CALLE=4;       /* px: cuánto baja el texto sobre la línea (ajustable) */
+const OFFSET_CALLE=-7;      /* px: negativo = el texto va por ENCIMA de la línea (ajustable) */
 function ptosLinea(layer){
   let ll=layer.getLatLngs();
   if(ll.length&&Array.isArray(ll[0])) ll=ll.slice().sort((a,b)=>b.length-a.length)[0]||[];
@@ -493,15 +493,12 @@ function numerarCalles(capa){
     const pts=ptosLinea(l); if(!pts||pts.length<2)return;
     const largo=(+p.LongTramo)||largoMetros(pts);
     let fracs;
-    if(largo<130){ fracs=[0.5]; }
-    else{
-      const n=Math.max(2,Math.min(MAX_NUM,Math.round(largo/ESPACIADO_NUM)+1));
-      fracs=[]; for(let k=0;k<n;k++) fracs.push(0.08+0.84*k/(n-1));  /* puntas + tramos intermedios */
-    }
+    if(largo<130){ fracs=[0.5]; }   /* calle corta: un solo número al medio */
+    else{ fracs=[0.06,0.94]; }       /* solo el número al inicio y al fin */
     fracs.forEach(fr=>{
       const pt=puntoFrac(pts,fr);
       capa.addLayer(L.marker(pt,{pane:'rotuloPane',interactive:false,
-        icon:L.divIcon({className:'num-wrap',iconSize:[0,0],html:'<div class="num-calle"><b>Calle</b>'+num+'</div>'})}));
+        icon:L.divIcon({className:'num-wrap',iconSize:[0,0],html:'<div class="num-calle">'+num+'</div>'})}));
     });
   });
 }
@@ -590,7 +587,7 @@ function agregar(gj,clase,nombre,overlays,visible){
     else if(clase==='vialProv') opts.style={color:'#e8590c',weight:3.5};
   }
   const capa=L.geoJSON(gj,opts);
-  if(clase==='calle') numerarCalles(capa);
+  if(clase==='calle'){ numerarCalles(capa); etiquetarCalles(capa); }
   if(clase==='calle'||clase==='curso'||clase==='vialProv') engrosarClicks(capa,clase);
   overlays[nombre]=capa; if(visible)capa.addTo(map);
   return capa;
@@ -600,7 +597,7 @@ function agregar(gj,clase,nombre,overlays,visible){
 function escalaNumeros(){
   const z=map.getZoom();
   let size;
-  if(z>=18) size=16; else if(z===17) size=15; else if(z===16) size=13; else if(z===15) size=12; else size=11;
+  if(z>=18) size=13; else if(z===17) size=12; else if(z===16) size=11; else if(z===15) size=10; else size=10;
   document.documentElement.style.setProperty('--num-size',size+'px');
   document.documentElement.style.setProperty('--num-display', z>=14 ? 'inline-flex' : 'none');
 }
