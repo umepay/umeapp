@@ -51,7 +51,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .rot-calle{position:absolute;left:0;top:0;white-space:nowrap;font:700 11px/1 system-ui,'Segoe UI',Roboto,sans-serif;color:#5a3a1a;text-shadow:0 0 3px #fff,0 0 3px #fff,1px 1px 2px #fff,-1px -1px 2px #fff,0 0 2px #fff;transform-origin:center}
 .lbl-calle::before{display:none}
 .num-wrap{background:none;border:0}
-.num-calle{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:var(--num-display,inline-flex);align-items:center;justify-content:center;width:calc(var(--num-size,10px) + 9px);height:calc(var(--num-size,10px) + 9px);background:#fff;border:2px solid #8a5a2b;border-radius:50%;color:#4a2f12;font-weight:800;font-size:var(--num-size,10px);line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.45);white-space:nowrap}
+.num-calle{position:absolute;left:0;top:0;transform:translate(-50%,-50%) rotate(var(--rot,0deg)) translateY(-13px) rotate(calc(-1 * var(--rot,0deg)));transform-origin:center;display:var(--num-display,inline-flex);align-items:center;justify-content:center;width:calc(var(--num-size,10px) + 9px);height:calc(var(--num-size,10px) + 9px);background:#fff;border:2px solid #8a5a2b;border-radius:50%;color:#4a2f12;font-weight:800;font-size:var(--num-size,10px);line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.45);white-space:nowrap}
 .num-calle b{font-weight:600;opacity:.7;margin-right:3px;font-size:.82em;text-transform:uppercase;letter-spacing:.02em}
 .cll-lbl{position:absolute;left:0;top:0;transform:translate(-50%,-50%) rotate(var(--rot,0deg)) translateY(-12px);transform-origin:center;display:var(--nom-display,inline-flex);align-items:center;justify-content:center;padding:1px 6px;background:#fff;border:1.5px solid #8a5a2b;border-radius:7px;color:#4a2f12;font-weight:700;font-size:var(--nom-size,11px);line-height:1;box-shadow:0 1px 2px rgba(0,0,0,.35);white-space:nowrap}
 .cll-lbl b{font-weight:600;opacity:.7;margin-right:3px;font-size:.82em;text-transform:uppercase;letter-spacing:.02em}
@@ -502,12 +502,12 @@ function numerarCalles(capa){
     const pts=ptosLinea(l); if(!pts||pts.length<2)return;
     const largo=(+p.LongTramo)||largoMetros(pts);
     let fracs;
-    if(largo<130){ fracs=[0.5]; }   /* calle corta: un solo número al medio */
-    else{ fracs=[0.06,0.94]; }       /* solo el número al inicio y al fin */
+    if(largo<130){ fracs=[0.5]; }      /* calle corta: un solo número al medio */
+    else{ fracs=[0.14,0.86]; }          /* adentrado de las puntas: no pisa el cruce/tanques */
     fracs.forEach(fr=>{
-      const pt=puntoFrac(pts,fr);
+      const pt=puntoFrac(pts,fr), ang=anguloEn(pts,fr);
       capa.addLayer(L.marker(pt,{pane:'rotuloPane',interactive:false,
-        icon:L.divIcon({className:'num-wrap',iconSize:[0,0],html:'<div class="num-calle">'+num+'</div>'})}));
+        icon:L.divIcon({className:'num-wrap',iconSize:[0,0],html:'<div class="num-calle" style="--rot:'+ang.toFixed(1)+'deg">'+num+'</div>'})}));
     });
   });
 }
