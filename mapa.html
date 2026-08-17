@@ -138,6 +138,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
       <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#0c8599" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 40H32"/><rect x="22" y="22" width="5" height="18"/><path d="M27 24L35 20"/><circle cx="27" cy="24" r="1.6" fill="#0c8599" stroke="none"/><path d="M22 28H15"/><circle cx="15" cy="33" r="1.9" fill="#0c8599" stroke="none"/></svg> Bomba</span>
       <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#1c7ed6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 33L16 20H39L36 33Z"/><path d="M20 20L17 33M27 20L25 33M34 20L33 33M13.5 26.5H37.5"/><path d="M24 33V39M20 39H28"/><circle cx="12" cy="11" r="2.5"/><path d="M12 5V7M6 11H8M16.5 6.5L15 8"/></svg> Paneles</span>
       <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16H36M24 16V38"/></svg> Bifurcación</span>
+      <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#c2255c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 40H30"/><path d="M24 40V24"/><circle cx="24" cy="19" r="5"/><path d="M20 10V6M24 9V4M28 10V6"/></svg> Venteo</span>
     </div>
     <div class="grp"><span class="glabel">Mangueras</span>
       <span class="ll"><span class="line" style="border-color:#748ffc"></span> 1/2"</span>
@@ -938,7 +939,8 @@ dique:`<svg width="32" height="32" viewBox="0 0 48 48" fill="none" stroke="#7f5b
 generador:`<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="#e8590c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="17" width="28" height="15" rx="2"/><circle cx="14" cy="24.5" r="3"/><path d="M36 21H41M12 32V35M32 32V35"/><path d="M25 19L21 25H24L22 30L28 23H25Z" fill="#e8590c" stroke="none"/></svg>`,
 bomba:`<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="#0c8599" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 40H32"/><rect x="22" y="22" width="5" height="18"/><path d="M27 24L35 20"/><circle cx="27" cy="24" r="1.6" fill="#0c8599" stroke="none"/><path d="M22 28H15"/><circle cx="15" cy="33" r="1.9" fill="#0c8599" stroke="none"/></svg>`,
 panel:`<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="#1c7ed6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 33L16 20H39L36 33Z"/><path d="M20 20L17 33M27 20L25 33M34 20L33 33M13.5 26.5H37.5"/><path d="M24 33V39M20 39H28"/><circle cx="12" cy="11" r="2.5"/><path d="M12 5V7M6 11H8M16.5 6.5L15 8"/></svg>`,
-bifur:`<svg width="22" height="22" viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16H36M24 16V38"/></svg>`
+bifur:`<svg width="22" height="22" viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16H36M24 16V38"/></svg>`,
+venteo:`<svg width="28" height="28" viewBox="0 0 48 48" fill="none" stroke="#c2255c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 40H30"/><path d="M24 40V24"/><circle cx="24" cy="19" r="5"/><path d="M20 10V6M24 9V4M28 10V6"/></svg>`
 };
 function icoSvg(key,size){return L.divIcon({html:AGUA_ICONS[key],className:'ico ico-svg',iconSize:[size,size],iconAnchor:[size/2,size/2]});}
 function aguaMarker(f,ll){
@@ -949,6 +951,7 @@ function aguaMarker(f,ll){
   if(cat.includes('bomba')) return L.marker(ll,{icon:icoSvg('bomba',30)}).bindTooltip('Bomba',{permanent:true,direction:'right',offset:[8,0],className:'lbl'});
   if(cat.includes('panel')) return L.marker(ll,{icon:icoSvg('panel',30)}).bindTooltip('Paneles',{permanent:true,direction:'left',offset:[-8,0],className:'lbl'});
   if(cat.includes('cisterna')) return L.marker(ll,{icon:icoSvg('cisterna',32)});
+  if(cat.includes('valvula')||cat.includes('venteo')) return L.marker(ll,{icon:icoSvg('venteo',28)}).bindTooltip('Venteo',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
   if(cat==='t') return L.marker(ll,{icon:icoSvg('bifur',26)});
   if(cat.includes('tanqacopio')) return L.marker(ll,{icon:icoSvg('tanqueAcopio',34)});
   if(cat.includes('acopio')) return L.marker(ll,{icon:icoSvg('acopioMadre',34)});
@@ -1047,7 +1050,7 @@ function miUbicacion(){
 }
 
 const ETIQUETAS={Barrio:'Barrio',NumParc:'Parcela N°',EstadoCat:'Estado catastral',TipoTitula:'Titularidad',Titular_es:'Titular',Umepay:'Umepay','Sup(m2)':'Superficie',Sup_ha:'Superficie',Descripcio:'Descripción',Manguera:'Manguera',TipoRed:'Red',NivelRed:'Nivel',AcopioMadr:'Acopio madre',Litros:'Litros',Observacio:'Observación',AutoBomba:'Carga autobomba',Acople:'Acople',Disponibil:'Disponibilidad',Nombre_Ref:'Referencia',LoteNro:'Lote',Propietari:'Propietario',H:'Altura',Simbolo:'Símbolo',Nombre:'Nombre',Lugar:'Lugar',Tipo:'Tipo',NOMBRE_COM:'Nombre',TIPO:'Tipo',ORDEN:'Orden',DEPARTAMEN:'Departamento',CUENCA:'Cuenca','Estado_de_':'Estado',red:'Red',rst:'Calzada',gna:'Tipo de vía'};
-const VALORES={SinRegistrar:'Sin registrar',Registrado:'Registrado',TitularUnico:'Titular único',Si:'Sí',No:'No',TanqAcopio:'Tanque acopio',TanqCasa:'Tanque casa',Acopio:'Acopio madre',Dique:'Dique','Estacion Brigada':'Estación brigada',T:'Bifurcación',Cisterna:'Cisterna',Generador:'Generador',Bomba:'Bomba',paneles:'Paneles',Paneles:'Paneles',Guardaganados:'Guardaganados'};
+const VALORES={SinRegistrar:'Sin registrar',Registrado:'Registrado',TitularUnico:'Titular único',Si:'Sí',No:'No',TanqAcopio:'Tanque acopio',TanqCasa:'Tanque casa',Acopio:'Acopio madre',Dique:'Dique','Estacion Brigada':'Estación brigada',T:'Bifurcación',Cisterna:'Cisterna',Generador:'Generador',Bomba:'Bomba',paneles:'Paneles',Paneles:'Paneles',Valvula:'Venteo',Venteo:'Venteo',Guardaganados:'Guardaganados'};
 const OCULTAR=['lote','NumParc','FID','FID_2','id','Norte','Este','x','y','EstadoCat','NivelRed'];
 const CAMPOS={
   parcela:['Barrio','Sup(m2)'],
