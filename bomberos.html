@@ -625,8 +625,10 @@ function encuadrar(){
   map.invalidateSize();
   if(ultimoBounds&&ultimoBounds.isValid()){
     const b=ultimoBounds.pad(0.01);
-    let z=map.getBoundsZoom(b,false);
-    z=Math.max(14,Math.min(17,z));
+    const anchoPC=map.getSize().x>=820;          /* pantalla ancha tipo PC */
+    /* PC: inside=true → llena el ANCHO de la pantalla (el largo se recorta); celular: entra la extensión entera */
+    let z=map.getBoundsZoom(b,anchoPC);
+    z=Math.max(anchoPC?15:14,Math.min(18,z));    /* arranca más cerca */
     map.setView(b.getCenter(),z);
   }
 }
