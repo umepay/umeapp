@@ -37,6 +37,12 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .ico{display:flex;align-items:center;justify-content:center}
 .ico i{line-height:1;text-shadow:0 0 2px #fff,0 0 3px #fff}
 .ico-svg svg{display:block;filter:drop-shadow(0 0 1.4px #fff) drop-shadow(0 0 1px #fff)}
+.leyenda-float{position:fixed;top:70px;right:12px;width:210px;max-height:72vh;overflow:auto;background:#f5f5f0;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.38);z-index:800;font-size:12px;display:none}
+.leyenda-float.abierta{display:block}
+.lf-head{position:sticky;top:0;display:flex;align-items:center;gap:8px;background:#2d5a3d;color:#fff;font-weight:700;font-size:14px;padding:9px 12px;cursor:move;border-radius:10px 10px 0 0;user-select:none;touch-action:none}
+.lf-head .lf-x{margin-left:auto;background:none;border:none;color:#cfe6d6;cursor:pointer;font-size:18px;display:flex;padding:0}
+.btn-leyenda{position:fixed;bottom:20px;left:12px;width:42px;height:42px;background:#fff;border:none;border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:790}
+.btn-leyenda i{font-size:22px;color:#2d5a3d}
 .ico-galpon i{color:#1d6fb8;font-size:22px}
 .ico-dique i{color:#7f5bd0;font-size:22px}
 .ico-gen i{color:#e8590c;font-size:20px}.ico-bomba i{color:#0c8599;font-size:20px}.ico-panel i{color:#1c7ed6;font-size:20px}
@@ -120,8 +126,11 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
   </div>
 </div>
 
-<details class="leyenda panel">
-  <summary><i class="ti ti-list-details"></i> Referencias <span class="chev">▸</span></summary>
+<div id="leyenda" class="leyenda-float abierta">
+  <div class="lf-head" id="lfHead">
+    <i class="ti ti-list-details"></i><span>Referencias</span>
+    <button class="lf-x" id="lfCerrar" title="Cerrar"><i class="ti ti-x"></i></button>
+  </div>
   <div class="items">
     <div class="grp"><span class="glabel">Parcelas</span>
       <span class="ll"><span class="sw ume"></span> Umepay</span>
@@ -135,7 +144,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
       <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#7f5bd0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M28 9Q22 24 28 41L36 41V9Z"/><path d="M8 17q3-2.5 6 0t6 0"/><path d="M8 24q3-2.5 6 0t6 0"/><path d="M8 31q3-2.5 6 0t6 0"/></svg> Dique</span>
       <span class="ll"><svg width="22" height="22" viewBox="0 0 48 48" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="30" width="38" height="4" rx="1" fill="#D3D7DA"/><rect x="4" y="16" width="22" height="15" rx="2" fill="#E53329"/><path d="M26 21H38L42 27V31H26Z" fill="#E53329"/><path d="M33 23H39L41.5 25.5V28H33Z" fill="#BFE9F5"/><path d="M29.5 21a2.6 2.6 0 0 1 5.2 0Z" fill="#F5A623"/><g stroke="#3B3B3B" stroke-width="1.9" fill="none"><path d="M6 9.5H29M6 12.7H29"/><path d="M11 12.7V16M22 12.7V16"/></g><circle cx="13" cy="35" r="5" fill="#2C2C2C"/><circle cx="13" cy="35" r="2.2" fill="#CFD3D6"/><circle cx="31" cy="35" r="5" fill="#2C2C2C"/><circle cx="31" cy="35" r="2.2" fill="#CFD3D6"/></svg> Estación brigada</span>
       <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#e8590c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="17" width="28" height="15" rx="2"/><circle cx="14" cy="24.5" r="3"/><path d="M36 21H41M12 32V35M32 32V35"/><path d="M25 19L21 25H24L22 30L28 23H25Z" fill="#e8590c" stroke="none"/></svg> Generador</span>
-      <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#0c8599" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 40H32"/><rect x="22" y="22" width="5" height="18"/><path d="M27 24L35 20"/><circle cx="27" cy="24" r="1.6" fill="#0c8599" stroke="none"/><path d="M22 28H15"/><circle cx="15" cy="33" r="1.9" fill="#0c8599" stroke="none"/></svg> Bomba</span>
+      <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#0c8599" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="21" r="11"/><path d="M25 14L19 23H24L22.5 31L30 21H25L26.5 14Z" fill="#0c8599" stroke="none"/><path d="M14 37H34"/><path d="M19 32V37M29 32V37"/></svg> Bomba</span>
       <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#1c7ed6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 33L16 20H39L36 33Z"/><path d="M20 20L17 33M27 20L25 33M34 20L33 33M13.5 26.5H37.5"/><path d="M24 33V39M20 39H28"/><circle cx="12" cy="11" r="2.5"/><path d="M12 5V7M6 11H8M16.5 6.5L15 8"/></svg> Paneles</span>
       <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16H36M24 16V38"/></svg> Bifurcación</span>
       <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#c2255c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 40H30"/><path d="M24 40V24"/><circle cx="24" cy="19" r="5"/><path d="M20 10V6M24 9V4M28 10V6"/></svg> Venteo</span>
@@ -154,7 +163,8 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
       <span class="ll"><span class="line" style="border-color:#e67e22"></span> Ruta provincial</span>
     </div>
   </div>
-</details>
+</div>
+<button id="btnLeyenda" class="btn-leyenda" title="Referencias"><i class="ti ti-list-details"></i></button>
 
 <button id="btnDescargas" class="btn-descargas panel" style="display:none">
   <i class="ti ti-download"></i> Descargas de la red <i class="ti ti-chevron-right chev-r"></i>
@@ -937,7 +947,7 @@ tanqueAcopio:`<svg width="34" height="34" viewBox="0 0 48 48" fill="none" stroke
 tanqueCasa:`<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="#d4a017" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14V12H28V14"/><ellipse cx="24" cy="16" rx="9" ry="2.8"/><path d="M15 16V32Q24 36 33 32V16"/></svg>`,
 dique:`<svg width="32" height="32" viewBox="0 0 48 48" fill="none" stroke="#7f5bd0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M28 9Q22 24 28 41L36 41V9Z"/><path d="M8 17q3-2.5 6 0t6 0"/><path d="M8 24q3-2.5 6 0t6 0"/><path d="M8 31q3-2.5 6 0t6 0"/></svg>`,
 generador:`<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="#e8590c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="17" width="28" height="15" rx="2"/><circle cx="14" cy="24.5" r="3"/><path d="M36 21H41M12 32V35M32 32V35"/><path d="M25 19L21 25H24L22 30L28 23H25Z" fill="#e8590c" stroke="none"/></svg>`,
-bomba:`<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="#0c8599" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 40H32"/><rect x="22" y="22" width="5" height="18"/><path d="M27 24L35 20"/><circle cx="27" cy="24" r="1.6" fill="#0c8599" stroke="none"/><path d="M22 28H15"/><circle cx="15" cy="33" r="1.9" fill="#0c8599" stroke="none"/></svg>`,
+bomba:`<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="#0c8599" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="21" r="11"/><path d="M25 14L19 23H24L22.5 31L30 21H25L26.5 14Z" fill="#0c8599" stroke="none"/><path d="M14 37H34"/><path d="M19 32V37M29 32V37"/></svg>`,
 panel:`<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="#1c7ed6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 33L16 20H39L36 33Z"/><path d="M20 20L17 33M27 20L25 33M34 20L33 33M13.5 26.5H37.5"/><path d="M24 33V39M20 39H28"/><circle cx="12" cy="11" r="2.5"/><path d="M12 5V7M6 11H8M16.5 6.5L15 8"/></svg>`,
 bifur:`<svg width="22" height="22" viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16H36M24 16V38"/></svg>`,
 venteo:`<svg width="28" height="28" viewBox="0 0 48 48" fill="none" stroke="#c2255c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 40H30"/><path d="M24 40V24"/><circle cx="24" cy="19" r="5"/><path d="M20 10V6M24 9V4M28 10V6"/></svg>`
@@ -951,12 +961,17 @@ function aguaMarker(f,ll){
   if(cat.includes('bomba')) return L.marker(ll,{icon:icoSvg('bomba',30)}).bindTooltip('Bomba',{permanent:true,direction:'right',offset:[8,0],className:'lbl'});
   if(cat.includes('panel')) return L.marker(ll,{icon:icoSvg('panel',30)}).bindTooltip('Paneles',{permanent:true,direction:'left',offset:[-8,0],className:'lbl'});
   if(cat.includes('cisterna')) return L.marker(ll,{icon:icoSvg('cisterna',32)});
-  if(cat.includes('valvula')||cat.includes('venteo')) return L.marker(ll,{icon:icoSvg('venteo',28)}).bindTooltip('Venteo',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
+  if(cat.includes('valvula')||cat.includes('venteo')) return L.marker(ll,{icon:icoSvg('venteo',28)});
   if(cat==='t') return L.marker(ll,{icon:icoSvg('bifur',26)});
   if(cat.includes('tanqacopio')) return L.marker(ll,{icon:icoSvg('tanqueAcopio',34)});
   if(cat.includes('acopio')) return L.marker(ll,{icon:icoSvg('acopioMadre',34)});
   if(cat.includes('casa')) return L.marker(ll,{icon:icoSvg('tanqueCasa',30)});
   return L.circleMarker(ll,{radius:6,color:'#fff',weight:2,fillColor:colorAgua(valCat(f.properties)),fillOpacity:1,pane:'puntosPane'});
+}
+/* solo se muestran los puntos de infraestructura reconocida; el resto (caño, tubo, vado, mojón, mangueras) se filtra */
+function aguaVisible(p){
+  const c=norm(valCat(p));
+  return c.includes('brigada')||c.includes('dique')||c.includes('generador')||c.includes('bomba')||c.includes('panel')||c.includes('cisterna')||c.includes('valvula')||c.includes('venteo')||c==='t'||c.includes('tanqacopio')||c.includes('acopio')||c.includes('casa');
 }
 function cruceMarker(f,ll){return L.marker(ll,{icon:icoTab('ico-cruce','ti-x',18)});}
 
@@ -1103,7 +1118,7 @@ function agregarCapa(gj,clase,nombre,overlays,visible){
       if(nom) l.bindTooltip(String(nom),{permanent:true,direction:'top',offset:[0,-10],className:'lbl-interes'});
     };
   }
-  else if(clase==='aguaPunto'){opts.pointToLayer=aguaMarker;}
+  else if(clase==='aguaPunto'){opts.pointToLayer=aguaMarker;opts.filter=f=>aguaVisible(f.properties);}
   else if(clase==='aguaLinea'){opts.style=f=>({color:colorAgua(valCat(f.properties)),weight:3});}
   else if(clase==='cruce'){opts.pointToLayer=cruceMarker;}
   else if(clase==='calle'){opts.style=estiloCalle;}
@@ -1286,6 +1301,33 @@ document.getElementById('pdCerrar').addEventListener('click',cerrarDescargas);
 pintarAcceso();
 init();
 window.addEventListener('load',()=>setTimeout(encuadrar,200));
+
+/* ---- Referencias: ventana flotante que se abre/cierra y se arrastra ---- */
+(function(){
+  const win=document.getElementById('leyenda'), head=document.getElementById('lfHead');
+  const abrir=document.getElementById('btnLeyenda'), cerrar=document.getElementById('lfCerrar');
+  if(!win||!head) return;
+  abrir.addEventListener('click',()=>win.classList.toggle('abierta'));
+  cerrar.addEventListener('click',()=>win.classList.remove('abierta'));
+  let arr=false,ox=0,oy=0;
+  function mover(e){
+    if(!arr) return;
+    let x=e.clientX-ox, y=e.clientY-oy;
+    x=Math.max(4,Math.min(window.innerWidth-win.offsetWidth-4,x));
+    y=Math.max(4,Math.min(window.innerHeight-win.offsetHeight-4,y));
+    win.style.left=x+'px'; win.style.top=y+'px';
+  }
+  function soltar(){arr=false;document.removeEventListener('pointermove',mover);document.removeEventListener('pointerup',soltar);}
+  head.addEventListener('pointerdown',e=>{
+    if(e.target.closest('.lf-x')) return;
+    arr=true;
+    const r=win.getBoundingClientRect();
+    ox=e.clientX-r.left; oy=e.clientY-r.top;
+    win.style.right='auto'; win.style.bottom='auto'; win.style.left=r.left+'px'; win.style.top=r.top+'px';
+    document.addEventListener('pointermove',mover); document.addEventListener('pointerup',soltar);
+    e.preventDefault();
+  });
+})();
 </script>
 </body>
 </html>
