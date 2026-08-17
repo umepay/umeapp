@@ -66,6 +66,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .lbl-barrio::before{display:none}
 .lbl-interes{background:rgba(240,140,0,.94);border:0;color:#fff;font-size:12px;font-weight:700;padding:2px 8px;border-radius:5px;box-shadow:0 1px 3px rgba(0,0,0,.3);white-space:nowrap}
 .lbl-interes::before{display:none}
+.popup-foto{width:100%;max-height:170px;object-fit:cover;border-radius:8px;margin-bottom:7px;display:block;background:#e9ecef}
 .popup b{font-size:15px;color:#2d5a3d;display:block;margin-bottom:4px}
 .popup .row{font-size:13px;padding:1px 0}
 .popup .k{color:#888}
@@ -1066,7 +1067,7 @@ function miUbicacion(){
 
 const ETIQUETAS={Barrio:'Barrio',NumParc:'Parcela N°',EstadoCat:'Estado catastral',TipoTitula:'Titularidad',Titular_es:'Titular',Umepay:'Umepay','Sup(m2)':'Superficie',Sup_ha:'Superficie',Descripcio:'Descripción',Manguera:'Manguera',TipoRed:'Red',NivelRed:'Nivel',AcopioMadr:'Acopio madre',Litros:'Litros',Observacio:'Observación',AutoBomba:'Carga autobomba',Acople:'Acople',Disponibil:'Disponibilidad',Nombre_Ref:'Referencia',LoteNro:'Lote',Propietari:'Propietario',H:'Altura',Simbolo:'Símbolo',Nombre:'Nombre',Lugar:'Lugar',Tipo:'Tipo',NOMBRE_COM:'Nombre',TIPO:'Tipo',ORDEN:'Orden',DEPARTAMEN:'Departamento',CUENCA:'Cuenca','Estado_de_':'Estado',red:'Red',rst:'Calzada',gna:'Tipo de vía'};
 const VALORES={SinRegistrar:'Sin registrar',Registrado:'Registrado',TitularUnico:'Titular único',Si:'Sí',No:'No',TanqAcopio:'Tanque acopio',TanqCasa:'Tanque casa',Acopio:'Acopio madre',Dique:'Dique','Estacion Brigada':'Estación brigada',T:'Bifurcación',Cisterna:'Cisterna',Generador:'Generador',Bomba:'Bomba',paneles:'Paneles',Paneles:'Paneles',Valvula:'Venteo',Venteo:'Venteo',Guardaganados:'Guardaganados'};
-const OCULTAR=['lote','NumParc','FID','FID_2','id','Norte','Este','x','y','EstadoCat','NivelRed'];
+const OCULTAR=['lote','NumParc','FID','FID_2','id','Norte','Este','x','y','EstadoCat','NivelRed','ID foto','layer','path','Campana_Fe'];
 const CAMPOS={
   parcela:['Barrio','Sup(m2)'],
   barrio:[],
@@ -1095,7 +1096,9 @@ function popup(p,clase){
   else pares=Object.entries(p).filter(([k,v])=>!vacio(v)&&!OCULTAR.includes(k));
   const filas=pares.map(([k,v])=>`<div class="row"><span class="k">${pretty(k)}:</span> ${valor(k,v)}</div>`).join('');
   const corr=FORM_URL?`<a class="corr" href="${FORM_URL}" target="_blank">Sugerir una corrección</a>`:'';
-  return `<div class="popup"><b>${titulo}</b>${filas}${corr}</div>`;
+  const fid=String(p['ID foto']||p['ID_foto']||p.foto||'').trim();
+  const foto=fid?`<a href="fotos/${fid}.jpg" target="_blank"><img class="popup-foto" src="fotos/${fid}.jpg" alt="foto del punto" loading="lazy" onerror="this.parentNode.style.display='none'"></a>`:'';
+  return `<div class="popup">${foto}<b>${titulo}</b>${filas}${corr}</div>`;
 }
 
 function agregarCapa(gj,clase,nombre,overlays,visible){

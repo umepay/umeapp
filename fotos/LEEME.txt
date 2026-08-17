@@ -1,0 +1,47 @@
+FOTOS DE LOS PUNTOS DE LA RED DE AGUA
+=====================================
+
+Acá van las fotos que se muestran en el pop-up de cada punto del mapa.
+
+REGLA DE NOMBRE (muy importante):
+El nombre del archivo tiene que ser EXACTAMENTE el valor de la columna
+"ID foto" del punto, con extensión .jpg en minúscula.
+
+  Ejemplo: el punto con ID foto = 23-20260731
+           -> el archivo debe llamarse   23-20260731.jpg
+
+Si el nombre no coincide, la foto no aparece (y el pop-up sigue andando igual,
+solo que sin imagen).
+
+Guardá las fotos en formato .jpg (minúscula). Ideal: achicarlas antes
+(ancho ~1000 px) para que pesen poco y carguen rápido en el celular.
+
+Las 28 fotos que faltan hoy (según la capa de puntos):
+  23-20260731.jpg
+  52-20260731.jpg
+  63-20260731.jpg
+  65-20260731.jpg
+  91-20260731.jpg
+  92-20260731.jpg
+  122-20260731.jpg
+  123-20260731.jpg
+  141-20260731.jpg
+  149-20260731.jpg
+  152-20260731.jpg
+  194-20260731.jpg
+  195-20260731.jpg
+  196-20260731.jpg
+  197-20260731.jpg
+  198-20260731.jpg
+  199-20260731.jpg
+  227-20260731.jpg
+  233-20260731.jpg
+  245-20260731.jpg
+  246-20260731.jpg
+  247-20260731.jpg
+  248-20260731.jpg
+  257-20260731.jpg
+  266-20260731.jpg
+  267-20260731.jpg
+  309-20260731.jpg
+  311-20260731.jpg
