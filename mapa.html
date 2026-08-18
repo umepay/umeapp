@@ -42,7 +42,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .leyenda-float.abierta{display:block}
 .lf-head{position:sticky;top:0;display:flex;align-items:center;gap:8px;background:#2d5a3d;color:#fff;font-weight:700;font-size:14px;padding:9px 12px;cursor:move;border-radius:10px 10px 0 0;user-select:none;touch-action:none}
 .lf-head .lf-x{margin-left:auto;background:none;border:none;color:#cfe6d6;cursor:pointer;font-size:18px;display:flex;padding:0}
-.btn-leyenda{position:fixed;bottom:20px;left:12px;height:42px;padding:0 15px;gap:8px;background:#fff;border:none;border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:790;font-size:14px;font-weight:600;color:#2d5a3d}
+.btn-leyenda{margin:8px 8px 0 8px;height:40px;padding:0 14px;gap:8px;background:#fff;border:none;border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#2d5a3d}
 .btn-leyenda i{font-size:20px;color:#2d5a3d}
 .ico-galpon i{color:#1d6fb8;font-size:22px}
 .ico-dique i{color:#7f5bd0;font-size:22px}
@@ -133,7 +133,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
   </div>
 </div>
 
-<div id="leyenda" class="leyenda-float abierta">
+<div id="leyenda" class="leyenda-float">
   <div class="lf-head" id="lfHead">
     <i class="ti ti-list-details"></i><span>Referencias</span>
     <button class="lf-x" id="lfCerrar" title="Cerrar"><i class="ti ti-x"></i></button>
@@ -154,7 +154,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
       <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#0c8599" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="21" r="11"/><path d="M25 14L19 23H24L22.5 31L30 21H25L26.5 14Z" fill="#0c8599" stroke="none"/><path d="M14 37H34"/><path d="M19 32V37M29 32V37"/></svg> Bomba</span>
       <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#1c7ed6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 33L16 20H39L36 33Z"/><path d="M20 20L17 33M27 20L25 33M34 20L33 33M13.5 26.5H37.5"/><path d="M24 33V39M20 39H28"/><circle cx="12" cy="11" r="2.5"/><path d="M12 5V7M6 11H8M16.5 6.5L15 8"/></svg> Paneles</span>
       <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16H36M24 16V38"/></svg> Bifurcación</span>
-      <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#c2255c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 40H30"/><path d="M24 40V24"/><circle cx="24" cy="19" r="5"/><path d="M20 10V6M24 9V4M28 10V6"/></svg> Venteo</span>
+      <span class="ll"><svg width="20" height="20" viewBox="0 0 48 48" fill="none" stroke="#1a1a1a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 31H43"/><path d="M15 25L24 31L15 37Z"/><path d="M33 25L24 31L33 37Z"/><path d="M24 31V16"/><ellipse cx="24" cy="12.5" rx="8.5" ry="3.2"/></svg> Venteo</span>
     </div>
     <div class="grp"><span class="glabel">Mangueras</span>
       <span class="ll"><span class="line" style="border-color:#748ffc"></span> 1/2"</span>
@@ -171,8 +171,6 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
     </div>
   </div>
 </div>
-<button id="btnLeyenda" class="btn-leyenda" title="Referencias"><i class="ti ti-list-details"></i><span>Referencias</span></button>
-
 <div id="fotoModal">
   <button class="fm-x" id="fmCerrar" title="Cerrar"><i class="ti ti-x"></i></button>
   <img id="fmImg" src="" alt="foto del punto"/>
@@ -882,7 +880,7 @@ const CAPAS=[
   {archivo:'data/lineas.geojson',                  nombre:'Mangueras',         clase:'aguaLinea',visible:false},
   {archivo:'data/Intersec_lineas_calles.geojson',  nombre:'Cruces agua/calle', clase:'cruce',    visible:false},
   {archivo:'data/ejes_calles_int.geojson',         nombre:'Calles',            clase:'calle',    visible:false},
-  {archivo:'data/puntos_de_interes_ume.geojson',   nombre:'Puntos de interés', clase:'interes',  visible:true},
+  {archivo:'data/puntos_de_interes_ume.geojson',   nombre:'Puntos de interés', clase:'interes',  visible:false},
   {archivo:'data/Cursos_de_agua_2021.geojson',     nombre:'Cursos de agua',    clase:'curso',    visible:false},
   {archivo:'data/red_vial_provincial.geojson',     nombre:'Ruta provincial',   clase:'vialProv', visible:true}
 ];
@@ -908,11 +906,23 @@ if(typeof OverlappingMarkerSpiderfier!=='undefined'){
   oms=new OverlappingMarkerSpiderfier(map,{keepSpiderfied:true,nearbyDistance:28,circleFootSeparation:36});
   oms.addListener('click',m=>{ L.popup({autoPan:true}).setLatLng(m.getLatLng()).setContent(m._popHTML||'').openOn(map); });
 }
+/* Botón Referencias (abajo-izq, apilado DEBAJO de Satélite) */
+const ctlLeyenda=L.control({position:'bottomleft'});
+ctlLeyenda.onAdd=function(){
+  const b=L.DomUtil.create('button','btn-leyenda');
+  b.type='button'; b.title='Referencias';
+  b.innerHTML='<i class="ti ti-list-details"></i><span>Referencias</span>';
+  L.DomEvent.disableClickPropagation(b);
+  L.DomEvent.on(b,'click',function(e){L.DomEvent.stop(e);document.getElementById('leyenda').classList.toggle('abierta');});
+  return b;
+};
+ctlLeyenda.addTo(map);
+
 let baseSat=false;
 const btnBase=L.control({position:'bottomleft'});
 btnBase.onAdd=function(){
   const d=L.DomUtil.create('div','');
-  d.style.cssText='background:#fff;border-radius:22px;box-shadow:0 1px 6px rgba(0,0,0,.4);padding:8px 14px;display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:#2d5a3d;cursor:pointer;user-select:none';
+  d.style.cssText='margin:8px;background:#fff;border-radius:22px;box-shadow:0 1px 6px rgba(0,0,0,.4);padding:8px 14px;display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:#2d5a3d;cursor:pointer;user-select:none';
   const pinta=function(){d.innerHTML='<i class="ti '+(baseSat?'ti-map':'ti-satellite')+'" style="font-size:18px"></i>'+(baseSat?'Mapa':'Satélite');};
   pinta();
   L.DomEvent.disableClickPropagation(d);
@@ -971,7 +981,7 @@ generador:`<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="#
 bomba:`<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="#0c8599" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="21" r="11"/><path d="M25 14L19 23H24L22.5 31L30 21H25L26.5 14Z" fill="#0c8599" stroke="none"/><path d="M14 37H34"/><path d="M19 32V37M29 32V37"/></svg>`,
 panel:`<svg width="30" height="30" viewBox="0 0 48 48" fill="none" stroke="#1c7ed6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 33L16 20H39L36 33Z"/><path d="M20 20L17 33M27 20L25 33M34 20L33 33M13.5 26.5H37.5"/><path d="M24 33V39M20 39H28"/><circle cx="12" cy="11" r="2.5"/><path d="M12 5V7M6 11H8M16.5 6.5L15 8"/></svg>`,
 bifur:`<svg width="22" height="22" viewBox="0 0 48 48" fill="none" stroke="#333" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16H36M24 16V38"/></svg>`,
-venteo:`<svg width="28" height="28" viewBox="0 0 48 48" fill="none" stroke="#c2255c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 40H30"/><path d="M24 40V24"/><circle cx="24" cy="19" r="5"/><path d="M20 10V6M24 9V4M28 10V6"/></svg>`
+venteo:`<svg width="22" height="22" viewBox="0 0 48 48" fill="none" stroke="#1a1a1a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 31H43"/><path d="M15 25L24 31L15 37Z"/><path d="M33 25L24 31L33 37Z"/><path d="M24 31V16"/><ellipse cx="24" cy="12.5" rx="8.5" ry="3.2"/></svg>`
 };
 function icoSvg(key,size){return L.divIcon({html:AGUA_ICONS[key],className:'ico ico-svg',iconSize:[size,size],iconAnchor:[size/2,size/2]});}
 function aguaMarker(f,ll){
@@ -982,7 +992,7 @@ function aguaMarker(f,ll){
   if(cat.includes('bomba')) return L.marker(ll,{icon:icoSvg('bomba',30)}).bindTooltip('Bomba',{permanent:true,direction:'right',offset:[8,0],className:'lbl'});
   if(cat.includes('panel')) return L.marker(ll,{icon:icoSvg('panel',30)}).bindTooltip('Paneles',{permanent:true,direction:'left',offset:[-8,0],className:'lbl'});
   if(cat.includes('cisterna')) return L.marker(ll,{icon:icoSvg('cisterna',32)});
-  if(cat.includes('valvula')||cat.includes('venteo')) return L.marker(ll,{icon:icoSvg('venteo',28)});
+  if(cat.includes('valvula')||cat.includes('venteo')) return L.marker(ll,{icon:icoSvg('venteo',22)});
   if(cat==='t') return L.marker(ll,{icon:icoSvg('bifur',26)});
   if(cat.includes('tanqacopio')) return L.marker(ll,{icon:icoSvg('tanqueAcopio',34)});
   if(cat.includes('acopio')) return L.marker(ll,{icon:icoSvg('acopioMadre',34)});
@@ -1358,9 +1368,8 @@ function verFoto(src){
 /* ---- Referencias: ventana flotante que se abre/cierra y se arrastra ---- */
 (function(){
   const win=document.getElementById('leyenda'), head=document.getElementById('lfHead');
-  const abrir=document.getElementById('btnLeyenda'), cerrar=document.getElementById('lfCerrar');
+  const cerrar=document.getElementById('lfCerrar');
   if(!win||!head) return;
-  abrir.addEventListener('click',()=>win.classList.toggle('abierta'));
   cerrar.addEventListener('click',()=>win.classList.remove('abierta'));
   let arr=false,ox=0,oy=0;
   function mover(e){
