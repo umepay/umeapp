@@ -67,7 +67,12 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 .lbl-barrio::before{display:none}
 .lbl-interes{background:rgba(240,140,0,.94);border:0;color:#fff;font-size:12px;font-weight:700;padding:2px 8px;border-radius:5px;box-shadow:0 1px 3px rgba(0,0,0,.3);white-space:nowrap}
 .lbl-interes::before{display:none}
-.popup-foto{width:100%;max-height:170px;object-fit:cover;border-radius:8px;margin-bottom:7px;display:block;background:#e9ecef}
+.popup-foto{width:100%;max-height:170px;object-fit:cover;border-radius:8px;margin-bottom:7px;display:block;background:#e9ecef;cursor:zoom-in}
+#fotoModal{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;display:none;align-items:center;justify-content:center;padding:18px}
+#fotoModal.abierto{display:flex}
+#fotoModal img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.5)}
+#fotoModal .fm-x{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.16);border:none;color:#fff;font-size:24px;width:46px;height:46px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#fotoModal .fm-tip{position:absolute;bottom:18px;left:0;right:0;text-align:center;color:#e9ecef;font-size:13px}
 .popup b{font-size:15px;color:#2d5a3d;display:block;margin-bottom:4px}
 .popup .row{font-size:13px;padding:1px 0}
 .popup .k{color:#888}
@@ -167,6 +172,12 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
   </div>
 </div>
 <button id="btnLeyenda" class="btn-leyenda" title="Referencias"><i class="ti ti-list-details"></i><span>Referencias</span></button>
+
+<div id="fotoModal">
+  <button class="fm-x" id="fmCerrar" title="Cerrar"><i class="ti ti-x"></i></button>
+  <img id="fmImg" src="" alt="foto del punto"/>
+  <div class="fm-tip">Tocá afuera o la ✕ para volver al mapa</div>
+</div>
 
 <button id="btnDescargas" class="btn-descargas panel" style="display:none">
   <i class="ti ti-download"></i> Descargas de la red <i class="ti ti-chevron-right chev-r"></i>
@@ -936,7 +947,7 @@ function colorAgua(v){v=norm(v);
   if(v.includes('1/2'))   return '#748ffc';   // 1/2''    azul claro
   if(v.includes("1'")||v==='1') return '#2b3fa8'; // 1''   azul oscuro
   if(v==='t') return '#888888';
-  return '#1d9e75';
+  return '#ffffff';   // sin representación definida → línea blanca
 }
 function valCat(p){p=p||{};return p.Descripcio||p.Manguera||p.codigo||p.Codigo||p.Tipo||'';}
 
@@ -1098,7 +1109,7 @@ function popup(p,clase){
   const filas=pares.map(([k,v])=>`<div class="row"><span class="k">${pretty(k)}:</span> ${valor(k,v)}</div>`).join('');
   const corr=FORM_URL?`<a class="corr" href="${FORM_URL}" target="_blank">Sugerir una corrección</a>`:'';
   const fid=String(p['ID foto']||p['ID_foto']||p.foto||'').trim();
-  const foto=fid?`<a href="fotos/${fid}.jpg" target="_blank"><img class="popup-foto" src="fotos/${fid}.jpg" alt="foto del punto" loading="lazy" onerror="this.parentNode.style.display='none'"></a>`:'';
+  const foto=fid?`<img class="popup-foto" src="fotos/${fid}.jpg" alt="foto del punto" loading="lazy" onclick="verFoto('fotos/${fid}.jpg')" onerror="this.style.display='none'">`:'';
   return `<div class="popup">${foto}<b>${titulo}</b>${filas}${corr}</div>`;
 }
 
@@ -1316,6 +1327,20 @@ function escalaIconos(){
   document.documentElement.style.setProperty('--ico-esc',e);
 }
 map.on('zoomend',escalaIconos); escalaIconos();
+
+/* ---- visor de fotos dentro de la app (sin abrir otra pestaña) ---- */
+function verFoto(src){
+  const m=document.getElementById('fotoModal');
+  if(!m) return;
+  document.getElementById('fmImg').src=src;
+  m.classList.add('abierto');
+}
+(function(){
+  const m=document.getElementById('fotoModal'); if(!m) return;
+  function cerrar(){m.classList.remove('abierto'); document.getElementById('fmImg').src='';}
+  m.addEventListener('click',e=>{ if(e.target===m||e.target.closest('#fmCerrar')) cerrar(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&m.classList.contains('abierto')) cerrar(); });
+})();
 
 /* ---- Referencias: ventana flotante que se abre/cierra y se arrastra ---- */
 (function(){
