@@ -1058,6 +1058,7 @@ function etiquetarCalles(capa){
 function flecharMangueras(capa){
   capa.getLayers().slice().forEach(l=>{
     if(!l.feature||typeof l.getLatLngs!=='function')return;
+    if(norm(valCat(l.feature.properties)).includes('dique'))return;   // el dique es paredón, sin flecha
     const col=colorAgua(valCat(l.feature.properties));
     const arrow=L.Symbol.arrowHead({pixelSize:10,polygon:false,pathOptions:{stroke:true,color:col,weight:2,opacity:.95}});
     const m=largoMetros(ptosLinea(l));
@@ -1157,7 +1158,7 @@ function agregarCapa(gj,clase,nombre,overlays,visible){
     };
   }
   else if(clase==='aguaPunto'){opts.pointToLayer=aguaMarker;opts.filter=f=>aguaVisible(f.properties);}
-  else if(clase==='aguaLinea'){opts.style=f=>({color:colorAgua(valCat(f.properties)),weight:3});}
+  else if(clase==='aguaLinea'){opts.style=f=>{const c=valCat(f.properties); if(norm(c).includes('dique')) return {color:'#8a8a8a',weight:8,opacity:.95,lineCap:'butt'}; return {color:colorAgua(c),weight:3};};}
   else if(clase==='cruce'){opts.pointToLayer=cruceMarker;}
   else if(clase==='calle'){opts.style=estiloCalle;}
   else if(clase==='curso'){opts.style={color:'#2b7bba',weight:2};}
