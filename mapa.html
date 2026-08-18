@@ -207,6 +207,7 @@ body{font-family:system-ui,sans-serif;color:#1a1a1a;display:flex;flex-direction:
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="assets/oms.min.js"></script>
 <script>
 /* Leaflet.PolylineDecorator (bbecquet) — flechas de dirección en mangueras */
 (function (global, factory) {
@@ -900,6 +901,13 @@ map.createPane('rotuloPane'); map.getPane('rotuloPane').style.zIndex=460; map.ge
 map.createPane('puntosPane'); map.getPane('puntosPane').style.zIndex=470;
 const calles=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:21,maxNativeZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
 const satelite=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:21,maxNativeZoom:19,attribution:'Imágenes &copy; Esri'});
+
+/* ====== tanques encimados: se abren en abanico (OverlappingMarkerSpiderfier) ====== */
+let oms=null;
+if(typeof OverlappingMarkerSpiderfier!=='undefined'){
+  oms=new OverlappingMarkerSpiderfier(map,{keepSpiderfied:true,nearbyDistance:28,circleFootSeparation:36});
+  oms.addListener('click',m=>{ L.popup({autoPan:true}).setLatLng(m.getLatLng()).setContent(m._popHTML||'').openOn(map); });
+}
 let baseSat=false;
 const btnBase=L.control({position:'bottomleft'});
 btnBase.onAdd=function(){
@@ -1114,7 +1122,11 @@ function popup(p,clase){
 }
 
 function agregarCapa(gj,clase,nombre,overlays,visible){
-  const opts={onEachFeature:(f,l)=>l.bindPopup(popup(f.properties,clase))};
+  const opts={onEachFeature:(f,l)=>{
+    const html=popup(f.properties,clase);
+    if(clase==='aguaPunto'&&oms){ l._popHTML=html; oms.addMarker(l); }   // encimados → abanico
+    else l.bindPopup(html);
+  }};
   if(clase==='parcela'){opts.style=estiloParcela;opts.pane='parcelasPane';}
   else if(clase==='barrio'){
     opts.style=estiloBarrio;
@@ -1203,6 +1215,7 @@ async function cargarProtegidas(activar){
   }
 }
 function quitarProtegidas(){
+  if(oms) oms.clearMarkers();   // sacar los puntos del abanico antes de descargarlos
   for(const c of CAPAS){
     if(!CLASES_PROTEGIDAS.includes(c.clase)) continue;
     const capa=OVERLAYS[c.nombre];
