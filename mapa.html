@@ -1090,7 +1090,7 @@ function popup(p,clase){
   else if(clase==='vialProv') titulo='Ruta provincial';
   else if(clase==='cruce') titulo='Cruce agua / calle';
   else if(clase==='calle'){const nm=p.Nombre;if(esEntrada(p)){const tp=norm(p.Tipo).includes('acceso')?'Acceso':'Entrada';titulo=nm?tp+' '+capitaliz(nm):tp;}else{titulo=nm?etiquetaCalle(nm):'Calle';}}
-  else if(clase==='aguaLinea') titulo=p.Manguera?('Manguera '+p.Manguera+' diám.'):'Línea de agua';
+  else if(clase==='aguaLinea'){const m=p.Manguera;titulo=m?(/\d/.test(String(m))?('Manguera '+m+' diám.'):capitaliz(String(m))):'Línea de agua';}
   else { const num=p.NumParc!=null?p.NumParc:p.lote; if(num!=null) titulo='Parcela '+num; else { const c=valCat(p); titulo=VALORES[c]||c||p.nombre||'Detalle'; } }
   let pares;
   if(CAMPOS[clase]) pares=CAMPOS[clase].map(k=>[k,p[k]]).filter(([k,v])=>!vacio(v));
