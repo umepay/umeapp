@@ -1064,12 +1064,16 @@ function flecharMangueras(capa){
     if(!l.feature||typeof l.getLatLngs!=='function')return;
     if(norm(valCat(l.feature.properties)).includes('dique'))return;   // el dique es paredón, sin flecha
     const col=colorAgua(valCat(l.feature.properties));
-    const arrow=L.Symbol.arrowHead({pixelSize:10,polygon:false,pathOptions:{stroke:true,color:col,weight:2,opacity:.95}});
     const m=largoMetros(ptosLinea(l));
-    const patterns = m<150
-      ? [{offset:'90%',repeat:0,symbol:arrow}]      // corta: una flecha cerca del final
-      : [{offset:'8%',repeat:90,symbol:arrow}];     // larga: flechas repetidas
-    capa.addLayer(L.polylineDecorator(l,{patterns}));
+    const mk=(color,size)=>{
+      const arrow=L.Symbol.arrowHead({pixelSize:size||10,polygon:false,pathOptions:{stroke:true,color:color,weight:2.2,opacity:1}});
+      return m<150
+        ? [{offset:'90%',repeat:0,symbol:arrow}]      // corta: una flecha cerca del final
+        : [{offset:'8%',repeat:90,symbol:arrow}];     // larga: flechas repetidas
+    };
+    const deco=L.polylineDecorator(l,{patterns:mk(col)});
+    l._deco=deco; l._decoMk=mk; l._decoCol=col;         // guardo el decorador junto a su línea
+    capa.addLayer(deco);
   });
 }
 /* área de click ancha e invisible para tocar líneas finas con el dedo */
@@ -1108,7 +1112,12 @@ function mostrarBarraLinea(p){
   barraLinea.style.display='flex';
 }
 function limpiarResaltado(){
-  if(lineaResaltada){ try{lineaResaltada.layer.setStyle(lineaResaltada.orig);}catch(e){} lineaResaltada=null; }
+  if(lineaResaltada){
+    const L0=lineaResaltada.layer;
+    try{L0.setStyle(lineaResaltada.orig);}catch(e){}
+    if(L0._deco&&L0._deco.setPatterns){ try{L0._deco.setPatterns(L0._decoMk(L0._decoCol));}catch(e){} }  // flechas a su color
+    lineaResaltada=null;
+  }
   if(barraLinea) barraLinea.style.display='none';
 }
 function resaltarLinea(l){
@@ -1117,6 +1126,7 @@ function resaltarLinea(l){
   const orig={color:o.color,weight:o.weight,opacity:(o.opacity==null?1:o.opacity),dashArray:o.dashArray,lineCap:o.lineCap};
   l.setStyle({color:'#ff2d55',weight:(orig.weight||3)+4,opacity:1});
   if(l.bringToFront)l.bringToFront();
+  if(l._deco&&l._deco.setPatterns){ l._deco.setPatterns(l._decoMk('#ffffff',13)); if(l._deco.bringToFront)l._deco.bringToFront(); }  // flechas blancas y al frente
   lineaResaltada={layer:l,orig:orig};
   mostrarBarraLinea(l.feature&&l.feature.properties);
 }
