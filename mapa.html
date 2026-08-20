@@ -990,6 +990,7 @@ function aguaMarker(f,ll){
   if(cat.includes('brigada')) return L.marker(ll,{icon:icoSvg('truck',42)});
   if(cat.includes('dique')) return L.marker(ll,{icon:icoSvg('dique',32)}).bindTooltip('Dique',{permanent:true,direction:'top',offset:[0,-2],className:'lbl'});
   if(cat.includes('generador')) return L.marker(ll,{icon:icoSvg('generador',30)}).bindTooltip('Generador',{permanent:true,direction:'bottom',offset:[0,8],className:'lbl'});
+  if(cat.includes('inversor')) return L.marker(ll,{icon:icoSvg('generador',30)}).bindTooltip('Inversor',{permanent:true,direction:'bottom',offset:[0,8],className:'lbl'});
   if(cat.includes('bomba')) return L.marker(ll,{icon:icoSvg('bomba',30)}).bindTooltip('Bomba',{permanent:true,direction:'right',offset:[8,0],className:'lbl'});
   if(cat.includes('panel')) return L.marker(ll,{icon:icoSvg('panel',30)}).bindTooltip('Paneles',{permanent:true,direction:'left',offset:[-8,0],className:'lbl'});
   if(cat.includes('cisterna')) return L.marker(ll,{icon:icoSvg('cisterna',32)});
@@ -1003,7 +1004,7 @@ function aguaMarker(f,ll){
 /* solo se muestran los puntos de infraestructura reconocida; el resto (caño, tubo, vado, mojón, mangueras) se filtra */
 function aguaVisible(p){
   const c=norm(valCat(p));
-  return c.includes('brigada')||c.includes('dique')||c.includes('generador')||c.includes('bomba')||c.includes('panel')||c.includes('cisterna')||c.includes('valvula')||c.includes('venteo')||c==='t'||c.includes('tanqacopio')||c.includes('acopio')||c.includes('casa');
+  return c.includes('brigada')||c.includes('dique')||c.includes('generador')||c.includes('inversor')||c.includes('bomba')||c.includes('panel')||c.includes('cisterna')||c.includes('valvula')||c.includes('venteo')||c==='t'||c.includes('tanqacopio')||c.includes('acopio')||c.includes('casa');
 }
 function cruceMarker(f,ll){return L.marker(ll,{icon:icoTab('ico-cruce','ti-x',18)});}
 
