@@ -1,4 +1,4 @@
-const CACHE = 'umeapp-v6';
+const CACHE = 'umeapp-v7';
 const CORE = [
   './', './index.html', './mapa.html', './bomberos.html', './cartelera.html', './gas.html', './umeblog.html',
   './acceso.js', './assets/oms.min.js',
