@@ -1124,9 +1124,9 @@ function resaltarLinea(l){
   limpiarResaltado();
   const o=l.options||{};
   const orig={color:o.color,weight:o.weight,opacity:(o.opacity==null?1:o.opacity),dashArray:o.dashArray,lineCap:o.lineCap};
-  l.setStyle({color:'#ff2d55',weight:(orig.weight||3)+4,opacity:1});
+  l.setStyle({color:'#ffd21a',weight:(orig.weight||3)+4,opacity:1});
   if(l.bringToFront)l.bringToFront();
-  if(l._deco&&l._deco.setPatterns){ l._deco.setPatterns(l._decoMk('#ffffff',13)); if(l._deco.bringToFront)l._deco.bringToFront(); }  // flechas blancas y al frente
+  if(l._deco&&l._deco.setPatterns){ l._deco.setPatterns(l._decoMk('#ffd21a',13)); if(l._deco.bringToFront)l._deco.bringToFront(); }  // flechas amarillas y al frente
   lineaResaltada={layer:l,orig:orig};
   mostrarBarraLinea(l.feature&&l.feature.properties);
 }
