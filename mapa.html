@@ -906,8 +906,9 @@ if(typeof OverlappingMarkerSpiderfier!=='undefined'){
   oms=new OverlappingMarkerSpiderfier(map,{keepSpiderfied:true,nearbyDistance:28,circleFootSeparation:36});
   oms.addListener('click',m=>{ L.popup({autoPan:true}).setLatLng(m.getLatLng()).setContent(m._popHTML||'').openOn(map); });
 }
-/* la manguera queda resaltada hasta elegir otra o tocar en un lugar vacío */
+/* la manguera queda resaltada hasta elegir otra, tocar en vacío o abrir otro popup (punto/calle) */
 map.on('click',limpiarResaltado);
+map.on('popupopen',limpiarResaltado);
 
 /* Botón Referencias (abajo-izq, apilado DEBAJO de Satélite) */
 const ctlLeyenda=L.control({position:'bottomleft'});
@@ -1080,8 +1081,9 @@ function flecharMangueras(capa){
 function engrosarClicks(capa,clase){
   capa.getLayers().slice().forEach(l=>{
     if(!l.feature||typeof l.getLatLngs!=='function')return;
-    const hit=L.polyline(l.getLatLngs(),{color:'#000',opacity:0,weight:18,pane:'hitPane',bubblingMouseEvents:false});
-    if(clase==='aguaLinea'){ hit.on('click',()=>resaltarLinea(l)); }
+    const hw=(clase==='aguaLinea')?12:18;   // mangueras: franja más angosta para que quede espacio "vacío" alrededor
+    const hit=L.polyline(l.getLatLngs(),{color:'#000',opacity:0,weight:hw,pane:'hitPane',bubblingMouseEvents:false});
+    if(clase==='aguaLinea'){ hit.on('click',()=>{ if(lineaResaltada&&lineaResaltada.layer===l) limpiarResaltado(); else resaltarLinea(l); }); }
     else{ hit.bindPopup(popup(l.feature.properties,clase)); }
     capa.addLayer(hit);
   });
