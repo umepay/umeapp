@@ -906,6 +906,9 @@ if(typeof OverlappingMarkerSpiderfier!=='undefined'){
   oms=new OverlappingMarkerSpiderfier(map,{keepSpiderfied:true,nearbyDistance:28,circleFootSeparation:36});
   oms.addListener('click',m=>{ L.popup({autoPan:true}).setLatLng(m.getLatLng()).setContent(m._popHTML||'').openOn(map); });
 }
+/* la manguera queda resaltada hasta elegir otra o tocar en un lugar vacío */
+map.on('click',limpiarResaltado);
+
 /* Botón Referencias (abajo-izq, apilado DEBAJO de Satélite) */
 const ctlLeyenda=L.control({position:'bottomleft'});
 ctlLeyenda.onAdd=function(){
@@ -1075,8 +1078,23 @@ function engrosarClicks(capa,clase){
     if(!l.feature||typeof l.getLatLngs!=='function')return;
     const hit=L.polyline(l.getLatLngs(),{color:'#000',opacity:0,weight:18,pane:'hitPane',bubblingMouseEvents:false});
     hit.bindPopup(popup(l.feature.properties,clase));
+    if(clase==='aguaLinea') hit.on('click',()=>resaltarLinea(l));
     capa.addLayer(hit);
   });
+}
+
+/* ---- resaltar una manguera para seguir su recorrido ---- */
+let lineaResaltada=null;
+function limpiarResaltado(){
+  if(lineaResaltada){ try{lineaResaltada.layer.setStyle(lineaResaltada.orig);}catch(e){} lineaResaltada=null; }
+}
+function resaltarLinea(l){
+  limpiarResaltado();
+  const o=l.options||{};
+  const orig={color:o.color,weight:o.weight,opacity:(o.opacity==null?1:o.opacity),dashArray:o.dashArray,lineCap:o.lineCap};
+  l.setStyle({weight:(orig.weight||3)+5,opacity:1});
+  if(l.bringToFront)l.bringToFront();
+  lineaResaltada={layer:l,orig:orig};
 }
 
 function distAFeature(yo,geom){let min=Infinity;(function w(c){if(Array.isArray(c)){if(typeof c[0]==='number'){const d=map.distance(yo,[c[1],c[0]]);if(d<min)min=d;}else c.forEach(w);}})(geom.coordinates);return min;}
