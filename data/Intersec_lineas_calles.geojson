@@ -43,6 +43,9 @@
 { "type": "Feature", "properties": { "Barrio": "Nogales Alto", "Nombre": null, "CalleNum": null, "Manguera": "1''" }, "geometry": { "type": "Point", "coordinates": [ -64.74778011197823, -32.195719857046655 ] } },
 { "type": "Feature", "properties": { "Barrio": "Nogales Bajo", "Nombre": "Marina", "CalleNum": null, "Manguera": "3/4''" }, "geometry": { "type": "Point", "coordinates": [ -64.7382532068074, -32.193022127045559 ] } },
 { "type": "Feature", "properties": { "Barrio": "Nogales Bajo", "Nombre": "Marina", "CalleNum": null, "Manguera": "3/4''" }, "geometry": { "type": "Point", "coordinates": [ -64.738465499790109, -32.192335949750188 ] } },
-{ "type": "Feature", "properties": { "Barrio": null, "Nombre": null, "CalleNum": null, "Manguera": null }, "geometry": { "type": "Point", "coordinates": [ -64.74603873662592, -32.193334983188279 ] } }
+{ "type": "Feature", "properties": { "Barrio": null, "Nombre": null, "CalleNum": null, "Manguera": null }, "geometry": { "type": "Point", "coordinates": [ -64.74603873662592, -32.193334983188279 ] } },
+{ "type": "Feature", "properties": { "Barrio": null, "Nombre": "RutaProv", "CalleNum": null, "Manguera": "1/2\"" }, "geometry": { "type": "Point", "coordinates": [ -64.753537651948051, -32.198955845282583 ] } },
+{ "type": "Feature", "properties": { "Barrio": null, "Nombre": "RutaProv", "CalleNum": null, "Manguera": "1\"" }, "geometry": { "type": "Point", "coordinates": [ -64.754037008238626, -32.194766079916548 ] } },
+{ "type": "Feature", "properties": { "Barrio": null, "Nombre": "RutaProv", "CalleNum": null, "Manguera": "1\"" }, "geometry": { "type": "Point", "coordinates": [ -64.752808848882708, -32.191763822275142 ] } }
 ]
 }
