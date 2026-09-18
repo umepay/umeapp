@@ -43,17 +43,17 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
   <div id="paso1" class="paso on">
     <div class="slabel" style="margin-top:0">Recarga · al 18/9/26</div>
     <div class="card" style="margin-bottom:14px">
-      <div class="row"><div class="lname">45 K (tubo alto)</div><div style="font-weight:500">$135.000</div></div>
-      <div class="row"><div class="lname">30 K</div><div style="font-weight:500">$91.000</div></div>
-      <div class="row"><div class="lname">15 K (garrafa alta)</div><div style="font-weight:500">$50.000</div></div>
-      <div class="row"><div class="lname">10 K (garrafa baja)</div><div style="font-weight:500">$37.000</div></div>
+      <div class="row"><div class="lname">45 K (tubo alto)</div><div id="pr45" style="font-weight:500">$135.000</div></div>
+      <div class="row"><div class="lname">30 K</div><div id="pr30" style="font-weight:500">$91.000</div></div>
+      <div class="row"><div class="lname">15 K (garrafa alta)</div><div id="pr15" style="font-weight:500">$50.000</div></div>
+      <div class="row"><div class="lname">10 K (garrafa baja)</div><div id="pr10" style="font-weight:500">$37.000</div></div>
       <div class="muted" style="margin-top:8px">+ $300 por transferencia · Alias: gas.centro.mejor (Norma Torres)</div>
     </div>
 
     <div class="slabel">Envases vacíos</div>
     <div class="card" style="margin-bottom:14px">
-      <div class="row"><div class="lname">45 K (tubo alto)</div><div style="font-weight:500">$250.000</div></div>
-      <div class="row"><div class="lname">15 K y 10 K (garrafa)</div><div style="font-weight:500">$160.000</div></div>
+      <div class="row"><div class="lname">45 K (tubo alto)</div><div id="env45" style="font-weight:500">$250.000</div></div>
+      <div class="row"><div class="lname">15 K y 10 K (garrafa)</div><div id="env1510" style="font-weight:500">$160.000</div></div>
       <div class="muted" style="margin-top:8px">Es solo el envase, sin la recarga. Si elegís "Tubo nuevo", el total ya suma el envase + la primera carga.</div>
     </div>
 
@@ -191,14 +191,46 @@ function filtrarLotes(){
   LOTES.filter(x=>!b||x.b===b).forEach(x=>{const o=document.createElement('option');o.value=x.l;o.textContent=x.l;sel.appendChild(o);});
   sel.value=(actual && LOTES.some(x=>x.l===actual && (!b||x.b===b))) ? actual : '';
 }
-window.addEventListener('DOMContentLoaded',function(){poblarBarrios();filtrarLotes();cargarLotes();});
+window.addEventListener('DOMContentLoaded',function(){poblarBarrios();filtrarLotes();cargarLotes();aplicarPrecios();cargarPrecios();});
 
 
 let pagoMode='efectivo', urgMode='tranquila', tipoMode='recarga', totalNum=0, pedidoActual=null;
 
+// Precios (respaldo local; se actualizan solos desde la pestaña PRECIOS APP de la planilla)
+let PRECIOS={recarga:{45:135000,30:91000,15:50000,10:37000}, envase:{45:250000,30:0,15:160000,10:160000}};
+try{ const _p=JSON.parse(localStorage.getItem('umegas_precios')||'null'); if(_p&&_p.recarga&&_p.envase) PRECIOS=_p; }catch(e){}
+
+// Trae los precios de la planilla (pestaña PRECIOS APP). Igual que los lotes: JSONP + respaldo.
+function cargarPrecios(){
+  if(!GAS_URL) return;
+  const cbName='umeprecios_'+Date.now();
+  const s=document.createElement('script');
+  const limpiar=function(){ try{delete window[cbName];}catch(e){window[cbName]=undefined;} if(s.parentNode) s.parentNode.removeChild(s); };
+  window[cbName]=function(obj){
+    limpiar();
+    if(obj && obj.recarga && obj.envase){
+      PRECIOS=obj;
+      try{ localStorage.setItem('umegas_precios', JSON.stringify(obj)); }catch(e){}
+      aplicarPrecios();
+    }
+  };
+  s.onerror=limpiar;
+  s.src=GAS_URL+'?accion=precios&callback='+cbName+'&t='+Date.now();
+  document.body.appendChild(s);
+}
+// Refleja los precios en las tarjetas de pantalla y recalcula el total.
+function aplicarPrecios(){
+  const p=PRECIOS.recarga, env=PRECIOS.envase;
+  const f=function(n){ return '$'+(+n||0).toLocaleString('es-AR'); };
+  const set=function(id,v){ const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('pr45',f(p[45])); set('pr30',f(p[30])); set('pr15',f(p[15])); set('pr10',f(p[10]));
+  set('env45',f(env[45])); set('env1510',f(env[15]));
+  calcGas();
+}
+
 function calcGas(){
-  const p={45:135000,30:91000,15:50000,10:37000};
-  const env={45:250000,30:0,15:160000,10:160000};   // envase vacío (0 = sin precio publicado)
+  const p=PRECIOS.recarga;
+  const env=PRECIOS.envase;   // envase vacío (0 = sin precio publicado)
   const c={45:+document.getElementById('g45').value||0, 30:+document.getElementById('g30').value||0,
            15:+document.getElementById('g15').value||0, 10:+document.getElementById('g10').value||0};
   const nuevo = tipoMode==='nuevo';
@@ -206,7 +238,7 @@ function calcGas(){
   [45,30,15,10].forEach(function(t){
     if(!c[t]) return;
     if(nuevo && !env[t]) sinPrecio=true;
-    totalNum += c[t] * (p[t] + (nuevo ? env[t] : 0));
+    totalNum += c[t] * ((+p[t]||0) + (nuevo ? (+env[t]||0) : 0));
   });
   if(totalNum>0 && pagoMode==='transferencia') totalNum+=300;
   const box=document.getElementById('total-gas');

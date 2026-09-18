@@ -42,6 +42,11 @@ function doGet(e){
     return ContentService.createTextOutput(cb + '(' + JSON.stringify(leerLotes()) + ')')
       .setMimeType(ContentService.MimeType.JAVASCRIPT);
   }
+  if(p.accion === 'precios'){
+    const cb = p.callback || 'callback';
+    return ContentService.createTextOutput(cb + '(' + JSON.stringify(leerPrecios()) + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
   return ContentService.createTextOutput('UmeGas OK').setMimeType(ContentService.MimeType.TEXT);
 }
 
@@ -228,6 +233,38 @@ function seedLotes(){
   const LOTES = [{"l": "1. Mauro y Lucy", "b": "Aldea"}, {"l": "2. Eugenia y Sergio", "b": "Aldea"}, {"l": "3. Barro Tal Vez (Batá)", "b": "Aldea"}, {"l": "4. Acros (Coni+Rodri+Bambú)", "b": "Aldea"}, {"l": "5. Casa Kurry", "b": "Aldea"}, {"l": "6. Cris Porto", "b": "Aldea"}, {"l": "7. Danila Tōshin y Noe", "b": "Aldea"}, {"l": "8. Amrit", "b": "Aldea"}, {"l": "9. Ceci Estenssoro", "b": "Aldea"}, {"l": "10. Ana Estenssoro", "b": "Aldea"}, {"l": "11. Santi Calvo", "b": "Aldea"}, {"l": "12. Jorge Estenssoro", "b": "Aldea"}, {"l": "13. Julieta y Robert", "b": "Aldea"}, {"l": "14. Maru y Eze (Domo)", "b": "Aldea"}, {"l": "15. Luciana (Ex Nacho)", "b": "Aldea"}, {"l": "16. Roberto Gallelli", "b": "Aldea"}, {"l": "17. Ademir", "b": "Aldea"}, {"l": "18. María Elena", "b": "Aldea"}, {"l": "19. Stephy y Mauro", "b": "Aldea"}, {"l": "20. Nati Tevelez", "b": "Aldea"}, {"l": "21. Mica Jere y Quimey", "b": "Aldea"}, {"l": "22. Casa Colibrí", "b": "Aldea"}, {"l": "23. Lau Petrolo (TheoLab)", "b": "Aldea"}, {"l": "24. Mati Echeguren", "b": "Aldea"}, {"l": "25. Caro y Ger (DeJa)", "b": "Aldea"}, {"l": "26. Ana Altavista", "b": "Aldea"}, {"l": "27. Bavali", "b": "Nogales Alto"}, {"l": "28. Obrador 100T", "b": "Nogales Alto"}, {"l": "29. Fran Fabre", "b": "Nogales Alto"}, {"l": "30. Caro Martin y Aaron", "b": "Nogales Alto"}, {"l": "31. Tonga", "b": "Nogales Alto"}, {"l": "32. Daphne (Emilse)", "b": "Nogales Alto"}, {"l": "33. Ceci Gus Haruki Akemi", "b": "Nogales Alto"}, {"l": "34. Vivi", "b": "Nogales Alto"}, {"l": "35. Nico Villa", "b": "Nogales Alto"}, {"l": "36. Pau (Titi Pañalera)", "b": "Nogales Alto"}, {"l": "37. Tristán", "b": "Nogales Alto"}, {"l": "38. Mario Paixao", "b": "Nogales Alto"}, {"l": "39. Maga de Masi", "b": "Nogales Alto"}, {"l": "40. Carla Lucas Raiza", "b": "Nogales Alto"}, {"l": "41. Gina y Noe", "b": "Nogales Alto"}, {"l": "42. Vale Bai", "b": "Nogales Alto"}, {"l": "43. Casa 4F", "b": "Nogales Bajo"}, {"l": "44. Fran Herni y Feli (Renoleta)", "b": "Nogales Bajo"}, {"l": "45. Marcelo y Mariana (ikonicoff)", "b": "Nogales Bajo"}, {"l": "46. Eli Lucho Luz y Tomoteo", "b": "Nogales Bajo"}, {"l": "47. Ro Ari Andina Marino", "b": "Nogales Bajo"}, {"l": "48. Graciela Varela (Gaby)", "b": "Nogales Bajo"}, {"l": "49. Rodri Rasta", "b": "Nogales Bajo"}, {"l": "50. Casa Aurora", "b": "Nogales Bajo"}, {"l": "51. Marina Britos (Ford Roja)", "b": "Nogales Bajo"}, {"l": "52. Agos Espeche (Debora)", "b": "Acacias"}, {"l": "53. Daniela Dewey", "b": "Acacias"}, {"l": "54. Juan Dixon", "b": "Acacias"}, {"l": "55. Eze Molina", "b": "Acacias"}, {"l": "56. Magda Chattah", "b": "Acacias"}, {"l": "57. Julieta Nacho Silvestre", "b": "Acacias"}, {"l": "58. Guille Morano", "b": "Espinillos"}, {"l": "59. Martin Corral", "b": "Espinillos"}, {"l": "60. Cami Joaco Selva", "b": "Espinillos"}, {"l": "61. Clari Canale", "b": "Espinillos"}, {"l": "62. Lau Dillon (Aixa)", "b": "Espinillos"}, {"l": "63. Ger Vidal Haan", "b": "Espinillos"}, {"l": "64. Nina+Tomy (Coni Soria)", "b": "Espinillos"}, {"l": "65. Anabella Osky y Aloe", "b": "Espinillos"}, {"l": "66. Sen de Campo (Despensa)", "b": "Cosecha"}, {"l": "67. Cintya y Orión", "b": "Cosecha"}, {"l": "68. Luna (Fondo izquierda)", "b": "Cosecha"}, {"l": "69. Seba Panero (Fondo derecha)", "b": "Cosecha"}, {"l": "70. Maru Mati y León", "b": "Arroyo del Sauce"}, {"l": "71. Carlitos", "b": "Arroyo del Sauce"}, {"l": "72. Belén", "b": "Arroyo del Sauce"}, {"l": "73. Adri", "b": "Arroyo del Sauce"}, {"l": "74. Ulises", "b": "Arroyo del Sauce"}, {"l": "75. Ornella (La Vieja Osada)", "b": "Arroyo del Sauce"}, {"l": "76. Erci", "b": "Arroyo del Sauce"}, {"l": "77. Natacha", "b": "Arroyo del Sauce"}, {"l": "78. Siembra Dicha", "b": "Nogales Alto"}, {"l": "79. Oficina 100T", "b": "Nogales Alto"}, {"l": "80. Ceci Sonzini", "b": "Castaños"}, {"l": "81. Mara", "b": "Castaños"}, {"l": "82. Leo Miraglia", "b": "Castaños"}, {"l": "83. Carolina (3R)", "b": "Tres Rios"}, {"l": "84. Lindsay y Mati (Dutto)", "b": "Tres Rios"}, {"l": "85. Milly Hirschon (3R)", "b": "Tres Rios"}, {"l": "86. Cabaña Pileta (La Vic)", "b": "La Victoria"}, {"l": "87. Cabaña Medio (La Vic)", "b": "La Victoria"}, {"l": "88. Cabaña Fondo (La Vic)", "b": "La Victoria"}, {"l": "92. Coles", "b": "Nogales Bajo"}, {"l": "93. Magui Riachi", "b": "Nogales Alto"}, {"l": "94. Rochi Juampi Awara", "b": "Nogales Alto"}, {"l": "95. Laura Kalauz (3R)", "b": "Tres Rios"}, {"l": "96. Clara Terán (3R)", "b": "Tres Rios"}, {"l": "97. Fran Barlett", "b": "Castaños"}, {"l": "98. Ikonikoff Acacias", "b": "Acacias"}, {"l": "99. La Audelina (Casa Principal fondo)", "b": "La Audelina"}, {"l": "100. Nati Damo Nina Simón", "b": "Aldea"}, {"l": "101. Tiny House (Ikonikoff Acacias)", "b": "Acacias"}, {"l": "102. Escuela Umepay", "b": "Nogales Alto"}, {"l": "103. Lu y Fede (Entrando a Kurry)", "b": "Aldea"}, {"l": "104. Johy (entre Bavali y Tristan)", "b": "Nogales Alto"}, {"l": "105. Magda Zucchi", "b": "Aldea"}, {"l": "106. Chacra Alimento", "b": "Nogales Alto"}, {"l": "107. Vicente Nadal", "b": "Aldea"}, {"l": "108. Gise (Nueva en 3 Ríos)", "b": "Tres Rios"}, {"l": "109. Rosa María (Lucio)", "b": ""}, {"l": "110. Oficina Pueblo Vivo", "b": "Cosecha"}, {"l": "111. Martín Corral (Flor/Pela)", "b": "Espinillos"}, {"l": "112. Mercedes Taranto", "b": "Aldea"}, {"l": "113. Robert (Casa Amor)", "b": "Aldea"}, {"l": "114. Mariano Quiroga", "b": "Tres Rios"}, {"l": "115. Mario Chacón (Lote Hugo)", "b": ""}, {"l": "116. JuliZyk", "b": "Aldea"}, {"l": "117. Coni Guevara", "b": "Paraje de los Guachos"}, {"l": "118. Nico Moner", "b": "Paraje de los Guachos"}];
   const filas = LOTES.map(function(x){ return [x.l, x.b]; });
   h.getRange(2, 1, filas.length, 2).setValues(filas);
+}
+
+// ===== Precios editables desde la pestaña "PRECIOS APP" =====================
+// Layout esperado (tolerante): una fila por tamaño con
+//   Columna A = tamaño (45 / 30 / 15 / 10)  ·  B = recarga  ·  C = envase vacío
+// Se ignoran títulos y encabezados: sólo se leen las filas cuya col. A es un
+// tamaño conocido. Si falta la hoja o algún valor, se usa el respaldo (DEF).
+function leerPrecios(){
+  const DEF = { recarga:{45:135000,30:91000,15:50000,10:37000},
+                envase:{45:250000,30:0,15:160000,10:160000} };
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const h = ss.getSheetByName('PRECIOS APP');
+  if(!h) return DEF;
+  const ult = h.getLastRow();
+  if(ult < 1) return DEF;
+  const vals = h.getRange(1, 1, ult, 3).getValues();
+  const soloNum = function(v){ const n = parseInt(String(v).replace(/[^0-9]/g,''), 10); return isNaN(n) ? null : n; };
+  const rec = {}, env = {};
+  for(let i = 0; i < vals.length; i++){
+    const t = soloNum(vals[i][0]);
+    if(t !== 45 && t !== 30 && t !== 15 && t !== 10) continue;   // saltea título/encabezados
+    const r = soloNum(vals[i][1]);
+    const e = soloNum(vals[i][2]);
+    if(r) rec[t] = r;
+    env[t] = e || 0;
+  }
+  if(!Object.keys(rec).length) return DEF;                       // hoja vacía/rota → respaldo
+  [45,30,15,10].forEach(function(k){                             // completar faltantes con DEF
+    if(!rec[k]) rec[k] = DEF.recarga[k];
+    if(env[k] == null) env[k] = DEF.envase[k];
+  });
+  return { recarga: rec, envase: env };
 }
 
 function ok(){
