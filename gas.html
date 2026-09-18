@@ -43,8 +43,8 @@ body{font-family:system-ui,sans-serif;background:#f5f5f0;color:#1a1a1a;max-width
   <div id="paso1" class="paso on">
     <div class="slabel" style="margin-top:0">Recarga · al 1/7/26</div>
     <div class="card" style="margin-bottom:14px">
-      <div class="row"><div class="lname">45 K (tubo alto)</div><div style="font-weight:500">$125.000</div></div>
-      <div class="row"><div class="lname">30 K</div><div style="font-weight:500">$85.000</div></div>
+      <div class="row"><div class="lname">45 K (tubo alto)</div><div style="font-weight:500">$135.000</div></div>
+      <div class="row"><div class="lname">30 K</div><div style="font-weight:500">$91.000</div></div>
       <div class="row"><div class="lname">15 K (garrafa alta)</div><div style="font-weight:500">$50.000</div></div>
       <div class="row"><div class="lname">10 K (garrafa baja)</div><div style="font-weight:500">$37.000</div></div>
       <div class="muted" style="margin-top:8px">+ $300 por transferencia · Alias: gas.centro.mejor (Norma Torres)</div>
@@ -197,7 +197,7 @@ window.addEventListener('DOMContentLoaded',function(){poblarBarrios();filtrarLot
 let pagoMode='efectivo', urgMode='tranquila', tipoMode='recarga', totalNum=0, pedidoActual=null;
 
 function calcGas(){
-  const p={45:125000,30:85000,15:50000,10:37000};
+  const p={45:135000,30:91000,15:50000,10:37000};
   const env={45:250000,30:0,15:160000,10:160000};   // envase vacío (0 = sin precio publicado)
   const c={45:+document.getElementById('g45').value||0, 30:+document.getElementById('g30').value||0,
            15:+document.getElementById('g15').value||0, 10:+document.getElementById('g10').value||0};
