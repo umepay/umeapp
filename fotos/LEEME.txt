@@ -10,13 +10,19 @@ El nombre del archivo tiene que ser EXACTAMENTE el valor de la columna
   Ejemplo: el punto con ID foto = 23-20260731
            -> el archivo debe llamarse   23-20260731.jpg
 
+El formato es   <nro de punto>-<fecha AAAAMMDD>   (con guión).
+Por eso un mismo nro de punto de dos relevamientos distintos NO choca:
+cambia la fecha (ej. 63-20260731.jpg y 63-20260918.jpg conviven).
+
 Si el nombre no coincide, la foto no aparece (y el pop-up sigue andando igual,
-solo que sin imagen).
+solo que sin imagen). Para que se vea, el punto en la capa (puntos.geojson)
+tiene que tener la columna "ID foto" con ese mismo valor.
 
 Guardá las fotos en formato .jpg (minúscula). Ideal: achicarlas antes
 (ancho ~1000 px) para que pesen poco y carguen rápido en el celular.
 
-Las 28 fotos que faltan hoy (según la capa de puntos):
+
+RELEVAMIENTO INICIAL (fecha 20260731) - 28 fotos:
   23-20260731.jpg
   52-20260731.jpg
   63-20260731.jpg
@@ -45,3 +51,64 @@ Las 28 fotos que faltan hoy (según la capa de puntos):
   267-20260731.jpg
   309-20260731.jpg
   311-20260731.jpg
+
+BARRIO ALDEA (fecha 20260918) - 59 fotos:
+  62-20260918.jpg
+  63-20260918.jpg
+  64-20260918.jpg
+  92-20260918.jpg
+  106-20260918.jpg
+  107-20260918.jpg
+  109-20260918.jpg
+  116-20260918.jpg
+  117-20260918.jpg
+  157-20260918.jpg
+  158-20260918.jpg
+  159-20260918.jpg
+  160-20260918.jpg
+  161-20260918.jpg
+  162-20260918.jpg
+  163-20260918.jpg
+  164-20260918.jpg
+  165-20260918.jpg
+  166-20260918.jpg
+  181-20260918.jpg
+  182-20260918.jpg
+  183-20260918.jpg
+  184-20260918.jpg
+  188-20260918.jpg
+  189-20260918.jpg
+  197-20260918.jpg
+  198-20260918.jpg
+  199-20260918.jpg
+  200-20260918.jpg
+  265-20260918.jpg
+  266-20260918.jpg
+  277-20260918.jpg
+  285-20260918.jpg
+  286-20260918.jpg
+  302-20260918.jpg
+  306-20260918.jpg
+  307-20260918.jpg
+  308-20260918.jpg
+  309-20260918.jpg
+  310-20260918.jpg
+  334-20260918.jpg
+  337-20260918.jpg
+  338-20260918.jpg
+  339-20260918.jpg
+  340-20260918.jpg
+  341-20260918.jpg
+  342-20260918.jpg
+  343-20260918.jpg
+  360-20260918.jpg
+  365-20260918.jpg
+  366-20260918.jpg
+  367-20260918.jpg
+  368-20260918.jpg
+  397-20260918.jpg
+  398-20260918.jpg
+  447-20260918.jpg
+  466-20260918.jpg
+  469-20260918.jpg
+  470-20260918.jpg
