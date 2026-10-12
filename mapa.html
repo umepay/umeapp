@@ -955,7 +955,7 @@ function estiloParcela(f){
   return {color:base,weight:1.5,dashArray:null,fillColor:base,fillOpacity:ume?0.30:0.10};
 }
 function estiloBarrio(){return {color:'#7a4326',weight:1.6,dashArray:'4,4',fillColor:'#c79a6a',fillOpacity:0.10};}
-function colorAgua(v){v=norm(v);
+function colorAgua(v){v=norm(v).replace(/"/g,"'");   // 1" y 1'' se tratan igual (comilla doble = dos simples)
   if(v.includes('casa')) return '#d4a017';
   if(v.includes('tanqacopio')) return '#2e9e54';
   if(v.includes('acopio')) return '#1d4ed8';
